@@ -47,6 +47,8 @@ Authentication: Django Auth
 
 📂 Project Structure
   * NEED PAG SCREENSHOT *
+
+
 ⚡ Installation & Setup
 🔹 Prerequisites
 
