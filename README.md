@@ -46,22 +46,7 @@ Authentication: Django Auth
 
 
 📂 Project Structure
-ReelTime/
-│── backend/           # Django project (API + Admin)
-│   ├── movies/        # Movies, schedules, bookings apps
-│   ├── users/         # Authentication & user management
-│   ├── settings.py    # Django settings
-│
-│── frontend/          # React app
-│   ├── src/
-│   │   ├── components/ # Reusable UI components
-│   │   ├── pages/      # Login, Movies, Booking, Admin
-│   │   ├── services/   # API calls
-│   │   └── App.js
-│
-│── docs/              # Documentation
-│── README.md
-
+  * NEED PAG SCREENSHOT *
 ⚡ Installation & Setup
 🔹 Prerequisites
 
