@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+gitignore 
+
+>>>>>>> 8451380 (added .gitignore file)
 # Python bytecode files 
 
 __pycache__/ 
