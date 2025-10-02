@@ -37,10 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-<<<<<<< HEAD
     'reel_time',
-=======
->>>>>>> d349c3e3be46cfb1132e29a404061902713d3598
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
