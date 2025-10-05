@@ -3,22 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Reel Time</title>
+    <title>Login</title>
 </head>
 <body>
-    <h1>Login to Reel Time</h1>
-    <form method="post">
+    <h1>Login</h1>
+    
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li style="color: '{% if message.tags == 'error' %}'red'{% else %}'green'{% endif %}';">
+                {{ message }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="POST">
         {% csrf_token %}
-        <label for="id_username">Username:</label>
-        <input type="text" name="username" id="id_username" required><br><br>
-
-        <label for="id_password">Password:</label>
-        <input type="password" name="password" id="id_password" required><br><br>
-
+        <p>
+            <label for="id_username_or_email">Username or Email:</label>
+            <input type="text" name="username_or_email" id="id_username_or_email" required>
+        </p>
+        <p>
+            <label for="id_password">Password:</label>
+            <input type="password" name="password" id="id_password" required>
+        </p>
         <button type="submit">Login</button>
     </form>
 
     <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
-    <p><a href="{% url 'home' %}">Back to Home</a></p>
+    <p><a href="{% url 'index' %}">Back to Home</a></p>
 </body>
 </html>
