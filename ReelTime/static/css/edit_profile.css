@@ -1,0 +1,83 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9f6f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.edit-container {
+  background-color: #ffffff;
+  padding: 2rem 3rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 400px;
+}
+
+h1 {
+  color: #c73e1d;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+input {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+input:focus {
+  border-color: #c73e1d;
+  outline: none;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.btn {
+  background-color: #c73e1d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: #a32f15;
+}
+
+.btn.cancel {
+  background-color: #555;
+}
+
+.btn.cancel:hover {
+  background-color: #333;
+}

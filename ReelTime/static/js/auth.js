@@ -14,18 +14,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Login form submission
   const loginForm = document.getElementById("loginForm")
   if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault()
-      const email = document.getElementById("email").value
-      const password = document.getElementById("password").value
+  loginForm.addEventListener("submit", (e) => {
+    const usernameOrEmail = document.getElementById("username_or_email").value
+    const password = document.getElementById("password").value
 
-      if (email && password) {
-        alert(`Welcome back! Logging in as ${email}`)
-        // Clear form
-        loginForm.reset()
-      }
-    })
-  }
+    if (!usernameOrEmail || !password) {
+      e.preventDefault()  // Prevent form submission
+      alert("Please fill in both fields before signing in.")
+    }
+    // Otherwise, allow normal form submission to Django
+  })
+}
 
   // Register form submission
   const registerForm = document.getElementById("registerForm")

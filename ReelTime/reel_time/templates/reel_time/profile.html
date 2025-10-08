@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+  <div class="profile-container">
+    <h1>User Profile</h1>
+    <div class="profile-card">
+      <div class="profile-field">
+        <label>First Name:</label>
+        <span>{{ user.first_name }}</span>
+      </div>
+
+      <div class="profile-field">
+        <label>Last Name:</label>
+        <span>{{ user.last_name }}</span>
+      </div>
+
+      <div class="profile-field">
+        <label>Username:</label>
+        <span>{{ user.username }}</span>
+      </div>
+
+      <div class="profile-field">
+        <label>Email:</label>
+        <span>{{ user.email }}</span>
+      </div>
+
+      <div class="profile-field">
+        <label>Phone Number:</label>
+        <span>{{ user.phone_number }}</span>
+      </div>
+
+      <div class="profile-actions">
+        <a href="{% url 'dashboard' %}" class="btn">Back to Dashboard</a>
+        <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
+        <a href="{% url 'logout' %}" class="btn logout">Logout</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
