@@ -8,4 +8,6 @@ urlpatterns = [
     path('register/', views.register_user, name='register'),  # Registration URL
     path('dashboard/', views.dashboard, name='dashboard'),  # Dashboard URL
     path('logout/', views.logout_user, name='logout'),  # Logout URL
+    path('profile/', views.profile_view, name='profile'),  # Profile URL
+    path('profile/edit/', views.edit_profile, name='edit_profile'), # Edit Profile URL
 ]

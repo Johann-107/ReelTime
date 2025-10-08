@@ -1,5 +1,4 @@
 // Coming Soon movies data and rendering
-
 const comingSoonMovies = [
   {
     id: 101,
@@ -8,7 +7,7 @@ const comingSoonMovies = [
     rating: "N/A",
     duration: "2h 25m",
     releaseDate: "March 15, 2025",
-    poster: `${staticUrl}images/futuristic-sci-fi-movie-poster-quantum-paradox.jpg`,
+    poster: `${STATIC_URL}images/futuristic-sci-fi-movie-poster-quantum-paradox.jpg`,
     description: "A mind-bending journey through parallel universes",
   },
   {
@@ -18,7 +17,7 @@ const comingSoonMovies = [
     rating: "N/A",
     duration: "2h 10m",
     releaseDate: "March 22, 2025",
-    poster: `${staticUrl}images/action-movie-poster-desert-kings.jpg`,
+    poster: `${STATIC_URL}images/action-movie-poster-desert-kings.jpg`,
     description: "An epic tale of survival in the unforgiving desert",
   },
   {
@@ -28,7 +27,7 @@ const comingSoonMovies = [
     rating: "N/A",
     duration: "1h 50m",
     releaseDate: "April 5, 2025",
-    poster: `${staticUrl}images/romantic-movie-poster-midnight-melody.jpg`,
+    poster: `${STATIC_URL}images/romantic-movie-poster-midnight-melody.jpg`,
     description: "A love story that transcends time and space",
   },
 ];
