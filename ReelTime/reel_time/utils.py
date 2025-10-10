@@ -1,0 +1,19 @@
+from .models import User
+from django.contrib.auth.hashers import make_password
+
+def create_default_admin(cinema_name):
+    # Convert spaces in cinema name to underscores
+    safe_cinema_name = cinema_name.lower().replace(' ', '_')
+    
+    admin = User.objects.create(
+        first_name='Cinema',
+        last_name='Admin',
+        username=f"{safe_cinema_name}_admin",
+        email=f"{safe_cinema_name}@cinema.com",
+        phone_number='0000000000',
+        password=make_password('admin123'),
+        is_admin=True,
+        must_change_password=True,
+        cinema_name=cinema_name
+    )
+    return admin
