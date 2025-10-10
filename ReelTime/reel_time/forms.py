@@ -22,5 +22,5 @@ class RegistrationForm(forms.ModelForm):
         confirm = cleaned_data.get('confirm_password')
         if password and confirm and password != confirm:
             raise ValidationError("Passwords do not match")
-        cleaned_data['password'] = make_password(password)  # hash password
+        # cleaned_data['password'] = make_password(password)  # hash password
         return cleaned_data

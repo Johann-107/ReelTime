@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Admin</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create Default Admin</h1>
+        {% if messages %}
+        {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+        {% csrf_token %}
+        <label for="cinema_name">Cinema Name:</label>
+        <input type="text" name="cinema_name" id="cinema_name" required>
+
+        <button type="submit">Create Admin</button>
+        </form>
+
+        <a href="{% url 'login' %}">Back to Login</a>
+    </div>
+</body>
+</html>
