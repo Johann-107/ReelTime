@@ -58,7 +58,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'reeltime.urls'
+ROOT_URLCONF = 'ReelTime.urls'
 
 TEMPLATES = [
     {
@@ -75,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'reeltime.wsgi.application'
+WSGI_APPLICATION = 'ReelTime.wsgi.application'
 
 
 # Database
@@ -135,5 +135,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirect after login
-LOGIN_REDIRECT_URL = '/'   # Go to home page after login
+LOGIN_REDIRECT_URL = '/dashboards/user-dashboard/'
 LOGOUT_REDIRECT_URL = '/'  # Go to home page after logout

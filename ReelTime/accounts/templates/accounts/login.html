@@ -6,6 +6,7 @@
     <title>Login</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <header class="header">
@@ -16,7 +17,7 @@
                         <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                         <line x1="7" y1="2" x2="7" y2="22"></line>
                         <line x1="17" y1="2" x2="17" y2="22"></line>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <line x1="2" y1="12" x2="22" y2="12" stroke="#e8b923"></line> 
                         <line x1="2" y1="7" x2="7" y2="7"></line>
                         <line x1="2" y1="17" x2="7" y2="17"></line>
                         <line x1="17" y1="17" x2="22" y2="17"></line>
@@ -25,19 +26,20 @@
                     <span>ReelTime</span>
                 </a>
                 <nav class="nav">
-                    <a href="{% url 'index' %}" class="nav-link">Home</a>
-                    <a href="{% url 'index' %}" class="nav-link">Movies</a> <!-- movies.html -->
-                    <a href="{% url 'index' %}" class="nav-link">My Bookings</a> <!-- bookings.html -->
+                <a href="{% url 'index' %}" class="nav-link">Home</a>                
+                <a href="{% url 'movies' %}" class="nav-link">Movies</a>               
+                <a href="{% url 'index' %}" class="nav-link">About</a>              
                 </nav>
             </div>
             <div class="header-right">
                 <a href="{% url 'login' %}" class="btn btn-ghost">Sign In</a>
-                <a href="{% url 'index' %}" class="btn btn-accent">Book Now</a> <!-- movies.html -->
+                <a href="{% url 'register' %}" class="btn btn-accent">Get Started</a> 
             </div>
         </div>
     </header>
 
-     <main class="auth-page">
+    <main class="auth-page">
+        {# ... Rest of the page content ... #}
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}
@@ -51,7 +53,7 @@
                 <p class="auth-description">Sign in to your ReelTime account</p>
             </div>
             <div class="card-content">
-                <form id="loginForm" class="auth-form" method="POST">
+                <form id="loginForm" class="auth-form" method="POST" action="{% url 'login' %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="username_or_email" class="form-label">Email</label>
@@ -74,7 +76,7 @@
                             <input type="checkbox" id="remember" name="remember">
                             <span>Remember me</span>
                         </label>
-                        <a href="#" class="link-primary">Forgot password?</a>
+                        <a href="{% url 'change_password' %}" class="link-primary">Forgot password?</a>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Sign In</button>
                 </form>
