@@ -13,9 +13,10 @@
 }
 /* --- Header & Navigation --- */
 .header {
-    position: fixed;
+    position: sticky;  /* stick to top */
     top: 0;
-    z-index: 1000;
+    width: 100%;
+    z-index: 1000;  
     background-color: #c73e1d; 
     box-shadow: var(--shadow);
     color: white;
