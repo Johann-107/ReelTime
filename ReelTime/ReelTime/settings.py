@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'reeltime.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default="sqlite:///dbsqlite3",
+        default=os.environ.get('DATABASE_URL'),
         conn_max_age=600, #persist the connection for 10 minutes
         ssl_require=True # Enforce SSL connection
     )
@@ -92,6 +92,8 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
+AUTH_USER_MODEL = 'accounts.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -106,6 +108,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 

@@ -5,39 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <link rel="stylesheet" href="{% static 'css/index_header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 <body>
-    <header class="header">
-        {# START: Header/Navigation Block (Copied from login.html) #}
-        <div class="container header-content">
-            <div class="header-left">
-                <a href="{% url 'index' %}" class="logo">
-                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                        <line x1="7" y1="2" x2="7" y2="22"></line>
-                        <line x1="17" y1="2" x2="17" y2="22"></line>
-                        <line x1="2" y1="12" x2="22" y2="12" stroke="#e8b923"></line> 
-                        <line x1="2" y1="7" x2="7" y2="7"></line>
-                        <line x1="2" y1="17" x2="7" y2="17"></line>
-                        <line x1="17" y1="17" x2="22" y2="17"></line>
-                        <line x1="17" y1="7" x2="22" y2="7"></line>
-                    </svg>
-                    <span>ReelTime</span>
-                </a>
-                <nav class="nav">
-                    <a href="{% url 'index' %}" class="nav-link">Home</a>                
-                    <a href="{% url 'movies' %}" class="nav-link">Movies</a>               
-                    <a href="{% url 'index' %}" class="nav-link">About</a>              
-                </nav>
-            </div>
-            <div class="header-right">
-                <a href="{% url 'login' %}" class="btn btn-accent">Sign In</a>
-            </div>
-        </div>
-        {# END: Header/Navigation Block #}
-    </header>
+    
+    {% include 'reel_time/partials/index_header.html' %}
 
     <main class="auth-page">
         {% if messages %}
@@ -96,6 +70,8 @@
             </div>
         </div>
     </main>
+
+    {% include 'reel_time/partials/footer.html' %}
 
     <script>
         const STATIC_URL = "{% static '' %}";

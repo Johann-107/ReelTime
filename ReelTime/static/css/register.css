@@ -31,104 +31,6 @@
         padding: 0 1rem;
     }
 
-    .header {
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        background-color: var(--color-primary);
-        color: white;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .header-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 64px;
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: bold;
-        font-size: 1.25rem;
-        color: white;
-        text-decoration: none;
-    }
-
-    .logo-icon {
-        width: 24px;
-        height: 24px;
-    }
-
-    .nav {
-        display: none;
-        align-items: center;
-        gap: 1.5rem;
-    }
-
-    @media (min-width: 768px) {
-        .nav {
-        display: flex;
-        }
-    }
-
-    .nav-link {
-        color: white;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-
-    .nav-link:hover {
-        text-decoration: underline;
-    }
-
-    .header-right {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        font-weight: 600;
-        border-radius: var(--radius);
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-
-    .btn-ghost {
-        background-color: transparent;
-        color: white;
-    }
-
-    .btn-ghost:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .btn-accent {
-        background-color: var(--color-accent);
-        color: var(--color-text);
-    }
-
-    .btn-accent:hover {
-        background-color: #d4a520;
-    }
-
     .btn-primary {
         background-color: var(--color-primary);
         color: white;
@@ -271,4 +173,9 @@
     .auth-footer {
         font-size: 0.875rem;
         color: var(--color-text-muted);
+    }
+
+    .text-danger {
+        color: red;
+        font-size: 0.875rem;
     }

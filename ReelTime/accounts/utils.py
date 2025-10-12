@@ -10,7 +10,7 @@ def create_default_admin(cinema_name):
         last_name='Admin',
         username=f"{safe_cinema_name}_admin",
         email=f"{safe_cinema_name}@cinema.com",
-        phone_number='0000000000',
+        phone_number= "00000000000",
         password=make_password('admin123'),
         is_admin=True,
         must_change_password=True,

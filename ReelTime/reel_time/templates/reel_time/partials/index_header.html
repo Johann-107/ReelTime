@@ -1,0 +1,45 @@
+<header class="header">
+    <div class="container header-content">
+        <div class="header-left">
+            {% if user.is_authenticated %}
+                <a href="{% url 'user_dashboard' %}" class="logo">
+            {% else %}
+                <a href="{% url 'index' %}" class="logo">
+            {% endif %}
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                    <line x1="2" y1="12" x2="22" y2="12" stroke="#e8b923"></line> 
+                    <line x1="2" y1="7" x2="7" y2="7"></line>
+                    <line x1="2" y1="17" x2="7" y2="17"></line>
+                    <line x1="17" y1="17" x2="22" y2="17"></line>
+                    <line x1="17" y1="7" x2="22" y2="7"></line>
+                </svg>
+                <span>ReelTime</span>
+            </a>
+            <nav class="nav">
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'user_dashboard' %}" class="nav-link">Home</a>
+                    <a href="{% url 'movies' %}" class="nav-link">Movies</a>
+                    <a href="{% url 'user_dashboard' %}" class="nav-link">Reservations</a>
+                {% else %}
+                    <a href="{% url 'index' %}" class="nav-link">Home</a>
+                    <a href="{% url 'movies' %}" class="nav-link">Movies</a>
+                    <a href="{% url 'index' %}" class="nav-link">About</a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <div class="header-right">
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" class="btn btn-ghost">Profile</a>
+                <a href="{% url 'logout' %}" class="btn btn-accent">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-ghost">Sign In</a>
+                <a href="{% url 'register' %}" class="btn btn-accent">Get Started</a>
+            {% endif %}
+        </div>
+    </div>
+</header>

@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Admin</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/index_header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/register_admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 <body>
+    {% include 'reel_time/partials/index_header.html' %}
+
     <div class="container">
         <h1>Create Default Admin</h1>
         {% if messages %}
@@ -18,7 +22,7 @@
 
         <form method="POST">
         {% csrf_token %}
-        <label for="cinema_name">Cinema Name:</label>
+        <label for="cinema_name">Cinema:</label>
         <input type="text" name="cinema_name" id="cinema_name" required>
 
         <button type="submit">Create Admin</button>
@@ -26,5 +30,6 @@
 
         <a href="{% url 'login' %}">Back to Login</a>
     </div>
+    {% include 'reel_time/partials/footer.html' %}
 </body>
 </html>
