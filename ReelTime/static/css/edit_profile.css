@@ -1,11 +1,29 @@
+:root {
+    --color-primary: #c73e1d;
+    --color-primary-dark: #a32f15;
+    --color-accent: #e8b923;
+    --color-background: #f9f6f0;
+    --color-card: #ffffff;
+    --color-text: #1a1a1a;
+    --color-text-muted: #6b6b6b;
+    --color-border: #e5e0d8;
+    --color-input: #f5f2eb;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --radius: 8px;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-  font-family: "Poppins", sans-serif;
-  background-color: #f9f6f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    line-height: 1.6;
 }
 
 .edit-container {
