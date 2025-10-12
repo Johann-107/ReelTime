@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ReelTime - Home Page</title>
     {% load static %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
@@ -16,7 +17,7 @@
                         <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                         <line x1="7" y1="2" x2="7" y2="22"></line>
                         <line x1="17" y1="2" x2="17" y2="22"></line>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <line x1="2" y1="12" x2="22" y2="12" stroke="#e8b923"></line> 
                         <line x1="2" y1="7" x2="7" y2="7"></line>
                         <line x1="2" y1="17" x2="7" y2="17"></line>
                         <line x1="17" y1="17" x2="22" y2="17"></line>
@@ -26,175 +27,178 @@
                 </a>
                 <nav class="nav">
                     <a href="{% url 'index' %}" class="nav-link">Home</a>
-                    <a href="{% url 'index' %}" class="nav-link">Movies</a> <!--movies.html-->
-                    <a href="{% url 'index' %}" class="nav-link">My Bookings</a> <!--bookings.html-->
+                    <a href="{% url 'movies' %}" class="nav-link">Movies</a>
+                    <a href="{% url 'index' %}" class="nav-link">About</a>
                 </nav>
             </div>
             <div class="header-right">
                 <a href="{% url 'login' %}" class="btn btn-ghost">Sign In</a>
-                <a href="{% url 'index' %}" class="btn btn-accent">Book Now</a> <!--movies.html-->
+                <a href="{% url 'register' %}" class="btn btn-accent">Get Started</a> 
             </div>
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container hero-content">
-            <h1 class="hero-title">Your Movie <span class="hero-accent">ReelTime</span> Starts Now</h1>
-            <p class="hero-description">
-                Book your favorite movies in under 2 minutes. Choose your seats, pick your showtime, and enjoy the magic of cinema.
-            </p>
-            <a href="{% url 'index' %}" class="btn btn-accent btn-lg">Book Tickets Now</a> <!--movies.html-->
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Now Showing</h2>
-            <div class="movie-grid">
-                <div class="movie-card">
-                    <div class="movie-poster-wrapper">
-                        <img src="{% static 'images/action-movie-ocean-heist.jpg' %}" alt="Ocean's Heist" class="movie-poster">
-                        <span class="movie-badge">Action</span>
-                    </div>
-                    <div class="movie-header">
-                        <div class="movie-title-row">
-                            <h3 class="movie-title">Ocean's Heist</h3>
-                            <div class="movie-rating">
-                                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                <span>8.5</span>
-                            </div>
-                        </div>
-                        <p class="movie-meta">2h 15m • Today</p>
-                    </div>
-                    <div class="movie-content">
-                        <div class="showtime-buttons">
-                            <button class="btn-showtime">10:00 AM</button>
-                            <button class="btn-showtime">2:30 PM</button>
-                            <button class="btn-showtime">7:00 PM</button>
-                        </div>
-                        <p class="movie-price">$12.99</p>
-                    </div>
-                    <div class="movie-footer">
-                        <a href="booking.html?id=1" class="btn btn-accent btn-full">Book Tickets</a>
-                    </div>
+    <section class="hero-new-design">
+        <div class="container hero-split-content">
+            <div class="hero-text-content">
+                <h1 class="hero-title">Your Movie <span class="hero-accent">ReelTime</span> Starts Now</h1>
+                <p class="hero-description">
+                    Book your favorite movies in under 2 minutes. Choose your seats, pick your showtime, and enjoy the magic of cinema.
+                </p>
+                <div class="hero-buttons">
+                    <a href="{% url 'index' %}" class="btn btn-start-watching btn-lg">
+                        Start Watching 
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-left: 8px;">
+                            <path d="M5 12h14M12 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-ghost-dark btn-lg">Sign In</a>
                 </div>
+            </div>
 
-                <div class="movie-card">
-                    <div class="movie-poster-wrapper">
-                        <img src="{% static 'images/adventure-movie-golden-treasure.jpg' %}" alt="Golden Adventure" class="movie-poster">
-                        <span class="movie-badge">Adventure</span>
-                    </div>
-                    <div class="movie-header">
-                        <div class="movie-title-row">
-                            <h3 class="movie-title">Golden Adventure</h3>
-                            <div class="movie-rating">
-                                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                <span>8.2</span>
-                            </div>
+            <div class="coming-soon-panel">
+                <h2 class="panel-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; margin-right: 8px;">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Coming Soon
+                </h2>
+                
+                <div class="coming-soon-list">
+                    <a href="{% url 'index' %}" class="coming-soon-item">
+                        <img src="{% static 'images/futuristic-sci-fi-movie-poster-tron-ares.jpeg' %}" alt="Tron: Ares" class="coming-soon-poster">
+                        <div class="coming-soon-details">
+                            <p class="movie-title-small">Tron: Ares</p>
+                            <p class="movie-genre-small">Sci-Fi</p>
                         </div>
-                        <p class="movie-meta">2h 5m • Today</p>
-                    </div>
-                    <div class="movie-content">
-                        <div class="showtime-buttons">
-                            <button class="btn-showtime">11:30 AM</button>
-                            <button class="btn-showtime">4:00 PM</button>
-                            <button class="btn-showtime">8:30 PM</button>
+                    </a>
+                    <a href="{% url 'index' %}" class="coming-soon-item">
+                        <img src="{% static 'images/adventure-movie-poster-avatar-fire-ash.jpg' %}" alt="Avatar: Fire and Ash" class="coming-soon-poster">
+                        <div class="coming-soon-details">
+                            <p class="movie-title-small">Avatar: Fire and Ash</p>
+                            <p class="movie-genre-small">Adventure</p>
                         </div>
-                        <p class="movie-price">$12.99</p>
-                    </div>
-                    <div class="movie-footer">
-                        <a href="booking.html?id=2" class="btn btn-accent btn-full">Book Tickets</a>
-                    </div>
-                </div>
-
-                <div class="movie-card">
-                    <div class="movie-poster-wrapper">
-                        <img src="{% static 'images/thriller-movie-red-storm.jpg' %}" alt="Red Storm" class="movie-poster">
-                        <span class="movie-badge">Thriller</span>
-                    </div>
-                    <div class="movie-header">
-                        <div class="movie-title-row">
-                            <h3 class="movie-title">Red Storm</h3>
-                            <div class="movie-rating">
-                                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                <span>8.8</span>
-                            </div>
+                    </a>
+                    <a href="{% url 'index' %}" class="coming-soon-item">
+                        <img src="{% static 'images/action-movie-poster-predator-badlands.webp' %}" alt="Predator: Badlands" class="coming-soon-poster">
+                        <div class="coming-soon-details">
+                            <p class="movie-title-small">Predator: Badlands</p>
+                            <p class="movie-genre-small">Action</p>
                         </div>
-                        <p class="movie-meta">2h 30m • Today</p>
-                    </div>
-                    <div class="movie-content">
-                        <div class="showtime-buttons">
-                            <button class="btn-showtime">1:00 PM</button>
-                            <button class="btn-showtime">5:30 PM</button>
-                            <button class="btn-showtime">9:00 PM</button>
-                        </div>
-                        <p class="movie-price">$14.99</p>
-                    </div>
-                    <div class="movie-footer">
-                        <a href="booking.html?id=3" class="btn btn-accent btn-full">Book Tickets</a>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
-
-    <section class="section" style="background-color: var(--color-card);">
+    
+    <section class="hero-content-scroll">
         <div class="container">
-            <h2 class="section-title">Coming Soon</h2>
-            <div class="movie-grid" id="comingSoonGrid">
-                 Coming soon movies will be rendered here by JavaScript 
+            <div class="recommendations-section">
+                <h2 class="section-title-white">Movie Recommendations</h2>
+                <p class="section-subtitle-white">Discover amazing movies handpicked just for you</p>
+                
+                <div class="movie-grid" id="moviesGrid">
+                    <div class="movie-card-new">
+                        <img src="{% static 'images/comedy-movie-the-roses.jpg' %}" alt="The Roses" class="movie-poster-new">
+                        <div class="movie-details-new">
+                            <h3 class="movie-title-new">The Roses</h3>
+                            <p class="movie-meta-new">Comedy</p>
+                            <div class="movie-rating-new">
+                                <span class="stars">★★★★★</span>
+                                <span>4.7/5</span>
+                            </div>
+                            <div class="movie-actions">
+                                <a href="{% url 'index' %}" class="btn btn-accent btn-book">Book Now</a>
+                                <a href="{% url 'index' %}" class="btn btn-info">More Info</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="movie-card-new">
+                        <img src="{% static 'images/anime-demon-slayer.jpg' %}" alt="Demon Slayer: Kimetsu No Yaiba" class="movie-poster-new">
+                        <div class="movie-details-new">
+                            <h3 class="movie-title-new">Demon Slayer: Kimetsu No Yaiba</h3>
+                            <p class="movie-meta-new">Action</p>
+                            <div class="movie-rating-new">
+                                <span class="stars">★★★★★</span>
+                                <span>4.8/5</span>
+                            </div>
+                            <div class="movie-actions">
+                                <a href="{% url 'index' %}" class="btn btn-accent btn-book">Book Now</a>
+                                <a href="{% url 'index' %}" class="btn btn-info">More Info</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="movie-card-new">
+                        <img src="{% static 'images/horror-the-conjuring.jpg' %}" alt="The Conjuring: Last Rites" class="movie-poster-new">
+                        <div class="movie-details-new">
+                            <h3 class="movie-title-new">The Conjuring: Last Rites</h3>
+                            <p class="movie-meta-new">Horror</p>
+                            <div class="movie-rating-new">
+                                <span class="stars">★★★★★</span>
+                                <span>4.8/5</span>
+                            </div>
+                            <div class="movie-actions">
+                                <a href="{% url 'index' %}" class="btn btn-accent btn-book">Book Now</a>
+                                <a href="{% url 'index' %}" class="btn btn-info">More Info</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>  
-    </section>
 
-    <section class="stats-section">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                    <p class="stat-number">4.8/5</p>
-                    <p class="stat-label">Average Rating</p>
-                </div>
-                <div class="stat-item">
-                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <p class="stat-number">50K+</p>
-                    <p class="stat-label">Tickets Booked</p>
-                </div>
-                <div class="stat-item">
-                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                    </svg>
-                    <p class="stat-number">&lt; 2 min</p>
-                    <p class="stat-label">Booking Time</p>
+            <div class="booking-cta-banner">
+                <h3 class="booking-cta-title">Ready to Book Your Movie?</h3>
+                <p class="booking-cta-subtitle">Sign up now to reserve your seats and enjoy the ultimate cinema experience.</p>
+                <div class="booking-cta-actions">
+                    <a href="{% url 'register' %}" class="btn btn-accent btn-lg">Create Account</a>
+                    <a href="{% url 'login' %}" class="btn btn-info btn-lg">Sign In</a> 
                 </div>
             </div>
         </div>
     </section>
-
-    <section class="cta-section">
-        <div class="container cta-content">
-            <h2 class="cta-title">Ready for Your ReelTime?</h2>
-            <a href="{% url 'index' %}" class="btn btn-teal btn-lg">Explore All Movies</a> <!--movies.html-->
+    
+    <section class="mission-section">
+        <div class="container">
+            <h4 class="mission-title">Why Choose ReelTime?</h4>
+            <p class="mission-statement">"More Than Just Tickets — ReelTime Delivers Unforgettable Movie Moments, Anytime, Anywhere."</p>
         </div>
     </section>
+
+    <footer class="footer-new">
+        <div class="container footer-content-new">
+            <div class="footer-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: white;">
+                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                    <line x1="2" y1="12" x2="22" y2="12" stroke="#e8b923"></line> 
+                    <line x1="2" y1="7" x2="7" y2="7"></line>
+                    <line x1="2" y1="17" x2="7" y2="17"></line>
+                    <line x1="17" y1="17" x2="22" y2="17"></line>
+                    <line x1="17" y1="7" x2="22" y2="7"></line>
+                </svg>
+                <span>ReelTime</span>
+            </div>
+            <div class="footer-links">
+                <a href="{% url 'index' %}">Home</a>
+                <a href="{% url 'index' %}">Movies</a>
+                <a href="{% url 'index' %}">About</a>
+                <a href="{% url 'index' %}">Contact</a>
+                <a href="{% url 'index' %}">Privacy</a>
+                <a href="{% url 'index' %}">Terms</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 ReelTime. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
-        const STATIC_URL = "{% static '' %}";
+        const STATIC_URL = "{% static '' %}"; 
     </script>
     <script src="{% static 'js/script.js' %}"></script>
-    <script src="{% static 'js/coming-soon.js' %}"></script>
 </body>
 </html>
