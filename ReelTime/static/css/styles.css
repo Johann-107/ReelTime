@@ -10,7 +10,7 @@
     --color-info: #E86C23; /* Secondary Orange for buttons */
 }
 
-/* --- Global Reset & Container (Fixes Logo/Nav issues) --- */
+/* --- Global Reset & Container --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -27,62 +27,6 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
-}
-
-/* --- Header & Navigation (Fixes logo sizing and stacked nav) --- */
-.header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background-color: #c73e1d; 
-    box-shadow: var(--shadow);
-    color: white;
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px; 
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-}
-
-/* FIX: Logo Sizing */
-.logo-icon {
-    width: 28px; 
-    height: 28px;
-    stroke: white; 
-}
-
-.nav {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.nav-link {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-}
-
-.nav-link:hover {
-    color: var(--color-accent);
 }
 
 /* --- Button Base Styles --- */
@@ -103,29 +47,11 @@ body {
     font-size: 1.1rem;
 }
 
-.btn-accent {
-    background-color: var(--color-accent);
-    color: var(--color-text);
-}
-
-.btn-accent:hover {
-    background-color: #f7cb5c;
-}
-
-.btn-ghost {
-    background-color: transparent;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.btn-ghost:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
 .btn-info {
     background-color: var(--color-info);
     color: white;
 }
+
 .btn-info:hover {
     background-color: #f99042;
 }
@@ -136,7 +62,7 @@ body {
         135deg,
         var(--color-primary) 0%, 
         #e86c23 60%, 
-        #e89523 100% 
+        #e89523 100%
     );
     color: white;
     padding-top: 5rem; 
@@ -250,18 +176,16 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
-
 /* --- Scrollable Content (Recommendations, CTA) --- */
 .hero-content-scroll {
-    /* Gradient continues from the hero section */
     background: linear-gradient(
         135deg,
         #c73e1d 0%, 
         #e86c23 60%, 
-        #e89523 100% 
+        #e89523 100%
     );
     color: white;
-    padding: 2rem 1rem 0; /* Remove bottom padding to let the mission section rise */
+    padding: 2rem 1rem 0;
 }
 
 /* --- Recommendations Section --- */
@@ -389,14 +313,12 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* --- Mission Section (Fixes Gradient Break) --- */
+/* --- Mission Section --- */
 .mission-section {
-    /* FIX: This section must have a solid white background and dark text colors */
     background-color: white; 
     color: var(--color-text); 
     text-align: center;
     padding: 4rem 1rem 8rem;
-    /* Optional: Add a slight curve or border top to visually separate it from the gradient */
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
     position: relative; 
@@ -417,61 +339,4 @@ body {
     max-width: 700px;
     margin: 0 auto;
     line-height: 1.5;
-}
-
-/* --- Footer --- */
-.footer-new {
-    background-color: #2c3e50; /* Dark blue/slate color */
-    color: white;
-    padding: 3rem 1rem 1rem;
-}
-
-.footer-content-new {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@media (min-width: 768px) {
-    .footer-content-new {
-        flex-direction: row;
-        justify-content: space-between;
-    }
-}
-
-.footer-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: bold;
-    font-size: 1.25rem;
-    color: white;
-}
-
-.footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.footer-links a {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.2s;
-}
-
-.footer-links a:hover {
-    color: var(--color-accent);
-}
-
-.footer-bottom {
-    text-align: center;
-    font-size: 0.75rem;
-    padding-top: 1rem;
-    color: rgba(255, 255, 255, 0.5);
 }

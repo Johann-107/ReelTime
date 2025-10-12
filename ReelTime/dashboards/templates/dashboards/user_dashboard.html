@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/index_header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 <body>
-    <p><a href="{% url 'profile' %}">Profile</a></p>
-    <h1>Welcome, {{ username }}!</h1>
+    {% include 'reel_time/partials/index_header.html' %}
+    
+    <h1>Welcome, {{ user.username }}!</h1>
     <p>You are now logged in.</p>
-    <p><a href="{% url 'logout' %}">Logout</a></p>
+
+    {% include 'reel_time/partials/footer.html' %}
 </body>
 </html>

@@ -37,11 +37,22 @@
       </div>
 
       <div class="profile-actions">
-        <a href="{% url 'user_dashboard' %}" class="btn">Back to Dashboard</a>
+        {% if request.session.is_admin %}
+          <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+        {% else %}
+          <a href="{% url 'user_dashboard' %}" class="btn">Back to Dashboard</a>
+        {% endif %}
         <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
         <a href="{% url 'logout' %}" class="btn logout">Logout</a>
       </div>
     </div>
   </div>
+  
+  {% if profile_updated %}
+  <script>
+      alert("Profile updated successfully!");
+  </script>
+  {% endif %}
+
 </body>
 </html>
