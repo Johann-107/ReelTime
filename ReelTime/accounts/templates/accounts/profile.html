@@ -6,8 +6,13 @@
   <title>User Profile</title>
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/index_header.css' %}">
+  <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 <body>
+
+  {% include 'reel_time/partials/index_header.html' %}
+
   <div class="profile-container">
     <h1>User Profile</h1>
     <div class="profile-card">
@@ -37,17 +42,18 @@
       </div>
 
       <div class="profile-actions">
-        {% if request.session.is_admin %}
+        {% if user.is_admin %}
           <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
         {% else %}
           <a href="{% url 'user_dashboard' %}" class="btn">Back to Dashboard</a>
         {% endif %}
         <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
-        <a href="{% url 'logout' %}" class="btn logout">Logout</a>
       </div>
     </div>
   </div>
-  
+
+  {% include 'reel_time/partials/footer.html' %}
+
   {% if profile_updated %}
   <script>
       alert("Profile updated successfully!");
