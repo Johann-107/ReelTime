@@ -58,7 +58,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'reeltime.urls'
+ROOT_URLCONF = 'ReelTime.urls'
 
 TEMPLATES = [
     {
@@ -75,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'reeltime.wsgi.application'
+WSGI_APPLICATION = 'ReelTime.wsgi.application'
 
 
 # Database
