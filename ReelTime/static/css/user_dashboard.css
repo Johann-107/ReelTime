@@ -1,27 +1,78 @@
 :root {
-        --color-primary: #c73e1d;
-        --color-primary-dark: #a32f15;
-        --color-accent: #e8b923;
-        --color-background: #f9f6f0;
-        --color-card: #ffffff;
-        --color-text: #1a1a1a;
-        --color-text-muted: #6b6b6b;
-        --color-border: #e5e0d8;
-        --color-input: #f5f2eb;
-        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        --radius: 8px;
-    }
+/* Corrected Variables */
+--color-primary: #c73e1d;
+--color-primary-dark: #a32f15;
+--color-accent: #e8b923;
+--color-background: #f9f6f0; 
+--color-card: #ffffff; 
+--color-text-dark: #1a1a1a; 
+--color-text-light: #ffffff; 
+--color-text-muted: #6b6b6b;
+--color-border: #e5e0d8;
+--color-input: #f5f2eb;
+--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+--radius: 8px;
+}
 
+/* --- Reset and Body Defaults (Including Sticky Footer) --- */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+/* Sticky Footer Setup */
+html, body {
+height: 100%; 
+margin: 0;
+padding: 0;
+}
+
+body {
+display: flex;
+flex-direction: column;
+
+font-family: var(--font-sans);
+background-color: var(--color-background);
+color: var(--color-text-dark); /* Use the new dark variable */
+line-height: 1.6;
+}
+
+main {
+flex-grow: 1; /* Pushes the footer down */
+}
+
+header, footer {
+flex-shrink: 0;
+}
+
+/* --- Dashboard Content Centering and Sizing --- */
+
+.dashboard-content {
+    /* Critical: Centers the block horizontally and constrains its width */
+    max-width: 1200px; /* Adjust this to the maximum width you want your content to span */
+    width: 100%;
+    margin: 0 auto; /* This line is what performs the horizontal CENTERING */
     
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    /* Ensure there is padding/spacing around the content */
+    padding: 2rem 1.5rem; 
+    
+    /* Ensure a minimum height so the background color extends */
+    min-height: 60vh; 
+}
 
-    body {
-        font-family: var(--font-sans);
-        background-color: var(--color-background);
-        color: var(--color-text);
-        line-height: 1.6;
-    }
+/* --- Basic Styling --- */
+
+.dashboard-content h1 {
+    color: var(--color-primary); 
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-content p {
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+/* Other admin-actions styling can follow here */

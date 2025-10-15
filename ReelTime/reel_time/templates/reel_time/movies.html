@@ -4,96 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>All Movies - ReelTime</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/index_header.css' %}">
+  <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 
+  
   <style>
     :root {
       --primary: #C73E1D;
       --secondary: #E86C23;
       --accent: #E8B923;
       --light: #fff8f0;
-      --radius: 1rem;
+      --radius: 2rem;
       --shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
     }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
       color: #fff;
       min-height: 100vh;
     }
-
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 1.5rem;
-    }
-
-    /* HEADER */
-    .header {
-      background: rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(8px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow);
-    }
-
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: 70px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.4rem;
-      text-decoration: none;
-    }
-
-    .logo-icon {
-      width: 24px;
-      height: 24px;
-    }
-
-    .nav {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .nav-link {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
-
-    .nav-link:hover {
-      color: var(--accent);
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 0.6rem 1.2rem;
-      border-radius: var(--radius);
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-
-    .btn-ghost {
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.5);
     }
 
     .btn-ghost:hover {
@@ -102,15 +41,13 @@
 
     .btn-accent {
       background: var(--accent);
-      color: #000;
+      color: #ffffff;
     }
 
     .btn-accent:hover {
-      background: #fff;
-      color: var(--primary);
+    background-color: #f7cb5c;
     }
 
-    /* PAGE CONTENT */
     .page-content {
       padding: 3rem 1rem;
       text-align: center;
@@ -345,29 +282,7 @@
 
 <body>
   {% load static %}
-
-  <header class="header">
-    <div class="container header-content">
-      <a href="{% url 'index' %}" class="logo">
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-          <line x1="7" y1="2" x2="7" y2="22"></line>
-          <line x1="17" y1="2" x2="17" y2="22"></line>
-          <line x1="2" y1="12" x2="22" y2="12"></line>
-        </svg>
-        ReelTime
-      </a>
-      <nav class="nav">
-        <a href="{% url 'index' %}" class="nav-link">Home</a>
-        <a href="{% url 'movies' %}" class="nav-link">Movies</a>
-        <a href="{% url 'index' %}" class="nav-link">About</a>
-      </nav>
-      <div>
-        <a href="{% url 'login' %}" class="btn btn-ghost">Sign In</a>
-        <a href="{% url 'register' %}" class="btn btn-accent">Get Started</a>
-      </div>
-    </div>
-  </header>
+  {% include 'reel_time/partials/index_header.html' %}
 
   <main class="page-content">
     <div class="container">
@@ -419,10 +334,7 @@
     </div>
   </main>
 
-  <footer>
-    &copy; 2025 ReelTime. All rights reserved.
-  </footer>
-
+  {% include 'reel_time/partials/footer.html' %}
   <script>
     const STATIC_URL = "{% static '' %}";
   </script>

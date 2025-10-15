@@ -1,25 +1,33 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/index_header.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+<link rel="stylesheet" href="{% static 'css/index_header.css' %}">
+<link rel="stylesheet" href="{% static 'css/footer.css' %}">
+
+<link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}">
 </head>
 <body>
-    {% include 'reel_time/partials/index_header.html' %}
+{% include 'reel_time/partials/index_header.html' %}
 
-    <div class="container">
-        <h1>🎬 Admin Dashboard</h1>
-        <p>Welcome, Admin!</p>
+<main>
+<div class="dashboard-content">
+<h1>Welcome, {{ user.username }}!</h1>
 
-        <div>
-        <a href="{% url 'change_password' %}">Change Password</a> |
-        </div>
-    </div>
+<p>You are now logged in as an Administrator.</p>
 
-    {% include 'reel_time/partials/footer.html' %}
+<div class="admin-actions">
+<a href="{% url 'change_password' %}" class="btn-link">Change Password</a> 
+</div>
+</div>
+</main>
+
+{% include 'reel_time/partials/footer.html' %}
 </body>
 </html>

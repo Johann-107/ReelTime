@@ -1,20 +1,33 @@
+/*
+|--------------------------------------------------------------------------
+| MERGED DARK/GLASSMORHISM THEME
+|--------------------------------------------------------------------------
+| Based primarily on the second style block, with structural elements 
+| (like the sticky header) from the first block.
+*/
+
 :root {
-    --color-primary: #c73e1d;
-    --color-primary-dark: #a32f15;
-    --color-accent: #e8b923;
-    --color-accent-dark: #d4a520;
-    --color-teal: #1e5f74;
-    --color-teal-light: #2a7a94;  
-    --color-background: #f9f6f0;
-    --color-card: #ffffff;
-    --color-text: #1a1a1a;
-    --color-text-muted: #6b6b6b;
-    --color-border: #e5e0d8;
-    --color-input: #f5f2eb;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --radius: 8px;
+    /* Color Palette */
+    --color-primary: #C73E1D; /* Deep Red/Maroon for Header/Accents */
+    --color-secondary: #E86C23; /* Bright Orange for Gradient/Hover */
+    --color-accent: #E8B923; /* Gold/Yellow for Highlights/Rating */
+    --color-text: #fff; /* White text for dark background */
+    --color-text-muted: #f1f1f1; /* Light gray for subtle text */
+    --color-background-start: #C73E1D; /* Start of body gradient */
+    --color-background-mid: #E86C23; /* Middle of body gradient */
+    --color-background-end: #E8B923; /* End of body gradient */
+    --color-card-bg: rgba(255, 255, 255, 0.12); /* Glassy Card Background */
+    --color-filter-bg: rgba(255, 255, 255, 0.07); /* Glassy Filter Bar Background */
+    --color-showtime-bg: rgba(232, 108, 35, 0.3); /* Soft orange for time slots */
+
+    /* Typography & Structure */
+    --font-sans: 'Poppins', sans-serif, -apple-system, BlinkMacSystemFont;
+    --radius: 1rem; /* Larger radius for modern look */
+    --header-height: 64px;
+    --shadow-base: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Base Resets */
 * {
     margin: 0;
     padding: 0;
@@ -23,31 +36,34 @@
 
 body {
     font-family: var(--font-sans);
-    background-color: var(--color-background);
+    /* Glassmorphism Gradient Background */
+    background: linear-gradient(135deg, var(--color-background-start), var(--color-background-mid), var(--color-background-end));
     color: var(--color-text);
+    min-height: 100vh;
     line-height: 1.6;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 1.5rem; /* Increased padding */
 }
 
+/* Header (Sticky and Solid) */
 .header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: var(--color-primary);
+    background-color: var(--color-primary); /* Solid color to contrast with gradient */
     color: white;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 64px;
+    height: var(--header-height);
 }
 
 .header-left {
@@ -79,7 +95,7 @@ body {
 
 @media (min-width: 768px) {
     .nav {
-    display: flex;
+        display: flex;
     }
 }
 
@@ -100,18 +116,19 @@ body {
     gap: 0.75rem;
 }
 
+/* Buttons */
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem;
     font-size: 0.875rem;
     font-weight: 600;
     border-radius: var(--radius);
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
 .btn-ghost {
@@ -125,44 +142,78 @@ body {
 
 .btn-accent {
     background-color: var(--color-accent);
-    color: var(--color-text);
+    color: #000; /* Black text for accent buttons */
 }
 
 .btn-accent:hover {
-    background-color: var(--color-accent-dark);
+    background-color: white;
+    color: var(--color-primary);
 }
 
 .btn-full {
     width: 100%;
 }
 
+/* Page Content */
 .page-content {
-    min-height: calc(100vh - 64px);
-    padding: 2rem 1rem;
+    min-height: calc(100vh - var(--header-height));
+    padding: 3rem 1rem;
+    text-align: center;
 }
 
 .page-title {
     font-size: 2.5rem;
-    font-weight: bold;
+    font-weight: 800;
     margin-bottom: 2rem;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Search and Filter Bar (Glassmorphism) */
 .search-filter-bar {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 2rem;
+    background: var(--color-filter-bg);
+    padding: 1rem;
+    border-radius: var(--radius);
+    backdrop-filter: blur(6px);
 }
 
 @media (min-width: 768px) {
     .search-filter-bar {
-    flex-direction: row;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
 }
 
 .search-wrapper {
     position: relative;
     flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: none;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.15); /* Slightly less transparent */
+    color: var(--color-text);
+    font-size: 1rem;
+    backdrop-filter: blur(10px);
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.25);
+    outline: 2px solid var(--color-accent);
 }
 
 .search-icon {
@@ -170,63 +221,61 @@ body {
     left: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    color: var(--color-text-muted);
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-    background-color: var(--color-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    font-size: 1rem;
+    width: 18px;
+    height: 18px;
+    color: var(--color-text);
+    opacity: 0.8;
 }
 
 .filter-select {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: var(--color-card);
-    border: 1px solid var(--color-border);
+    width: 180px;
+    padding: 0.8rem;
+    border: none;
     border-radius: var(--radius);
+    background-color: var(--color-showtime-bg);
+    color: var(--color-text);
     font-size: 1rem;
+    backdrop-filter: blur(10px);
+    outline: none;
+    transition: 0.3s;
+    appearance: none;
 }
 
-@media (min-width: 768px) {
-    .filter-select {
-    width: 200px;
-    }
+.filter-select option {
+    background-color: var(--color-primary); /* Darker option background */
+    color: white;
 }
 
+.filter-select:hover,
+.filter-select:focus {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.25);
+    outline: 2px solid var(--color-accent);
+}
+
+/* Movie Grid */
 .movie-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    /* Flexible column layout: min 240px wide */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
+    margin-top: 2rem;
 }
 
-@media (min-width: 768px) {
-    .movie-grid {
-    grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .movie-grid {
-    grid-template-columns: repeat(3, 1fr);
-    }
-}
-
+/* Movie Card (Glassmorphism) */
 .movie-card {
-    background-color: var(--color-card);
+    background: var(--color-card-bg);
     border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s;
+    box-shadow: var(--shadow-base);
+    transition: transform 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(6px);
+    text-align: center;
 }
 
 .movie-card:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .movie-poster-wrapper {
@@ -235,7 +284,7 @@ body {
 
 .movie-poster {
     width: 100%;
-    height: 400px;
+    height: 360px; /* Consistent height */
     object-fit: cover;
 }
 
@@ -251,73 +300,100 @@ body {
     font-weight: 600;
 }
 
-.movie-header {
-    padding: 1rem 1.5rem 0;
-}
-
-.movie-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
+.movie-info {
+    padding: 1rem 1.2rem;
 }
 
 .movie-title {
+    font-weight: 700;
     font-size: 1.25rem;
-    font-weight: bold;
+    color: var(--color-text);
+    margin-bottom: 0.3rem;
 }
 
 .movie-rating {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-weight: 600;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 1rem;
+    color: gold;
+    margin: 1rem 0 0.3rem;
 }
 
 .star-icon {
-    width: 16px;
-    height: 16px;
-    color: var(--color-accent);
+    width: 18px;
+    height: 18px;
+    fill: gold;
+    color: gold; /* Added for consistency with the first theme's icon style */
 }
 
 .movie-meta {
-    font-size: 0.875rem;
     color: var(--color-text-muted);
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
 }
 
-.movie-content {
-    padding: 1rem 1.5rem;
-}
-
-.showtime-buttons {
+/* Showtime Buttons (Pill Style) */
+.movie-times {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem; /* Added margin for spacing price/button */
 }
 
-.btn-showtime {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    border: 1px solid var(--color-border);
-    background-color: transparent;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-showtime:hover,
-.btn-showtime.selected {
-    background-color: var(--color-accent);
-    border-color: var(--color-accent);
+.time-slot {
+    display: inline-block;
+    background: var(--color-showtime-bg);
     color: var(--color-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 1.2rem;
+    border-radius: 999px;
+    border: 2px solid var(--color-accent);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-base);
+    letter-spacing: 0.4px;
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+}
+
+.time-slot:hover,
+.time-slot.selected { /* Unified selected state */
+    background: var(--color-accent);
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.time-slot:focus {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 3px;
 }
 
 .movie-price {
+    color: var(--color-accent);
+    font-weight: 600;
     font-size: 1.5rem;
-    font-weight: bold;
 }
 
-.movie-footer {
-    padding: 0 1.5rem 1.5rem;
+/* Coming Soon Badge */
+.coming-soon {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+    color: #fff;
+    text-transform: uppercase;
+    margin-top: 0.6rem;
+    font-weight: bold;
+    letter-spacing: 0.05em;
 }
+
+/* Remove conflicting/unused styles from the original files where applicable */
+/* .movie-header and .movie-footer classes were removed as they were redundant due to unified .movie-info and button placement */

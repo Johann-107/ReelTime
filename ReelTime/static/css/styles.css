@@ -1,500 +1,490 @@
 /* --- Global Variables (Essential) --- */
 :root {
-    --color-primary: #C73E1D; /* Deep Red/Orange */
-    --color-accent: #E8B923; /* Gold/Yellow Accent */
-    --color-text: #2C3E50; /* Dark Blue/Text Color */
-    --color-text-muted: #6C7A89; /* Muted Gray */
-    --color-background: #FFFFFF;
-    --radius: 8px;
-    --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    --color-info: #E86C23; /* Secondary Orange for buttons */
+--color-primary: #C73E1D; /* Deep Red/Orange */
+--color-accent: #E8B923; /* Gold/Yellow Accent */
+--color-text: #2C3E50; /* Dark Blue/Text Color */
+--color-text-muted: #6C7A89; /* Muted Gray */
+--color-background: #FFFFFF;
+--radius: 8px;
+--shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+--color-info: #E86C23; /* Secondary Orange for buttons */
 }
 
 /* --- Global Reset & Container (Fixes Logo/Nav issues) --- */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+box-sizing: border-box;
+margin: 0;
+padding: 0;
 }
 
 body {
-    font-family: sans-serif;
-    background-color: var(--color-background);
-    color: var(--color-text);
+font-family: sans-serif;
+background-color: var(--color-background);
+color: var(--color-text);
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 1rem;
 }
 
 /* --- Header & Navigation (Fixes logo sizing and stacked nav) --- */
 .header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background-color: #c73e1d; 
-    box-shadow: var(--shadow);
-    color: white;
+position: sticky;
+top: 0;
+z-index: 1000;
+background-color: #c73e1d; 
+box-shadow: var(--shadow);
+color: white;
 }
 
 .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px; 
+display: flex;
+align-items: center;
+justify-content: space-between;
+height: 64px; 
 }
 
 .header-left {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
+display: flex;
+align-items: center;
+gap: 3rem;
 }
 
 .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+text-decoration: none;
+font-size: 1.5rem;
+font-weight: bold;
+color: white;
 }
 
 /* FIX: Logo Sizing */
 .logo-icon {
-    width: 28px; 
-    height: 28px;
-    stroke: white; 
+width: 28px; 
+height: 28px;
+stroke: white; 
 }
 
 .nav {
-    display: flex;
-    gap: 1.5rem;
+display: flex;
+gap: 1.5rem;
 }
 
 .nav-link {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
+color: rgba(255, 255, 255, 0.8);
+text-decoration: none;
+font-weight: 500;
+transition: color 0.2s;
 }
 
 .nav-link:hover {
-    color: var(--color-accent);
+color: var(--color-accent);
 }
 
 /* --- Button Base Styles --- */
 .btn {
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-    font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.2s, opacity 0.2s;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    display: inline-block;
+padding: 0.5rem 1rem;
+border-radius: var(--radius);
+font-weight: bold;
+text-decoration: none;
+transition: background-color 0.2s, opacity 0.2s;
+border: none;
+cursor: pointer;
+text-align: center;
+display: inline-block;
 }
 
 .btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
+padding: 0.75rem 1.5rem;
+font-size: 1.1rem;
 }
 
 .btn-accent {
-    background-color: var(--color-accent);
-    color: var(--color-text);
+background-color: var(--color-accent);
+color: var(--color-text);
 }
 
 .btn-accent:hover {
-    background-color: #f7cb5c;
+background-color: #f7cb5c;
 }
 
 .btn-ghost {
-    background-color: transparent;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+background-color: transparent;
+color: white;
+border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .btn-ghost:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+background-color: rgba(255, 255, 255, 0.1);
 }
 
 .btn-info {
-    background-color: var(--color-info);
-    color: white;
+background-color: var(--color-info);
+color: white;
 }
 .btn-info:hover {
-    background-color: #f99042;
+background-color: #f99042;
 }
 
-/* --- NEW HERO SECTION (Split-Screen Top) --- */
 .hero-new-design {
-    background: linear-gradient(
-        135deg,
-        var(--color-primary) 0%, 
-        #e86c23 60%, 
-        #e89523 100% 
-    );
-    color: white;
-    padding-top: 5rem; 
-    padding-bottom: 5rem;
+background: linear-gradient(
+135deg,
+var(--color-primary) 0%, 
+#e86c23 60%, 
+#e89523 100% 
+);
+color: white;
+padding-top: 5rem; 
+padding-bottom: 5rem;
 }
 
 .hero-split-content {
-    display: flex;
-    gap: 3rem;
-    align-items: center;
-    min-height: 450px; 
+display: flex;
+gap: 3rem;
+align-items: center;
+min-height: 450px; 
 }
 
 @media (max-width: 900px) {
-    .hero-split-content {
-        flex-direction: column;
-        text-align: center;
-    }
+.hero-split-content {
+flex-direction: column;
+text-align: center;
+}
 }
 
 .hero-text-content {
-    flex: 1.5;
-    max-width: 600px;
+flex: 1.5;
+max-width: 600px;
 }
 
 .hero-title {
-    font-size: 3.5rem;
-    line-height: 1.1;
-    margin-bottom: 1.5rem;
+font-size: 3.5rem;
+line-height: 1.1;
+margin-bottom: 1.5rem;
 }
 
 .hero-accent {
-    color: var(--color-accent);
+color: var(--color-accent);
 }
 
 .hero-description {
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-    color: rgba(255, 255, 255, 0.9);
+font-size: 1.1rem;
+margin-bottom: 2rem;
+color: rgba(255, 255, 255, 0.9);
 }
 
 .hero-buttons {
-    display: flex;
-    gap: 1rem;
+display: flex;
+gap: 1rem;
 }
 
 .btn-start-watching {
-    background-color: var(--color-accent);
-    color: var(--color-text);
-    display: flex;
-    align-items: center;
+background-color: var(--color-accent);
+color: var(--color-text);
+display: flex;
+align-items: center;
 }
 
 .btn-ghost-dark {
-    background-color: rgba(0, 0, 0, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+background-color: rgba(0, 0, 0, 0.1);
+color: white;
+border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .coming-soon-panel {
-    flex: 1;
-    min-width: 300px;
-    max-width: 350px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+flex: 1;
+min-width: 300px;
+max-width: 350px;
+background-color: rgba(0, 0, 0, 0.2);
+border-radius: var(--radius);
+padding: 1.5rem;
+box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
 .panel-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+font-size: 1.5rem;
+font-weight: bold;
+margin-bottom: 1.5rem;
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
 }
 
 .coming-soon-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+display: flex;
+flex-direction: column;
+gap: 1rem;
 }
 
 .coming-soon-item {
-    display: flex;
-    gap: 1rem;
-    padding: 0.75rem;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    text-decoration: none;
-    color: white;
-    transition: background-color 0.2s;
+display: flex;
+gap: 1rem;
+padding: 0.75rem;
+background-color: rgba(0, 0, 0, 0.1);
+border-radius: 4px;
+text-decoration: none;
+color: white;
+transition: background-color 0.2s;
 }
 
 .coming-soon-poster {
-    width: 60px;
-    height: 85px;
-    object-fit: cover;
-    border-radius: 4px;
+width: 60px;
+height: 85px;
+object-fit: cover;
+border-radius: 4px;
 }
 
 .movie-title-small {
-    font-weight: bold;
-    font-size: 0.95rem;
+font-weight: bold;
+font-size: 0.95rem;
 }
 
 .movie-genre-small {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
+font-size: 0.8rem;
+color: rgba(255, 255, 255, 0.7);
 }
 
-
-/* --- Scrollable Content (Recommendations, CTA) --- */
 .hero-content-scroll {
-    /* Gradient continues from the hero section */
-    background: linear-gradient(
-        135deg,
-        #c73e1d 0%, 
-        #e86c23 60%, 
-        #e89523 100% 
-    );
-    color: white;
-    padding: 2rem 1rem 0; /* Remove bottom padding to let the mission section rise */
+background: linear-gradient(
+135deg,
+#c73e1d 0%, 
+#e86c23 60%, 
+#e89523 100% 
+);
+color: white;
+padding: 2rem 1rem 0; 
 }
 
-/* --- Recommendations Section --- */
 .recommendations-section {
-    padding-top: 4rem;
-    padding-bottom: 2rem;
-    text-align: center;
+padding-top: 4rem;
+padding-bottom: 2rem;
+text-align: center;
 }
 
 .section-title-white {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: white;
+font-size: 2rem;
+font-weight: bold;
+margin-bottom: 0.5rem;
+color: white;
 }
 
 .section-subtitle-white {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 3rem;
+font-size: 1rem;
+color: rgba(255, 255, 255, 0.8);
+margin-bottom: 3rem;
 }
 
-/* Movie Card Grid */
 .movie-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 2rem;
+max-width: 1000px;
+margin: 0 auto;
 }
 
 .movie-card-new {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+background-color: rgba(0, 0, 0, 0.2);
+border-radius: var(--radius);
+overflow: hidden;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+transition: transform 0.3s ease;
 }
 
 .movie-card-new:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+transform: translateY(-5px);
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 .movie-poster-new {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
+width: 100%;
+height: auto;
+object-fit: cover;
 }
 
 .movie-details-new {
-    padding: 1rem 1.5rem 1.5rem;
-    text-align: left;
+padding: 1rem 1.5rem 1.5rem;
+text-align: left;
 }
 
 .movie-title-new {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-    color: white;
+font-size: 1.25rem;
+font-weight: bold;
+margin-bottom: 0.25rem;
+color: white;
 }
 
 .movie-meta-new {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 0.5rem;
+font-size: 0.9rem;
+color: rgba(255, 255, 255, 0.7);
+margin-bottom: 0.5rem;
 }
 
 .movie-rating-new {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+margin-bottom: 1rem;
 }
 
 .movie-rating-new span:last-child {
-    font-size: 0.9rem;
-    color: var(--color-accent);
-    font-weight: 600;
+font-size: 0.9rem;
+color: var(--color-accent);
+font-weight: 600;
 }
 
 .movie-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1rem;
+display: flex;
+gap: 0.75rem;
+margin-top: 1rem;
 }
 
-/* --- Booking CTA Banner --- */
 .booking-cta-banner {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: var(--radius);
-    padding: 3rem 2rem;
-    text-align: center;
-    max-width: 800px;
-    margin: 4rem auto;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+background-color: rgba(0, 0, 0, 0.3);
+border-radius: var(--radius);
+padding: 3rem 2rem;
+text-align: center;
+max-width: 800px;
+margin: 4rem auto;
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
 }
 
 .booking-cta-title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: white;
+font-size: 2rem;
+font-weight: bold;
+margin-bottom: 0.5rem;
+color: white;
 }
 
 .booking-cta-subtitle {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 1.5rem;
+font-size: 1.1rem;
+color: rgba(255, 255, 255, 0.8);
+margin-bottom: 1.5rem;
 }
 
 .booking-cta-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+display: flex;
+justify-content: center;
+gap: 1rem;
 }
 
 .booking-cta-actions .btn-info {
-    background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    color: white;
+background-color: transparent;
+border: 1px solid rgba(255, 255, 255, 0.5);
+color: white;
 }
 
 .booking-cta-actions .btn-info:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* --- Mission Section (Fixes Gradient Break) --- */
 .mission-section {
-    /* FIX: This section must have a solid white background and dark text colors */
-    background-color: white; 
-    color: var(--color-text); 
-    text-align: center;
-    padding: 4rem 1rem 8rem;
-    /* Optional: Add a slight curve or border top to visually separate it from the gradient */
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    position: relative; 
-    z-index: 2; 
+background-color: white; 
+color: var(--color-text); 
+text-align: center;
+padding: 4rem 1rem 8rem;
+border-top-left-radius: 12px;
+border-top-right-radius: 12px;
+position: relative; 
+z-index: 2; 
 }
 
 .mission-title {
-    font-size: 2.25rem;
-    font-weight: bold;
-    color: var(--color-primary); 
-    margin-bottom: 2rem;
+font-size: 2.25rem;
+font-weight: bold;
+color: var(--color-primary); 
+margin-bottom: 2rem;
 }
 
 .mission-statement {
-    font-size: 1.25rem;
-    font-style: italic;
-    color: var(--color-text-muted);
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.5;
+font-size: 1.25rem;
+font-style: italic;
+color: var(--color-text-muted);
+max-width: 700px;
+margin: 0 auto;
+line-height: 1.5;
 }
 
 /* --- Footer --- */
 .footer-new {
-    background-color: #2c3e50; /* Dark blue/slate color */
-    color: white;
-    padding: 3rem 1rem 1rem;
+background-color: #2c3e50; /* Dark blue/slate color */
+color: white;
+padding: 3rem 1rem 1rem;
 }
 
 .footer-content-new {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 1.5rem;
+padding-bottom: 2rem;
+border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (min-width: 768px) {
-    .footer-content-new {
-        flex-direction: row;
-        justify-content: space-between;
-    }
+.footer-content-new {
+flex-direction: row;
+justify-content: space-between;
+}
 }
 
 .footer-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: bold;
-    font-size: 1.25rem;
-    color: white;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+font-weight: bold;
+font-size: 1.25rem;
+color: white;
 }
 
 .footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 1rem;
 }
 
 .footer-links a {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.2s;
+color: rgba(255, 255, 255, 0.8);
+text-decoration: none;
+font-size: 0.875rem;
+transition: color 0.2s;
 }
 
 .footer-links a:hover {
-    color: var(--color-accent);
+color: var(--color-accent);
 }
 
 .footer-bottom {
-    text-align: center;
-    font-size: 0.75rem;
-    padding-top: 1rem;
-    color: rgba(255, 255, 255, 0.5);
+text-align: center;
+font-size: 0.75rem;
+padding-top: 1rem;
+color: rgba(255, 255, 255, 0.5);
 }
 
-/* --- Shared Movies / Page Layout Styles --- */
 .page-content {
-    min-height: calc(100vh - 64px);
-    padding: 2rem 1rem;
-    background-color: #FAFBFC; /* very light neutral background for readability */
+min-height: calc(100vh - 64px);
+padding: 2rem 1rem;
+background-color: #FAFBFC;
 }
 
 .content-inner {
-    background-color: transparent;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
+background-color: transparent;
+max-width: 1200px;
+margin: 0 auto;
+padding: 1rem;
 }
 
 .page-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
+font-size: 2.5rem;
+font-weight: bold;
+margin-bottom: 2rem;
 }
+
 
 .search-filter-bar { display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem; }
 @media (min-width:768px){ .search-filter-bar{ flex-direction:row; } }
