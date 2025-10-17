@@ -24,12 +24,12 @@ body {
  color: var(--color-text);
  line-height: 1.6;
 }
-w
+
 main {
     padding: 3rem 1.5rem; 
     min-height: 80vh; 
+    margin: 2rem 0;
 }
-
 
 .profile-container {
 

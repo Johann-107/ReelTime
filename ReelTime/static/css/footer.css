@@ -54,23 +54,3 @@ font-size: 0.75rem;
 padding-top: 1rem;
 color: rgba(255, 255, 255, 0.5);
 }
-
-html, body {
-    height: 100%; 
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-}
-
-main {
-    flex-grow: 1;
-    background-color: var(--color-background, #C73E1D);
-}
-
-header, footer {
-    flex-shrink: 0;
-}
