@@ -5,32 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Default Admin</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <style>
-        /* small local tweaks to ensure the admin form is compact */
-        .admin-note { font-size: 0.95rem; color: var(--color-text-muted); margin-bottom: .5rem; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/register_admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 <body>
-    <header class="header">
-        <div class="container header-content">
-            <div class="header-left">
-                <a href="{% url 'index' %}" class="logo">
-                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                        <line x1="7" y1="2" x2="7" y2="22"></line>
-                        <line x1="17" y1="2" x2="17" y2="22"></line>
-                    </svg>
-                    <span>ReelTime</span>
-                </a>
-            </div>
-            <div class="header-right">
-                <a href="{% url 'login' %}" class="btn btn-ghost">Sign In</a>
-                <a href="{% url 'register' %}" class="btn btn-accent">Get Started</a>
-            </div>
-        </div>
-    </header>
+    {% include 'reel_time/partials/header.html' %}
 
     <main class="auth-page">
         <div class="auth-card card">

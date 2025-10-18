@@ -1,377 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>All Movies - ReelTime</title>
-
-  <style>
-    :root {
-      --primary: #C73E1D;
-      --secondary: #E86C23;
-      --accent: #E8B923;
-      --light: #fff8f0;
-      --radius: 1rem;
-      --shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-      color: #fff;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1.5rem;
-    }
-
-    /* HEADER */
-    .header {
-      background: rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(8px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow);
-    }
-
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: 70px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.4rem;
-      text-decoration: none;
-    }
-
-    .logo-icon {
-      width: 24px;
-      height: 24px;
-    }
-
-    .nav {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .nav-link {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
-
-    .nav-link:hover {
-      color: var(--accent);
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 0.6rem 1.2rem;
-      border-radius: var(--radius);
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-
-    .btn-ghost {
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .btn-accent {
-      background: var(--accent);
-      color: #000;
-    }
-
-    .btn-accent:hover {
-      background: #fff;
-      color: var(--primary);
-    }
-
-    /* PAGE CONTENT */
-    .page-content {
-      padding: 3rem 1rem;
-      text-align: center;
-    }
-
-    .page-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 2rem;
-      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    /* SEARCH BAR */
-    .search-filter-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      background: rgba(255, 255, 255, 0.07);
-      padding: 1rem;
-      border-radius: var(--radius);
-      backdrop-filter: blur(6px);
-      box-shadow: var(--shadow);
-    }
-
-    @media (min-width: 768px) {
-      .search-filter-bar {
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-      }
-    }
-
-    .search-wrapper {
-      position: relative;
-      flex: 1;
-      max-width: 400px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 0.8rem 1rem 0.8rem 2.5rem;
-      border: none;
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-      font-size: 1rem;
-      backdrop-filter: blur(10px);
-      outline: none;
-      transition: 0.3s;
-    }
-
-    .search-input::placeholder {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .search-input:focus {
-      background: rgba(255, 255, 255, 0.25);
-      outline: 2px solid var(--accent);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      color: #fff;
-      opacity: 0.8;
-    }
-
-    .filter-select {
-  width: 180px;
-  padding: 0.8rem;
-  border: none;
-  border-radius: var(--radius);
-  background-color: rgba(232, 108, 35, 0.2); /* Slight orange */
-  color: #fff;
-  font-size: 1rem;
-  backdrop-filter: blur(10px);
-  outline: none;
-  transition: 0.3s;
-  appearance: none; /* Remove system default styling */
-}
-
-.filter-select option {
-  background-color: #bf3900 ; /* Deeper orange for dropdown options */
-  color: #fff;
-}
-    .filter-select:hover,
-    .filter-select:focus {
-      cursor: pointer;
-      background-color: rgba(255, 255, 255, 0.25);
-      outline: 2px solid var(--accent);
-    }
-
-    /* MOVIE GRID */
-    .movie-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .movie-card {
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform 0.3s, box-shadow 0.3s;
-      backdrop-filter: blur(6px);
-      text-align: center;
-    }
-
-    .movie-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    .movie-poster {
-      width: 100%;
-      height: 380px;
-      object-fit: cover;
-    }
-
-    .movie-info {
-      padding: 1rem 1.2rem;
-    }
-
-    .movie-title {
-      font-weight: 700;
-      font-size: 1.25rem;
-      color: #fff;
-      margin-bottom: 0.3rem;
-    }
-
-    .movie-meta {
-      color: #f1f1f1;
-      font-size: 0.9rem;
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
-    }
-
-    .movie-price {
-      color: var(--accent);
-      font-weight: 600;
-      font-size: 1.1rem;
-      margin-top: 0.5rem;
-    }
-
-    /* STAR RATING */
-    .movie-rating {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.3rem;
-      font-size: 1rem;
-      color: gold;
-      margin: 1rem 0 0.3rem;
-    }
-
-    .star-icon {
-      width: 18px;
-      height: 18px;
-      fill: gold;
-    }
-
-    /* SHOWTIMES */
-   .movie-times {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.time-slot {
-  background: rgba(232, 108, 35, 0.3); /* soft orange background */
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.4rem 1rem;
-  border-radius: 999px;
-  border: 2px solid var(--accent);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  letter-spacing: 0.4px;
-  backdrop-filter: blur(4px);
-}
-
-.time-slot:hover {
-  background: var(--accent);
-  color: #000;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-.time-slot:focus {
-  outline: 2px solid var(--secondary);
-  outline-offset: 3px;
-}
-
-
-    /* COMING SOON BADGE */
-    .coming-soon {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 0.3rem 0.6rem;
-      font-size: 0.75rem;
-      border-radius: 0.5rem;
-      color: #fff;
-      text-transform: uppercase;
-      margin-top: 0.6rem;
-      font-weight: bold;
-      letter-spacing: 0.05em;
-    }
-
-    /* FOOTER */
-    footer {
-      background: rgba(0, 0, 0, 0.3);
-      text-align: center;
-      color: #f1f1f1;
-      padding: 1rem;
-      font-size: 0.9rem;
-      margin-top: 2rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Movies - ReelTime</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/movies.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 
 <body>
   {% load static %}
 
-  <header class="header">
-    <div class="container header-content">
-      <a href="{% url 'index' %}" class="logo">
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-          <line x1="7" y1="2" x2="7" y2="22"></line>
-          <line x1="17" y1="2" x2="17" y2="22"></line>
-          <line x1="2" y1="12" x2="22" y2="12"></line>
-        </svg>
-        ReelTime
-      </a>
-      <nav class="nav">
-        <a href="{% url 'index' %}" class="nav-link">Home</a>
-        <a href="{% url 'movies' %}" class="nav-link">Movies</a>
-        <a href="{% url 'index' %}" class="nav-link">About</a>
-      </nav>
-      <div>
-        <a href="{% url 'login' %}" class="btn btn-ghost">Sign In</a>
-        <a href="{% url 'register' %}" class="btn btn-accent">Get Started</a>
-      </div>
-    </div>
-  </header>
+    {% include 'reel_time/partials/header.html' %}
 
-  <main class="page-content">
-    <div class="container">
-      <h1 class="page-title">All Movies</h1>
+    <main class="page-content">
+        <div class="container">
+            <h1 class="page-title">All Movies</h1>
+
+            <div class="search-filter-bar">
+                <div class="search-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="search" id="movieSearch" placeholder="Search movies..." class="search-input">
+                </div>
+                <select id="genreFilter" class="filter-select">
+                    <option value="all">All Genres</option>
+                    <option value="action">Action</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="thriller">Thriller</option>
+                    <option value="sci-fi">Sci-Fi</option>
+                    <option value="romance">Romance</option>
+                    <option value="comedy">Comedy</option>
+                </select>
+            </div>
 
       <div class="search-filter-bar">
         <div class="search-wrapper">
