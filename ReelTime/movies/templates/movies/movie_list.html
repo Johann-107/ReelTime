@@ -6,37 +6,16 @@
     <title>All Movies - ReelTime</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
-    <link rel="stylesheet" href="{% static 'css/movies.css' %}">
+    <link rel="stylesheet" href="{% static 'css/movie_list.css' %}">
     <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 
 <body>
-  {% load static %}
-
     {% include 'reel_time/partials/header.html' %}
 
     <main class="page-content">
         <div class="container">
             <h1 class="page-title">All Movies</h1>
-
-            <div class="search-filter-bar">
-                <div class="search-wrapper">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.35-4.35"></path>
-                    </svg>
-                    <input type="search" id="movieSearch" placeholder="Search movies..." class="search-input">
-                </div>
-                <select id="genreFilter" class="filter-select">
-                    <option value="all">All Genres</option>
-                    <option value="action">Action</option>
-                    <option value="adventure">Adventure</option>
-                    <option value="thriller">Thriller</option>
-                    <option value="sci-fi">Sci-Fi</option>
-                    <option value="romance">Romance</option>
-                    <option value="comedy">Comedy</option>
-                </select>
-            </div>
 
       <div class="search-filter-bar">
         <div class="search-wrapper">
@@ -56,9 +35,23 @@
           <option value="comedy">Comedy</option>
         </select>
       </div>
+      
+      {% for movie in movies %}
+        <div class="movie-card">
+          <h3>{{ movie.obj.title }}</h3>
+          {% if movie.obj.poster %}
+            <img src="{{ movie.obj.poster.url }}" alt="{{ movie.obj.title }} Poster" width="200px">
+          {% else %}
+            <img src="/static/images/default_poster.jpg" alt="No poster available" width="200px">
+          {% endif %}
 
-      <div class="movie-grid" id="movieGrid">
-        <!-- Example Static Card -->
+          <p><strong>Duration:</strong> {{ movie.obj.duration_minutes }} minutes</p>
+          <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
+          <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
+        </div>
+      {% endfor %}
+
+      <!-- <div class="movie-grid" id="movieGrid">
         <div class="movie-card">
           <img src="https://via.placeholder.com/300x400" alt="Poster" class="movie-poster" />
           <div class="movie-info">
@@ -76,22 +69,19 @@
             </div>
             <div class="movie-price">$13.99</div>
             <a href="#" class="btn btn-accent" style="margin-top: 1rem;">Book Tickets</a>
-            <!-- Optional Coming Soon -->
-            <!-- <div class="coming-soon">Coming Soon</div> -->
+            
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </main>
-
-  <footer>
-    &copy; 2025 ReelTime. All rights reserved.
-  </footer>
 
   <script>
     const STATIC_URL = "{% static '' %}";
   </script>
   <script src="{% static 'js/script.js' %}"></script>
   <script src="{% static 'js/movies.js' %}"></script>
+
+    {% include 'reel_time/partials/footer.html' %}
 </body>
 </html>
