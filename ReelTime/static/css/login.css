@@ -31,6 +31,72 @@ body {
     padding: 0 1rem;
 }
 
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--color-primary);
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: white;
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.nav {
+    display: none;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .nav {
+    display: flex;
+    }
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -142,6 +208,8 @@ body {
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .form-input:focus {
@@ -151,17 +219,29 @@ body {
 
 .password-wrapper {
     position: relative;
+    display: block;
+}
+
+.password-wrapper .form-input {
+    /* make space for the toggle button */
+    padding-right: 3rem;
 }
 
 .password-toggle {
     position: absolute;
-    right: 0.75rem;
+    right: 0.5rem;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
     color: var(--color-text-muted);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
 }
 
 .eye-icon {

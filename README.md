@@ -1,6 +1,6 @@
 # 🎬 ReelTime – Movie Reservation System
 
-ReelTime is a web-based movie reservation system built with a Django backend and a React frontend. The platform provides users with a seamless experience to browse movie schedules, book tickets, and select seats in real time. An admin panel allows administrators to manage movies, showtimes, seats, and user bookings efficiently.
+ReelTime is a web-based movie reservation system built with a Django backend and html, css, and js frontend. The platform provides users with a seamless experience to browse movie schedules, book tickets, and select seats in real time. An admin panel allows administrators to manage movies, showtimes, seats, and user bookings efficiently.
 
 ## 🚀 Features
 ### 🔑 Authentication

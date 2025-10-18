@@ -10,7 +10,7 @@
     --color-info: #E86C23; /* Secondary Orange for buttons */
 }
 
-/* --- Global Reset & Container --- */
+/* --- Global Reset & Container (Fixes Logo/Nav issues) --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -27,6 +27,62 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
+}
+
+/* --- Header & Navigation (Fixes logo sizing and stacked nav) --- */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #c73e1d; 
+    box-shadow: var(--shadow);
+    color: white;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px; 
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* FIX: Logo Sizing */
+.logo-icon {
+    width: 28px; 
+    height: 28px;
+    stroke: white; 
+}
+
+.nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--color-accent);
 }
 
 /* --- Button Base Styles --- */
@@ -47,11 +103,29 @@ body {
     font-size: 1.1rem;
 }
 
+.btn-accent {
+    background-color: var(--color-accent);
+    color: var(--color-text);
+}
+
+.btn-accent:hover {
+    background-color: #f7cb5c;
+}
+
+.btn-ghost {
+    background-color: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.btn-ghost:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 .btn-info {
     background-color: var(--color-info);
     color: white;
 }
-
 .btn-info:hover {
     background-color: #f99042;
 }
@@ -62,7 +136,7 @@ body {
         135deg,
         var(--color-primary) 0%, 
         #e86c23 60%, 
-        #e89523 100%
+        #e89523 100% 
     );
     color: white;
     padding-top: 5rem; 
@@ -176,16 +250,18 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
+
 /* --- Scrollable Content (Recommendations, CTA) --- */
 .hero-content-scroll {
+    /* Gradient continues from the hero section */
     background: linear-gradient(
         135deg,
         #c73e1d 0%, 
         #e86c23 60%, 
-        #e89523 100%
+        #e89523 100% 
     );
     color: white;
-    padding: 2rem 1rem 0;
+    padding: 2rem 1rem 0; /* Remove bottom padding to let the mission section rise */
 }
 
 /* --- Recommendations Section --- */
@@ -313,12 +389,14 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* --- Mission Section --- */
+/* --- Mission Section (Fixes Gradient Break) --- */
 .mission-section {
+    /* FIX: This section must have a solid white background and dark text colors */
     background-color: white; 
     color: var(--color-text); 
     text-align: center;
     padding: 4rem 1rem 8rem;
+    /* Optional: Add a slight curve or border top to visually separate it from the gradient */
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
     position: relative; 
@@ -340,3 +418,103 @@ body {
     margin: 0 auto;
     line-height: 1.5;
 }
+
+/* --- Footer --- */
+.footer-new {
+    background-color: #2c3e50; /* Dark blue/slate color */
+    color: white;
+    padding: 3rem 1rem 1rem;
+}
+
+.footer-content-new {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 768px) {
+    .footer-content-new {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: var(--color-accent);
+}
+
+.footer-bottom {
+    text-align: center;
+    font-size: 0.75rem;
+    padding-top: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- Shared Movies / Page Layout Styles --- */
+.page-content {
+    min-height: calc(100vh - 64px);
+    padding: 2rem 1rem;
+    background-color: #FAFBFC; /* very light neutral background for readability */
+}
+
+.content-inner {
+    background-color: transparent;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.search-filter-bar { display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem; }
+@media (min-width:768px){ .search-filter-bar{ flex-direction:row; } }
+
+.search-wrapper{ position:relative; flex:1; }
+.search-input{ width:100%; padding:0.75rem 0.75rem 0.75rem 2.5rem; background-color:var(--color-card); border:1px solid var(--color-border); border-radius:var(--radius); font-size:1rem; }
+.filter-select{ width:100%; padding:0.75rem; background-color:var(--color-card); border:1px solid var(--color-border); border-radius:var(--radius); font-size:1rem; }
+@media (min-width:768px){ .filter-select{ width:200px; } }
+
+.movie-grid{ display:grid; grid-template-columns:1fr; gap:1.5rem; }
+@media (min-width:768px){ .movie-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (min-width:1024px){ .movie-grid{ grid-template-columns:repeat(3,1fr); } }
+
+.movie-card{ background-color:#FFFFFF; border-radius:var(--radius); overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.1); transition:box-shadow 0.2s; }
+.movie-card:hover{ box-shadow:0 10px 25px rgba(0,0,0,0.15); }
+.movie-poster{ width:100%; height:400px; object-fit:cover; }
+.movie-badge{ position:absolute; top:0.75rem; right:0.75rem; background-color:var(--color-primary); color:white; padding:0.25rem 0.75rem; border-radius:0.25rem; font-size:0.75rem; font-weight:600; }
+.movie-title{ font-size:1.25rem; font-weight:bold; }
+.movie-rating{ display:flex; align-items:center; gap:0.25rem; font-weight:600; }
+.movie-meta{ font-size:0.875rem; color:var(--color-text-muted); }
+.btn-showtime{ padding:0.25rem 0.75rem; font-size:0.75rem; border:1px solid var(--color-border); background-color:transparent; border-radius:0.25rem; cursor:pointer; transition:all 0.2s; }
+.btn-showtime:hover, .btn-showtime.selected{ background-color:var(--color-accent); border-color:var(--color-accent); color:var(--color-text); }
+.movie-price{ font-size:1.5rem; font-weight:bold; }
