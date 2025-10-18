@@ -217,18 +217,6 @@ body {
     }
 }
 
-.movie-card {
-    background-color: var(--color-card);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s;
-}
-
-.movie-card:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
 .movie-poster-wrapper {
     position: relative;
 }
@@ -320,4 +308,63 @@ body {
 
 .movie-footer {
     padding: 0 1.5rem 1.5rem;
+}
+
+/* --- Movie Card Styles --- */
+
+.movie-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.movie-card img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+}
+
+.movie-card h3 {
+    font-size: 1.2rem;
+    margin: 10px 0 5px;
+    color: #2c3e50;
+}
+
+.movie-card p {
+    font-size: 0.9rem;
+    color: #6c7a89;
+    padding: 0 10px 15px;
+}
+
+/* Optional button style */
+.movie-card a {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 8px 16px;
+    background-color: #C73E1D; /* Colony’s deep red/orange */
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.movie-card a:hover {
+    background-color: #a63117;
+}
+
+.movie-card p strong {
+  color: #C73E1D;
+}
+
+.movie-card p {
+  margin: 4px 0;
 }

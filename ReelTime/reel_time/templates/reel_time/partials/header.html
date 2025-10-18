@@ -30,7 +30,7 @@
                     {% else %}
                         <a href="{% url 'user_dashboard' %}" class="nav-link">Home</a>
                     {% endif %}
-                    <a href="{% url 'movies' %}" class="nav-link">Movies</a>
+                    <a href="{% url 'movie_list' %}" class="nav-link">Movies</a>
                     {% if user.is_admin %}
                         <a href="{% url 'admin_dashboard' %}" class="nav-link">Reservations</a>
                     {% else %}
@@ -38,7 +38,7 @@
                     {% endif %}
                 {% else %}
                     <a href="{% url 'index' %}" class="nav-link">Home</a>
-                    <a href="{% url 'movies' %}" class="nav-link">Movies</a>
+                    <a href="{% url 'movie_list' %}" class="nav-link">Movies</a>
                     <a href="{% url 'index' %}" class="nav-link">About</a>
                 {% endif %}
             </nav>

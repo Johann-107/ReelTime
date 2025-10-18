@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'reel_time',
     'accounts',
     'dashboards',
+    'movies',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ReelTime.urls'
+ROOT_URLCONF = 'reeltime.urls'
 
 TEMPLATES = [
     {
@@ -75,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ReelTime.wsgi.application'
+WSGI_APPLICATION = 'reeltime.wsgi.application'
 
 
 # Database
@@ -134,6 +135,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Media files (for user uploads like movie posters)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+USE_TZ = True
+TIME_ZONE = "Asia/Manila"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -141,5 +148,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirect after login
-LOGIN_REDIRECT_URL = '/dashboards/user-dashboard/'
+LOGIN_REDIRECT_URL = '/dashboards/user_dashboard/'
 LOGOUT_REDIRECT_URL = '/'  # Go to home page after logout
