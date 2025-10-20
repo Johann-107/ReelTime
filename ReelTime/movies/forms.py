@@ -1,16 +1,85 @@
 from django import forms
-from .models import Movie
+from .models import Movie, MovieAdminDetails
+from django.forms.widgets import DateInput, Textarea
+
+class MovieAdminDetailsForm(forms.ModelForm):
+    class Meta:
+        model = MovieAdminDetails
+        fields = ['release_date', 'end_date', 'showing_times', 'poster']
+        widgets = {
+            'release_date': DateInput(attrs={'type': 'date'}),
+            'end_date': DateInput(attrs={'type': 'date'}),
+            'showing_times': Textarea(attrs={'rows': 2, 'placeholder': 'e.g. ["10:00 AM", "1:30 PM", "6:45 PM"]'}),
+        }
 
 class MovieForm(forms.ModelForm):
+    # Embed the admin details form fields here:
+    release_date = forms.DateField(widget=DateInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(widget=DateInput(attrs={'type': 'date'}))
+    showing_times = forms.CharField(
+        widget=Textarea(attrs={'rows': 2, 'placeholder': 'e.g. ["10:00 AM", "1:30 PM", "6:45 PM"]'}),
+        required=False
+    )
+    poster = forms.ImageField(required=False)
+
     class Meta:
         model = Movie
         fields = [
-            'title', 'description', 'release_date', 'end_date',
-            'showing_times', 'poster', 'genre', 'director',
-            'duration_minutes', 'rating'
+            'title', 'description',
+            'genre', 'director', 'duration_minutes', 'rating',
         ]
-        widgets = {
-            'release_date': forms.DateInput(attrs={'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'type': 'date'}),
-            'showing_times': forms.Textarea(attrs={'rows': 2, 'placeholder': 'e.g. ["10:00 AM", "1:30 PM", "6:45 PM"]'}),
-        }
+
+    def __init__(self, *args, **kwargs):
+        # Optionally receive admin user to save later
+        self.admin = kwargs.pop('admin', None)
+        super().__init__(*args, **kwargs)
+
+        # If editing existing movie and admin details, populate initial admin fields
+        if self.instance.pk and self.admin:
+            try:
+                admin_details = self.instance.admin_details.get(admin=self.admin)
+                self.fields['release_date'].initial = admin_details.release_date
+                self.fields['end_date'].initial = admin_details.end_date
+                self.fields['showing_times'].initial = admin_details.showing_times
+                self.fields['poster'].initial = admin_details.poster
+            except MovieAdminDetails.DoesNotExist:
+                pass
+
+    def clean_showing_times(self):
+        data = self.cleaned_data['showing_times']
+        if isinstance(data, str):
+            import json
+            try:
+                data_list = json.loads(data)
+                if not isinstance(data_list, list):
+                    raise forms.ValidationError("Showing times must be a list.")
+                return data_list
+            except Exception:
+                raise forms.ValidationError("Enter showing times as a JSON list, e.g. [\"10:00 AM\", \"1:30 PM\"]")
+        return data
+
+    def save(self, commit=True):
+        movie = super().save(commit=commit)
+
+        # Save or create admin details
+        if self.admin:
+            admin_details, created = MovieAdminDetails.objects.get_or_create(
+                movie=movie,
+                admin=self.admin,
+                defaults={
+                    'release_date': self.cleaned_data['release_date'],
+                    'end_date': self.cleaned_data['end_date'],
+                    'showing_times': self.cleaned_data['showing_times'],
+                    'poster': self.cleaned_data.get('poster'),
+                }
+            )
+            if not created:
+                # Update existing admin details
+                admin_details.release_date = self.cleaned_data['release_date']
+                admin_details.end_date = self.cleaned_data['end_date']
+                admin_details.showing_times = self.cleaned_data['showing_times']
+                if self.cleaned_data.get('poster'):
+                    admin_details.poster = self.cleaned_data['poster']
+                admin_details.save()
+
+        return movie
