@@ -37,19 +37,23 @@
       </div>
       
       {% for movie in movies %}
-        <div class="movie-card">
-          <h3>{{ movie.obj.title }}</h3>
-          {% if movie.obj.poster %}
-            <img src="{{ movie.obj.poster.url }}" alt="{{ movie.obj.title }} Poster" width="200px">
-          {% else %}
-            <img src="/static/images/default_poster.jpg" alt="No poster available" width="200px">
-          {% endif %}
+        {% with detail=movie.detail %}
+          <div class="movie-card">
+            <h3>{{ detail.movie.title }}</h3>
 
-          <p><strong>Duration:</strong> {{ movie.obj.duration_minutes }} minutes</p>
-          <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
-          <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
-        </div>
+            {% if detail.poster %}
+              <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" width="200px">
+            {% else %}
+              <img src="/static/images/default_poster.jpg" alt="No poster available" width="200px">
+            {% endif %}
+
+            <p><strong>Duration:</strong> {{ detail.movie.duration_minutes }} minutes</p>
+            <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
+            <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
+          </div>
+        {% endwith %}
       {% endfor %}
+
 
       <!-- <div class="movie-grid" id="movieGrid">
         <div class="movie-card">
