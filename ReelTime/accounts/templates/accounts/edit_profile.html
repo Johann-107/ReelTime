@@ -1,53 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Profile</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'css/header.css' %}">
-  <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
-<body>
-  {% include 'reel_time/partials/header.html' %}
+{% extends 'reel_time/partials/base.html' %} 
+{% load static %} 
 
-  <div class="edit-container">
+{# 1. PAGE TITLE BLOCK #}
+{% block title %}
+    Edit Profile
+{% endblock title %}
+
+---
+
+{# 2. PAGE-SPECIFIC CSS BLOCK #}
+{# Only the CSS unique to the edit profile page is included here #}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/edit_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock extra_head %}
+
+---
+
+{# 3. MAIN CONTENT BLOCK (The Edit Profile Form) #}
+{% block content %}
+<div class="edit-container">
     <h1>Edit Profile</h1>
 
     <form method="POST" class="edit-form">
-      {% csrf_token %}
-      <div class="form-group">
-        <label for="first_name">First Name:</label>
-        <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}" required>
-      </div>
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="first_name">First Name:</label>
+            <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}" required>
+        </div>
 
-      <div class="form-group">
-        <label for="last_name">Last Name:</label>
-        <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}" required>
-      </div>
+        <div class="form-group">
+            <label for="last_name">Last Name:</label>
+            <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}" required>
+        </div>
 
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" value="{{ user.username }}" required>
-      </div>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" value="{{ user.username }}" required>
+        </div>
 
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" value="{{ user.email }}" required>
-      </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" value="{{ user.email }}" required>
+        </div>
 
-      <div class="form-group">
-        <label for="phone_number">Phone Number:</label>
-        <input type="text" name="phone_number" id="phone_number" value="{{ user.phone_number }}" required>
-      </div>
+        <div class="form-group">
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" name="phone_number" id="phone_number" value="{{ user.phone_number }}" required>
+        </div>
 
-      <div class="buttons">
-        <button type="submit" class="btn save">Save Changes</button>
-        <a href="{% url 'profile' %}" class="btn cancel">Cancel</a>
-      </div>
+        <div class="buttons">
+            <button type="submit" class="btn save">Save Changes</button>
+            <a href="{% url 'profile' %}" class="btn cancel">Cancel</a>
+        </div>
     </form>
-  </div>
-
-  {% include 'reel_time/partials/footer.html' %}
-</body>
-</html>
+</div>
+{% endblock content %}

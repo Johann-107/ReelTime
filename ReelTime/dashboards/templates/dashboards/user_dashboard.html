@@ -1,21 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+{% extends 'reel_time/partials/base.html' %} 
+{% load static %} 
+
+{% block title %}
+    Dashboard
+{% endblock title %}
+
+{# Since header.css and footer.css are now in base.html, we only need user_dashboard.css here #}
+{% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
-<body>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+    <div class="welcome-header">
+        <h1>Welcome Back, {{ user.username }}!</h1>
+        <p>You are now logged in. Explore what's showing now.</p>
+    </div>
+
+    <main>
+    <div class="dashboard-container">
     
-    {% include 'reel_time/partials/header.html' %}
+    <h2 class="dashboard-section-title">Now Showing Movies</h2>
 
-    <h1>Welcome, {{ user.username }}!</h1>
-    <p>You are now logged in.</p>
+    <div class="movie-grid" id="movieDashboardGrid">
+    </div>
+    
+    <div class="pagination">
+    <button id="prevPageBtn" disabled>Previous Page</button>
+    <button id="nextPageBtn">Next Page</button>
+    </div>
+    
+    </div>
+    </main>
+{% endblock content %}
 
-    {% include 'reel_time/partials/footer.html' %}
-</body>
-</html>
+
+{% block extra_js %}
+    <script>
+        const STATIC_URL = "{% static '' %}"; 
+    </script>
+    <script src="{% static 'js/dashboard_movies.js' %}"></script>
+{% endblock extra_js %}
