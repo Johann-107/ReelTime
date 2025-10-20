@@ -1,27 +1,247 @@
 :root {
-        --color-primary: #c73e1d;
-        --color-primary-dark: #a32f15;
-        --color-accent: #e8b923;
-        --color-background: #f9f6f0;
-        --color-card: #ffffff;
-        --color-text: #1a1a1a;
-        --color-text-muted: #6b6b6b;
-        --color-border: #e5e0d8;
-        --color-input: #f5f2eb;
-        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        --radius: 8px;
-    }
+/* --- THEME VARIABLES --- */
+--color-primary: #c73e1d; /* Deep Red/Maroon */
+--color-primary-dark: #a32f15; 
+--color-accent: #e8b923; /* Gold/Yellow Accent */
 
-    
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+/* New variable definition based on your movie card style */
+--color-secondary: #e86c23; /* Orange/Secondary Action Color */
 
-    body {
-        font-family: var(--font-sans);
-        background-color: var(--color-background);
-        color: var(--color-text);
-        line-height: 1.6;
+--color-background: #f9f6f0; 
+--color-card: #ffffff; 
+--color-text-dark: #1a1a1a; 
+--color-text-light: #ffffff; 
+--color-text-muted: #6b6b6b;
+--color-border: #e5e0d8;
+--color-input: #f5f2eb;
+
+--font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Poppins added */
+--radius: 8px;
+}
+
+/* --- BASE RESET & FONT --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* Consolidated and cleaned up body styles */
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-sans);
+    background-color: var(--color-background); /* Using defined variable */
+    color: var(--color-text-dark); 
+    line-height: 1.6;
+    /* Removed redundant background-color: #f8f8f8 and color: #333 */
+}
+
+main {
+    flex-grow: 1; 
+    /* Consolidated main styles */
+    min-height: calc(100vh - 120px); /* Keep this if 120px is your header + footer height */
+    padding: 2rem 0; /* Add vertical padding */
+    /* background-color: #f8f8f8; - Removed if using --color-background */
+}
+
+
+/* --- DASHBOARD LAYOUT & CENTERING --- */
+
+/* Consolidated container/content styling for centering */
+.dashboard-content, 
+.dashboard-container {
+    max-width: 1200px; 
+    width: 100%;
+    margin: 0 auto; 
+    padding: 0 1.5rem; /* Ensures side padding */
+}
+
+/* --- WELCOME HEADER --- */
+
+.welcome-header {
+    /* Using new variable definitions for consistency */
+    background: var(--color-primary); 
+    color: var(--color-text-light);
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0 0 var(--radius) var(--radius);
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* --- TYPOGRAPHY --- */
+
+/* Target the dashboard-content <h1> and <p> styles from the first block of CSS */
+.dashboard-content h1 {
+    color: var(--color-primary); 
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-content p {
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.dashboard-section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-secondary); /* Corrected variable */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--color-accent); /* Corrected variable */
+    display: inline-block;
+    width: 100%;
+}
+
+/* --- MOVIE GRID & CARD --- */
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 1000px) {
+    .movie-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
+}
+
+.movie-card {
+    background: var(--color-card); /* Using defined variable */
+    color: var(--color-text-dark); /* Using defined variable */
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.movie-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.movie-poster {
+    width: 100%;
+    height: 320px; 
+    object-fit: cover;
+}
+
+.movie-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-primary); /* Corrected variable */
+    margin-top: 0.5rem;
+    padding: 0 0.5rem;
+}
+
+.movie-meta {
+    color: var(--color-text-muted); /* Using a defined muted variable */
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.movie-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    color: gold;
+    margin: 0.5rem 0 0.3rem;
+}
+.star-icon {
+    width: 16px;
+    height: 16px;
+    fill: gold;
+}
+
+.movie-times {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.time-slot {
+    /* Using defined variables for consistency */
+    background: rgba(232, 108, 35, 0.1); 
+    color: var(--color-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.8rem; 
+    border-radius: 999px;
+    border: 1px solid var(--color-secondary);
+    transition: background 0.2s;
+}
+.time-slot:hover {
+    background: var(--color-secondary);
+    color: var(--color-text-light); /* Corrected variable */
+    cursor: pointer;
+}
+
+.movie-price {
+    color: var(--color-accent); /* Corrected variable */
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.book-btn {
+    display: block;
+    width: 90%;
+    margin: 0 auto 1rem auto;
+    padding: 0.75rem;
+    background: var(--color-secondary); /* Corrected variable */
+    color: var(--color-text-light);
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.book-btn:hover {
+    background: var(--color-primary); /* Corrected variable */
+}
+
+/* --- PAGINATION --- */
+.pagination {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.pagination button {
+    background: var(--color-accent); /* Corrected variable */
+    color: var(--color-text-dark); /* Changed from #000 for theme consistency */
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: var(--color-secondary); /* Corrected variable */
+    color: var(--color-text-light); /* Corrected variable */
+}
+
+.pagination button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
