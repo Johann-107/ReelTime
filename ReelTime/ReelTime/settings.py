@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ReelTime.urls'
+ROOT_URLCONF = 'reeltime.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ReelTime.wsgi.application'
+WSGI_APPLICATION = 'reeltime.wsgi.application'
 
 
 # Database
@@ -150,3 +150,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect after login
 LOGIN_REDIRECT_URL = '/dashboards/user_dashboard/'
 LOGOUT_REDIRECT_URL = '/'  # Go to home page after logout
+
+# Email configuration for sending admin confirmation emails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # or your email provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = 'ReelTime <johnanthonysb@gmail.com>'
