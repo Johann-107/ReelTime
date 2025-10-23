@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('register/', views.register_user, name='register'), # User Registration
     path('register-admin/', views.register_admin, name='register_admin'), # Admin Registration
+    path('confirm-admin/<str:token>/', views.confirm_admin, name='confirm_admin'), # Confirm Admin Registration
     path('login/', views.login_user, name='login'), # User Login
     path('logout/', views.logout_user, name='logout'), # Logout URL
     path('change-password/', views.change_password, name='change_password'), # Change Password

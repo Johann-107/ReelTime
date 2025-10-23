@@ -3,6 +3,7 @@ import string
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -28,3 +29,18 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'reel_time_user'
+
+
+class PendingAdmin(models.Model):
+    cinema_name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    token = models.CharField(max_length=100, unique=True)
+    is_confirmed = models.BooleanField(default=False)  # ✅ Added this field
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        status = "Confirmed" if self.is_confirmed else "Pending"
+        return f"{self.cinema_name} - {self.email} ({status})"
+
+    class Meta:
+        ordering = ["-created_at"]  # optional: latest requests first

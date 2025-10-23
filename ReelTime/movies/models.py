@@ -29,7 +29,7 @@ class MovieAdminDetails(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('movie', 'admin', 'release_date', 'end_date')  # Prevent same admin adding same showtime twice
+        unique_together = ('movie', 'admin', 'release_date', 'end_date')  # Prevent same admin adding same movi twice
 
     @property
     def is_now_showing(self):

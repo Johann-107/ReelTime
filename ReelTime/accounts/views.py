@@ -1,26 +1,97 @@
 from accounts.utils import create_default_admin
-from accounts.models import User
+from accounts.models import User, PendingAdmin
 from accounts.forms import RegistrationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
+from django.utils.crypto import get_random_string
+from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib import messages
+
 
 # --------------------------
 # Admin Registration
 # --------------------------
 def register_admin(request):
-    if request.method == 'POST':
-        cinema_name = request.POST.get('cinema_name')
+    if request.method == "POST":
+        cinema_name = request.POST.get("cinema_name")
+        email = request.POST.get("email")
 
-        if not cinema_name:
-            return redirect('register_admin')
+        if not cinema_name or not email:
+            messages.error(request, "Please provide both cinema name and email.")
+            return redirect("register_admin")
 
-        # Create default admin for that cinema
-        create_default_admin(cinema_name)
-        request.session['admin_registration_success'] = True
-        return redirect('login')
+        # Check if email already exists in PendingAdmin
+        pending, created = PendingAdmin.objects.get_or_create(
+            email=email,
+            defaults={
+                "cinema_name": cinema_name,
+                "token": get_random_string(48),
+            },
+        )
 
-    return render(request, 'accounts/register_admin.html')
+        if not created:
+            if pending.is_confirmed:
+                messages.error(request, "This email is already confirmed as an admin.")
+                return redirect("login")
+            else:
+                # Update cinema name and regenerate token in case they want to retry
+                pending.cinema_name = cinema_name
+                pending.token = get_random_string(48)
+                pending.save()
+                messages.info(request, "A new confirmation link has been sent to your email.")
+
+        else:
+            messages.success(request, "A confirmation email has been sent. Please check your inbox.")
+
+        # Send or resend confirmation email
+        confirmation_link = request.build_absolute_uri(f"/accounts/confirm-admin/{pending.token}/")
+        subject = "Confirm your admin registration - ReelTime"
+        message = (
+            f"Hello!\n\n"
+            f"Did you register as admin for ReelTime?\n\n"
+            f"If yes, please confirm by clicking this link:\n{confirmation_link}\n\n"
+            f"If not, you can ignore this email."
+        )
+
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+        return redirect("register_admin")
+
+    return render(request, "accounts/register_admin.html")
+
+
+# --------------------------
+# Confirm Admin Registration
+# --------------------------
+def confirm_admin(request, token):
+    try:
+        pending = PendingAdmin.objects.get(token=token)
+    except PendingAdmin.DoesNotExist:
+        messages.error(request, "Invalid or expired confirmation link.")
+        return redirect("register_admin")
+
+    # Create the default admin
+    admin = create_default_admin(pending.cinema_name, pending.email)
+
+    # Send credentials to the admin email
+    subject = "Your ReelTime Admin Account Credentials"
+    message = (
+        f"Your admin account for '{pending.cinema_name}' has been created!\n\n"
+        f"Username: {admin.username}\n"
+        f"Password: admin123\n\n"
+        f"Please log in and change your password immediately."
+    )
+
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pending.email])
+
+    # Mark as confirmed instead of deleting
+    pending.is_confirmed = True
+    pending.save()
+
+    messages.success(request, "Admin account confirmed! Login details sent to your email.")
+    return redirect("login")
+
 
 
 # --------------------------
@@ -47,8 +118,8 @@ def login_user(request):
     logout_success = request.session.pop('logout_success', False)
 
     if request.method == 'POST':
-        username_or_email = request.POST.get('username_or_email')
-        password = request.POST.get('password')
+        username_or_email = request.POST.get('username_or_email').strip()
+        password = request.POST.get('password').strip()
 
         # Try username first
         user = authenticate(request, username=username_or_email, password=password)
