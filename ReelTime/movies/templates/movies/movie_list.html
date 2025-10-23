@@ -39,8 +39,13 @@
       {% for movie in movies %}
         {% with detail=movie.detail %}
           <div class="movie-card">
-            <h3>{{ detail.movie.title }}</h3>
-
+            {% if user.is_authenticated and user.is_admin %}
+                <a href="{% url 'movie_detail' movie.detail.pk %}" class="movie-link">
+                    <h3>{{ movie.detail.movie.title }}</h3>
+                </a>
+            {% else %}
+                <h3>{{ movie.detail.movie.title }}</h3>
+            {% endif %}
             {% if detail.poster %}
               <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" width="200px">
             {% else %}
@@ -50,6 +55,7 @@
             <p><strong>Duration:</strong> {{ detail.movie.duration_minutes }} minutes</p>
             <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
             <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
+            <p><strong>End Date:</strong> {{ movie.end_date }}</p>
           </div>
         {% endwith %}
       {% endfor %}
