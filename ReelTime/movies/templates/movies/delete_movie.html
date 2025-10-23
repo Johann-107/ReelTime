@@ -1,0 +1,14 @@
+{% extends 'reel_time/partials/base.html' %}
+
+{% block content %}
+<div class="delete-movie-container">
+    <h2>Delete Movie</h2>
+    <p>Are you sure you want to delete <strong>{{ detail.movie.title }}</strong>? This action cannot be undone.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'movie_detail' detail.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
