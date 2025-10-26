@@ -205,6 +205,11 @@ def edit_profile(request):
         user.username = request.POST.get('username')
         user.email = request.POST.get('email')
         user.phone_number = request.POST.get('phone_number')
+        
+        # Handle profile picture upload
+        if 'profile_picture' in request.FILES:
+            user.profile_picture = request.FILES['profile_picture']
+        
         user.save()
 
         request.session['profile_updated'] = True
