@@ -1,97 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Movies - ReelTime</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+{% extends 'reel_time/partials/base.html' %}
+
+{% load static %}
+
+{% block title %}All Movies - ReelTime{% endblock title %}
+
+{% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/movie_list.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
+{% endblock extra_head %}
 
-<body>
-    {% include 'reel_time/partials/header.html' %}
-
+{% block content %}
     <main class="page-content">
         <div class="container">
             <h1 class="page-title">All Movies</h1>
 
-      <div class="search-filter-bar">
-        <div class="search-wrapper">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <input type="search" id="movieSearch" placeholder="Search movies..." class="search-input">
-        </div>
-        <select id="genreFilter" class="filter-select">
-          <option value="all">All Genres</option>
-          <option value="action">Action</option>
-          <option value="adventure">Adventure</option>
-          <option value="thriller">Thriller</option>
-          <option value="sci-fi">Sci-Fi</option>
-          <option value="romance">Romance</option>
-          <option value="comedy">Comedy</option>
-        </select>
-      </div>
-      
-      {% for movie in movies %}
-        {% with detail=movie.detail %}
-          <div class="movie-card">
-            {% if user.is_authenticated and user.is_admin %}
-                <a href="{% url 'movie_detail' movie.detail.pk %}" class="movie-link">
-                    <h3>{{ movie.detail.movie.title }}</h3>
-                </a>
-            {% else %}
-                <h3>{{ movie.detail.movie.title }}</h3>
-            {% endif %}
-            {% if detail.poster %}
-              <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" width="200px">
-            {% else %}
-              <img src="/static/images/default_poster.jpg" alt="No poster available" width="200px">
-            {% endif %}
-
-            <p><strong>Duration:</strong> {{ detail.movie.duration_minutes }} minutes</p>
-            <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
-            <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
-            <p><strong>End Date:</strong> {{ movie.end_date }}</p>
-          </div>
-        {% endwith %}
-      {% endfor %}
-
-
-      <!-- <div class="movie-grid" id="movieGrid">
-        <div class="movie-card">
-          <img src="https://via.placeholder.com/300x400" alt="Poster" class="movie-poster" />
-          <div class="movie-info">
-            <div class="movie-meta">Action</div>
-            <div class="movie-title">Demon Slayer: Infinity Castle</div>
-            <div class="movie-rating">
-              <svg class="star-icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              <span>8.9</span>
+            <div class="search-filter-bar">
+                <div class="search-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="search" id="movieSearch" placeholder="Search movies..." class="search-input">
+                </div>
+                <select id="genreFilter" class="filter-select">
+                    <option value="all">All Genres</option>
+                    <option value="action">Action</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="thriller">Thriller</option>
+                    <option value="sci-fi">Sci-Fi</option>
+                    <option value="romance">Romance</option>
+                    <option value="comedy">Comedy</option>
+                </select>
             </div>
-            <div class="movie-meta">2h 0m • Today</div>
-            <div class="movie-times">
-              <button class="time-slot">11:00 AM</button>
-              <button class="time-slot">4:30 PM</button>
-              <button class="time-slot">9:00 PM</button>
-            </div>
-            <div class="movie-price">$13.99</div>
-            <a href="#" class="btn btn-accent" style="margin-top: 1rem;">Book Tickets</a>
             
-          </div>
+            <div class="movie-grid">
+                {% for movie in movies %}
+                    {% with detail=movie.detail %}
+                        <div class="movie-card">
+                            {% if user.is_authenticated and user.is_admin %}
+                                <a href="{% url 'movie_detail' movie.detail.pk %}" class="movie-link">
+                                    <h3>{{ movie.detail.movie.title }}</h3>
+                                </a>
+                            {% else %}
+                                <h3>{{ movie.detail.movie.title }}</h3>
+                            {% endif %}
+                            
+                            {% if detail.poster %}
+                                <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" class="movie-poster">
+                            {% else %}
+                                <img src="{% static 'images/default_poster.jpg' %}" alt="No poster available" class="movie-poster">
+                            {% endif %}
+
+                            <p><strong>Duration:</strong> {{ detail.movie.duration_minutes }} minutes</p>
+                            <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
+                            <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
+                            <p><strong>End Date:</strong> {{ movie.end_date }}</p>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+
         </div>
-      </div> -->
-    </div>
-  </main>
+    </main>
+{% endblock content %}
 
-  <script>
-    const STATIC_URL = "{% static '' %}";
-  </script>
-  <script src="{% static 'js/script.js' %}"></script>
-  <script src="{% static 'js/movies.js' %}"></script>
-
-    {% include 'reel_time/partials/footer.html' %}
-</body>
-</html>
+{% block extra_js %}
+    <script>
+        const STATIC_URL = "{% static '' %}";
+    </script>
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/movies.js' %}"></script>
+{% endblock extra_js %}

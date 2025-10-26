@@ -99,3 +99,14 @@ input:focus {
 .btn.cancel:hover {
   background-color: #333;
 }
+
+
+.edit-container {
+    background-color: #ffffff;
+    padding: 2rem 3rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 400px;
+  
+    margin: 3rem auto;
+}

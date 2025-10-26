@@ -92,7 +92,6 @@ def movie_list_view(request):
         end_date = detail.end_date
         days_diff = (release_date - today).days
 
-        # Human-readable release label
         if days_diff == 0:
             release_label = "Today"
         elif days_diff == 1:
@@ -102,13 +101,11 @@ def movie_list_view(request):
         else:
             release_label = release_date.strftime("%B %d, %Y").replace(" 0", " ")
 
-        # Handle showing_times list
         if isinstance(detail.showing_times, (list, tuple)):
             showing_times_display = ", ".join(detail.showing_times)
         else:
             showing_times_display = str(detail.showing_times)
 
-        # ✅ Include end date (formatted)
         end_date_label = end_date.strftime("%B %d, %Y").replace(" 0", " ") if end_date else "N/A"
 
         movies.append({
@@ -127,10 +124,8 @@ def movie_list_view(request):
 
 @login_required
 def movie_detail_view(request, pk):
-    # Fetch the MovieAdminDetails entry
     detail = get_object_or_404(MovieAdminDetails.objects.select_related('movie'), pk=pk)
 
-    # Only admins who own the movie can edit/delete
     can_manage = request.user.is_admin and detail.admin == request.user
 
     manila_tz = ZoneInfo("Asia/Manila")

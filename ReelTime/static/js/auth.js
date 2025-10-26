@@ -1,5 +1,4 @@
   document.addEventListener("DOMContentLoaded", () => {
-    // Password visibility toggle
     const togglePassword = document.getElementById("togglePassword")
     if (togglePassword) {
       togglePassword.addEventListener("click", () => {
@@ -9,7 +8,6 @@
       })
     }
 
-    // Login form submission
     const loginForm = document.getElementById("loginForm")
     if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
@@ -23,7 +21,6 @@
     })
   }
 
-  // Register form submission
     const registerForm = document.getElementById("registerForm")
     if (registerForm) {
       registerForm.addEventListener("submit", (e) => {
@@ -31,14 +28,12 @@
         const confirmPassword = document.getElementById("confirmPassword").value
         const terms = document.getElementById("terms").checked
 
-        // 1. Check Terms and Conditions
         if (!terms) {
           e.preventDefault() 
           alert("Please agree to the Terms of Service and Privacy Policy.")
           return
         }
 
-        // 2. Check Password Match
         if (password !== confirmPassword) {
           e.preventDefault() 
           alert("Passwords do not match.")

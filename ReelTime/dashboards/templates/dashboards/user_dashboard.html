@@ -1,21 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+{% extends 'reel_time/partials/base.html' %} 
+{% load static %} 
+
+{% block title %}
+    User Dashboard - {{ user.username }}
+{% endblock title %}
+
+{% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
-<body>
-    
-    {% include 'reel_time/partials/header.html' %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}"> 
+{% endblock extra_head %}
 
-    <h1>Welcome, {{ user.username }}!</h1>
-    <p>You are now logged in.</p>
+{% block content %}
+    <main class="dashboard-page-content">
+        <div class="container">
+            
+            <div class="welcome-header">
+                <h1 class="page-title">Welcome Back, <span class="accent-text">{{ user.username }}</span>!</h1>
+                <p>Manage your account, view your bookings, and explore what's showing now.</p>
+                <a href="{% url 'movie_list' %}" class="btn btn-primary btn-cta-dashboard">Book a New Movie</a>
+            </div>
 
-    {% include 'reel_time/partials/footer.html' %}
-</body>
-</html>
+            <hr>
+
+            <h2 class="dashboard-section-title"> Your Upcoming Bookings</h2>
+            
+            <div class="bookings-grid movie-grid"> 
+                {% if bookings %}
+                    {% for booking in bookings %}
+                        <div class="movie-card"> 
+                            <img src="{% if booking.movie.poster %}{{ booking.movie.poster.url }}{% else %}{% static 'images/default_poster.jpg' %}{% endif %}" 
+                                 alt="{{ booking.movie.title }} Poster" class="movie-poster">
+                            
+                            <div class="movie-details-new">
+                                <h3 class="movie-title-new">{{ booking.movie.title }}</h3>
+                                <p class="movie-meta-new">Showtime: {{ booking.showtime_display }}</p>
+                                <p class="movie-meta-new">Seats: {{ booking.seat_count }}</p>
+                                <a href="{% url 'booking_detail' booking.pk %}" class="btn btn-info btn-book">View Ticket</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <p>You have no active bookings. Time to get some popcorn!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <hr>
+
+            <h2 class="dashboard-section-title">Movies Now Showing</h2>
+
+            <div class="movie-grid" id="movieDashboardGrid">
+                {% for movie in movies %}
+                    {% with detail=movie.detail %}
+                        <div class="movie-card">
+                            {% if user.is_authenticated and user.is_admin %}
+                                <a href="{% url 'movie_detail' movie.detail.pk %}" class="movie-link">
+                                    <h3>{{ movie.detail.movie.title }}</h3>
+                                </a>
+                            {% else %}
+                                <h3>{{ movie.detail.movie.title }}</h3>
+                            {% endif %}
+                            
+                            {% if detail.poster %}
+                                <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" class="movie-poster">
+                            {% else %}
+                                <img src="{% static 'images/default_poster.jpg' %}" alt="No poster available" class="movie-poster">
+                            {% endif %}
+
+                            <p><strong>Duration:</strong> {{ detail.movie.duration_minutes }} minutes</p>
+                            <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
+                            <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
+                            <p><strong>End Date:</strong> {{ movie.end_date }}</p>
+                        </div>
+                    {% endwith %}
+                {% empty %}
+                    <p class="alert alert-warning full-width-alert">No movies are currently showing.</p>
+                {% endfor %}
+            </div>
+            
+            <div class="pagination">
+                <button id="prevPageBtn" class="btn btn-secondary" disabled>Previous Page</button>
+                <button id="nextPageBtn" class="btn btn-secondary">Next Page</button>
+            </div>
+            
+        </div>
+    </main>
+{% endblock content %}
+
+{% block extra_js %}
+    <script>
+        const STATIC_URL = "{% static '' %}"; 
+    </script>
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/movies.js' %}"></script>
+{% endblock extra_js %}

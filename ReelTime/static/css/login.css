@@ -293,7 +293,3 @@ body {
     font-size: 0.875rem;
     color: var(--color-text-muted);
 }
-
-/* Accessibility utility: visually-hidden
-   Keeps content available to screen readers but visually hidden from layout.
-   Use for off-screen labels, helper text, or status updates. */

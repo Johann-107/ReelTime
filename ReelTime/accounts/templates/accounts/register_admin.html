@@ -1,17 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Default Admin</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/header.css' %}">
-    <link rel="stylesheet" href="{% static 'css/register_admin.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
-<body>
-    {% include 'reel_time/partials/header.html' %}
+{% extends 'reel_time/partials/base.html' %}
+{% load static %}
 
+{% block title %}
+    Create Default Admin
+{% endblock title %}
+
+{% block extra_head %}
+    {# Only include CSS files that are specific to this page and not in base.html #}
+    <link rel="stylesheet" href="{% static 'css/register_admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+    {# Removed the manual inclusion of header/footer as base.html handles this #}
     <main class="auth-page">
         <div class="auth-card card">
             <div class="card-header auth-header">
@@ -47,7 +48,9 @@
             </div>
         </div>
     </main>
+{% endblock content %}
 
+{% block extra_js %}
+    {# Include specific JavaScript for this form, if necessary #}
     <script src="{% static 'js/auth.js' %}"></script>
-</body>
-</html>
+{% endblock extra_js %}
