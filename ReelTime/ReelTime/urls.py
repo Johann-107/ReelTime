@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('reel_time.urls')),  # Include URLs from the reeltime app
+    path('', include('reel_time.urls')),  # Include URLs from the reel_time app
 ]
 
 if settings.DEBUG:

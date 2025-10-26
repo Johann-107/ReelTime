@@ -29,7 +29,7 @@ class MovieAdminDetails(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('movie', 'admin', 'release_date', 'end_date')  # Prevent same admin adding same movi twice
+        unique_together = ('movie', 'admin', 'release_date', 'end_date')  # Prevent same admin adding same movie twice
 
     @property
     def is_now_showing(self):
@@ -45,3 +45,25 @@ class MovieAdminDetails(models.Model):
 
     def __str__(self):
         return f"{self.admin.username}'s details for {self.movie.title}"
+
+
+class Reservation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reservations')
+    movie_detail = models.ForeignKey(MovieAdminDetails, on_delete=models.CASCADE, related_name='reservations')
+    cinema_name = models.CharField(max_length=255)  # Store cinema name from admin
+    showtime = models.CharField(max_length=50)  # Selected showtime
+    number_of_seats = models.PositiveIntegerField(default=1)
+    reservation_date = models.DateTimeField(auto_now_add=True)
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    class Meta:
+        ordering = ['-reservation_date']
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.movie_detail.movie.title} at {self.cinema_name}"

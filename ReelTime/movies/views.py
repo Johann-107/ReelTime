@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import MovieForm
-from .models import Movie, MovieAdminDetails
+from .models import Movie, MovieAdminDetails, Reservation
 from accounts.decorators import admin_required
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib import messages
 from .forms import MovieAdminDetailsForm
+from django.db.models import Q
 
 @admin_required
 def add_movie(request):
@@ -149,3 +150,85 @@ def movie_detail_view(request, pk):
     }
 
     return render(request, 'movies/movie_detail.html', context)
+
+
+@login_required
+def reserve_movie_view(request, movie_id):
+    """
+    Show all registered cinemas with their details for this movie
+    """
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
+    # Get the movie
+    movie = get_object_or_404(Movie, id=movie_id)
+    
+    # Get ALL cinema admins (no prefetch since there's no related_name on admin FK)
+    cinema_admins = User.objects.filter(is_admin=True).order_by('cinema_name')
+    
+    # Get all movie details for this movie in ONE query
+    movie_details_dict = {}
+    for detail in MovieAdminDetails.objects.filter(movie=movie).select_related('admin'):
+        movie_details_dict[detail.admin_id] = detail
+    
+    # Prepare cinema data (no more database queries in loop)
+    cinemas = []
+    for admin in cinema_admins:
+        movie_detail = movie_details_dict.get(admin.id)
+        
+        if movie_detail:
+            # Cinema has this movie - show their showtimes and poster
+            cinemas.append({
+                'detail_id': movie_detail.id,
+                'cinema_name': admin.cinema_name,
+                'showing_times': movie_detail.showing_times,
+                'poster': movie_detail.poster,
+                'has_movie': True,
+            })
+        else:
+            # Cinema doesn't have this movie yet - show as unavailable
+            cinemas.append({
+                'detail_id': None,
+                'cinema_name': admin.cinema_name,
+                'showing_times': [],
+                'poster': None,
+                'has_movie': False,
+            })
+    
+    context = {
+        'movie': movie,
+        'cinemas': cinemas,
+    }
+    
+    return render(request, 'movies/reserve_movie.html', context)
+
+
+@login_required
+def confirm_reservation_view(request, detail_id):
+    """
+    Confirm the reservation for a specific cinema and showtime
+    """
+    detail = get_object_or_404(MovieAdminDetails, id=detail_id)
+    
+    if request.method == 'POST':
+        showtime = request.POST.get('showtime')
+        seats = request.POST.get('seats', 1)
+        
+        # Create reservation
+        reservation = Reservation.objects.create(
+            user=request.user,
+            movie_detail=detail,
+            cinema_name=detail.admin.cinema_name,
+            showtime=showtime,
+            number_of_seats=int(seats),
+            status='confirmed'
+        )
+        
+        messages.success(request, f"Reservation confirmed for {detail.movie.title} at {detail.admin.cinema_name}!")
+        return redirect('user_dashboard')
+    
+    context = {
+        'detail': detail,
+    }
+    
+    return render(request, 'movies/confirm_reservation.html', context)

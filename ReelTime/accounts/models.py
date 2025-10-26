@@ -12,6 +12,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
     must_change_password = models.BooleanField(default=False)
     cinema_name = models.CharField(max_length=100, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     def clean(self):
         if not self.is_admin and ' ' in self.username:
