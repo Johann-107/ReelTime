@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/register.css' %}">
-    <link rel="stylesheet" href="{% static 'css/header.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
-<body>
-    
-    {% include 'reel_time/partials/header.html' %}
+{% extends 'reel_time/partials/base.html' %} 
+{% load static %}
 
+{% block title %}Register - ReelTime{% endblock title %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
     <main class="auth-page">
         {% if messages %}
             <div class="messages">
@@ -32,7 +28,6 @@
                 <form id="registerForm" class="auth-form" method="POST" action="{% url 'register' %}">
                     {% csrf_token %}
 
-                    {# BLOCK ADDED: Display non-field errors (like password mismatch) #}
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger">
                             {% for error in form.non_field_errors %}
@@ -44,13 +39,13 @@
                     {% for field in form %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            {# {{ field }} relies on forms.py to add class="form-input" #}
                             {{ field }}
                             {% if field.errors %}
                                 <span class="text-danger">{{ field.errors.0 }}</span>
                             {% endif %}
                         </div>
                     {% endfor %}
+
                     <div class="form-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="terms" name="terms" required>
@@ -70,13 +65,12 @@
             </div>
         </div>
     </main>
+{% endblock content %}
 
-    {% include 'reel_time/partials/footer.html' %}
-
+{% block extra_js %}
     <script>
         const STATIC_URL = "{% static '' %}";
     </script>
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/auth.js' %}"></script>
-</body>
-</html>
+{% endblock extra_js %}
