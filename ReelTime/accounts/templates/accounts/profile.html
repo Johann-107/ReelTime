@@ -1,82 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'css/header.css' %}">
-  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-  <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
-<body>
+{% extends 'reel_time/partials/base.html' %}
+{% load static %}
 
-  {% include 'reel_time/partials/header.html' %}
+{# 1. PAGE TITLE BLOCK #}
+{% block title %}
+    User Profile
+{% endblock title %}
 
-  <main class="page-content">
-    <div class="container">
-      <div class="profile-container">
+
+{# Only the CSS unique to the profile page is included here #}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+{% endblock extra_head %}
+
+---
+
+{# 3. MAIN CONTENT BLOCK #}
+{% block content %}
+<main>
+    <div class="profile-container">
         <h1>User Profile</h1>
         
+        {# --- PROFILE PICTURE SECTION START --- #}
         <div class="profile-picture-section">
-          {% if user.profile_picture %}
-            <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
-          {% else %}
-            <div class="profile-picture-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </div>
-          {% endif %}
+            {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" alt="{{ user.username }} Profile Picture" class="profile-picture">
+            {% else %}
+                <div class="profile-picture-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+            {% endif %}
         </div>
+        {# --- PROFILE PICTURE SECTION END --- #}
 
         <div class="profile-card">
-          <div class="profile-field">
-            <label>First Name:</label>
-            <span>{{ user.first_name }}</span>
-          </div>
+            <div class="profile-field">
+                <label>First Name:</label>
+                <span>{{ user.first_name }}</span>
+            </div>
 
-          <div class="profile-field">
-            <label>Last Name:</label>
-            <span>{{ user.last_name }}</span>
-          </div>
+            <div class="profile-field">
+                <label>Last Name:</label>
+                <span>{{ user.last_name }}</span>
+            </div>
 
-          <div class="profile-field">
-            <label>Username:</label>
-            <span>{{ user.username }}</span>
-          </div>
+            <div class="profile-field">
+                <label>Username:</label>
+                <span>{{ user.username }}</span>
+            </div>
 
-          <div class="profile-field">
-            <label>Email:</label>
-            <span>{{ user.email }}</span>
-          </div>
+            <div class="profile-field">
+                <label>Email:</label>
+                <span>{{ user.email }}</span>
+            </div>
 
-          <div class="profile-field">
-            <label>Phone Number:</label>
-            <span>{{ user.phone_number }}</span>
-          </div>
+            <div class="profile-field">
+                <label>Phone Number:</label>
+                <span>{{ user.phone_number }}</span>
+            </div>
 
-          <div class="profile-actions">
-            {% if user.is_admin %}
-              <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
-            {% else %}
-              <a href="{% url 'user_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
-            {% endif %}
-            <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-          </div>
+            <div class="profile-actions">
+                {% if user.is_admin %}
+                <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+                {% else %}
+                <a href="{% url 'user_dashboard' %}" class="btn">Back to Dashboard</a>
+                {% endif %}
+                <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
+            </div>
         </div>
-      </div>
     </div>
-  </main>
+</main>
+{% endblock content %}
 
-  {% include 'reel_time/partials/footer.html' %}
+---
 
-  {% if profile_updated %}
-  <script>
-      alert("Profile updated successfully!");
-  </script>
-  {% endif %}
-
-</body>
-</html>
+{# 4. PAGE-SPECIFIC JAVASCRIPT BLOCK #}
+{% block extra_js %}
+    {% if profile_updated %}
+    <script>
+        alert("Profile updated successfully!");
+    </script>
+    {% endif %}
+{% endblock extra_js %}

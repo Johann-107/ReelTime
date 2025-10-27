@@ -1,244 +1,250 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserve {{ movie.title }} - ReelTime</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/header.css' %}">
-    <link rel="stylesheet" href="{% static 'css/reserve_movie.css' %}">
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
-</head>
-<body>
-    {% include 'reel_time/partials/header.html' %}
+{% extends 'reel_time/partials/base.html' %} 
+{% load static %} 
 
-    <main class="page-content">
-        <div class="container">
-            <!-- Movie Header -->
-            <div class="movie-header">
-                <button onclick="window.history.back()" class="btn-back">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Back to Dashboard
-                </button>
-                <div class="movie-info">
-                    <h1 class="movie-title">{{ movie.title }}</h1>
-                    <div class="movie-meta">
-                        {% if movie.genre %}
-                            <span class="meta-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 7h10l4 12H3L7 7z"/>
-                                </svg>
-                                {{ movie.genre }}
-                            </span>
-                        {% endif %}
-                        {% if movie.duration_minutes %}
-                            <span class="meta-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <polyline points="12 6 12 12 16 14"/>
-                                </svg>
-                                {{ movie.duration_minutes }} mins
-                            </span>
-                        {% endif %}
-                        {% if movie.rating %}
-                            <span class="meta-item rating">{{ movie.rating }}</span>
-                        {% endif %}
-                    </div>
-                    {% if movie.description %}
-                        <p class="movie-description">{{ movie.description }}</p>
+{# 1. PAGE TITLE BLOCK #}
+{% block title %}
+    Reserve {{ movie.title }} - ReelTime
+{% endblock title %}
+
+---
+
+{# 2. PAGE-SPECIFIC CSS BLOCK #}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/reserve_movie.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock extra_head %}
+
+---
+
+{# 3. MAIN CONTENT BLOCK #}
+{% block content %}
+<main class="page-content">
+    <div class="container">
+        <div class="movie-header">
+            <button onclick="window.history.back()" class="btn-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Dashboard
+            </button>
+            <div class="movie-info">
+                <h1 class="movie-title">{{ movie.title }}</h1>
+                <div class="movie-meta">
+                    {% if movie.genre %}
+                        <span class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 7h10l4 12H3L7 7z"/>
+                            </svg>
+                            {{ movie.genre }}
+                        </span>
+                    {% endif %}
+                    {% if movie.duration_minutes %}
+                        <span class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            {{ movie.duration_minutes }} mins
+                        </span>
+                    {% endif %}
+                    {% if movie.rating %}
+                        <span class="meta-item rating">{{ movie.rating }}</span>
                     {% endif %}
                 </div>
-            </div>
-
-            <!-- Cinemas Section -->
-            <div class="cinemas-section">
-                <h2 class="section-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                        <polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                    Available Cinemas
-                </h2>
-
-                {% if cinemas %}
-                    <div class="cinemas-grid">
-                        {% for cinema in cinemas %}
-                            <div class="cinema-card {% if not cinema.has_movie %}cinema-unavailable{% endif %}">
-                                <div class="cinema-header">
-                                    <div class="cinema-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
-                                            <polyline points="17 2 12 7 7 2"/>
-                                        </svg>
-                                    </div>
-                                    <h3 class="cinema-name">{{ cinema.cinema_name }}</h3>
-                                </div>
-
-                                {% if cinema.poster %}
-                                    <div class="cinema-poster">
-                                        <img src="{{ cinema.poster.url }}" alt="{{ movie.title }} poster">
-                                    </div>
-                                {% endif %}
-
-                                {% if cinema.has_movie %}
-                                    <div class="showtimes-section">
-                                        <h4 class="showtimes-label">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <polyline points="12 6 12 12 16 14"/>
-                                            </svg>
-                                            Available Showtimes
-                                        </h4>
-                                        <div class="showtimes-grid">
-                                            {% for showtime in cinema.showing_times %}
-                                                <button class="showtime-btn" 
-                                                        data-detail-id="{{ cinema.detail_id }}" 
-                                                        data-showtime="{{ showtime }}"
-                                                        data-cinema="{{ cinema.cinema_name }}">
-                                                    {{ showtime }}
-                                                </button>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% else %}
-                                    <div class="movie-not-available">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <line x1="12" y1="8" x2="12" y2="12"/>
-                                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                                        </svg>
-                                        <p>This movie is not available at this cinema</p>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="no-cinemas">
-                        <svg class="no-cinemas-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        <h3>No Cinemas Available</h3>
-                        <p>This movie is not currently showing at any registered cinemas.</p>
-                        <a href="{% url 'user_dashboard' %}" class="btn-primary">Back to Dashboard</a>
-                    </div>
+                {% if movie.description %}
+                    <p class="movie-description">{{ movie.description }}</p>
                 {% endif %}
             </div>
         </div>
-    </main>
 
-    <!-- Reservation Modal -->
-    <div id="reservationModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Complete Your Reservation</h2>
-                <button class="modal-close" onclick="closeModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
+        <div class="cinemas-section">
+            <h2 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Available Cinemas
+            </h2>
+
+            {% if cinemas %}
+                <div class="cinemas-grid">
+                    {% for cinema in cinemas %}
+                        <div class="cinema-card {% if not cinema.has_movie %}cinema-unavailable{% endif %}">
+                            <div class="cinema-header">
+                                <div class="cinema-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
+                                        <polyline points="17 2 12 7 7 2"/>
+                                    </svg>
+                                </div>
+                                <h3 class="cinema-name">{{ cinema.cinema_name }}</h3>
+                            </div>
+
+                            {% if cinema.poster %}
+                                <div class="cinema-poster">
+                                    <img src="{{ cinema.poster.url }}" alt="{{ movie.title }} poster">
+                                </div>
+                            {% endif %}
+
+                            {% if cinema.has_movie %}
+                                <div class="showtimes-section">
+                                    <h4 class="showtimes-label">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        Available Showtimes
+                                    </h4>
+                                    <div class="showtimes-grid">
+                                        {% for showtime in cinema.showing_times %}
+                                            <button class="showtime-btn" 
+                                                    data-detail-id="{{ cinema.detail_id }}" 
+                                                    data-showtime="{{ showtime }}"
+                                                    data-cinema="{{ cinema.cinema_name }}">
+                                                {{ showtime }}
+                                            </button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="movie-not-available">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="12" y1="8" x2="12" y2="12"/>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    </svg>
+                                    <p>This movie is not available at this cinema</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-cinemas">
+                    <svg class="no-cinemas-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
                     </svg>
-                </button>
-            </div>
-            <form id="reservationForm" method="POST">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="reservation-summary">
-                        <div class="summary-item">
-                            <span class="summary-label">Movie:</span>
-                            <span class="summary-value">{{ movie.title }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Cinema:</span>
-                            <span class="summary-value" id="selectedCinema"></span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Showtime:</span>
-                            <span class="summary-value" id="selectedShowtime"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="seats" class="form-label">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                <circle cx="8.5" cy="7" r="4"/>
-                                <path d="M20 8v6M23 11h-6"/>
-                            </svg>
-                            Number of Seats
-                        </label>
-                        <input type="number" 
-                               id="seats" 
-                               name="seats" 
-                               class="form-input" 
-                               min="1" 
-                               max="10" 
-                               value="1" 
-                               required>
-                    </div>
-
-                    <input type="hidden" name="showtime" id="showtimeInput">
+                    <h3>No Cinemas Available</h3>
+                    <p>This movie is not currently showing at any registered cinemas.</p>
+                    <a href="{% url 'user_dashboard' %}" class="btn-primary">Back to Dashboard</a>
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button>
-                    <button type="submit" class="btn-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        Confirm Reservation
-                    </button>
-                </div>
-            </form>
+            {% endif %}
         </div>
     </div>
+</main>
 
-    {% include 'reel_time/partials/footer.html' %}
+<div id="reservationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Complete Your Reservation</h2>
+            <button class="modal-close" onclick="closeModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <form id="reservationForm" method="POST">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="reservation-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Movie:</span>
+                        <span class="summary-value">{{ movie.title }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Cinema:</span>
+                        <span class="summary-value" id="selectedCinema"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Showtime:</span>
+                        <span class="summary-value" id="selectedShowtime"></span>
+                    </div>
+                </div>
 
-    <script>
-        const modal = document.getElementById('reservationModal');
-        const form = document.getElementById('reservationForm');
-        const showtimeButtons = document.querySelectorAll('.showtime-btn');
+                <div class="form-group">
+                    <label for="seats" class="form-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="8.5" cy="7" r="4"/>
+                            <path d="M20 8v6M23 11h-6"/>
+                        </svg>
+                        Number of Seats
+                    </label>
+                    <input type="number" 
+                           id="seats" 
+                           name="seats" 
+                           class="form-input" 
+                           min="1" 
+                           max="10" 
+                           value="1" 
+                           required>
+                </div>
 
-        showtimeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const detailId = this.getAttribute('data-detail-id');
-                const showtime = this.getAttribute('data-showtime');
-                const cinema = this.getAttribute('data-cinema');
+                <input type="hidden" name="showtime" id="showtimeInput">
+            </div>
 
-                // Update modal content
-                document.getElementById('selectedCinema').textContent = cinema;
-                document.getElementById('selectedShowtime').textContent = showtime;
-                document.getElementById('showtimeInput').value = showtime;
+            <div class="modal-footer">
+                <button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button>
+                <button type="submit" class="btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Confirm Reservation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
 
-                // Update form action
-                form.action = "{% url 'confirm_reservation' 0 %}".replace('0', detailId);
+---
 
-                // Show modal
-                modal.style.display = 'flex';
-            });
+{# 4. PAGE-SPECIFIC JAVASCRIPT BLOCK #}
+{% block extra_js %}
+<script>
+    const modal = document.getElementById('reservationModal');
+    const form = document.getElementById('reservationForm');
+    const showtimeButtons = document.querySelectorAll('.showtime-btn');
+
+    showtimeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const detailId = this.getAttribute('data-detail-id');
+            const showtime = this.getAttribute('data-showtime');
+            const cinema = this.getAttribute('data-cinema');
+
+            // Update modal content
+            document.getElementById('selectedCinema').textContent = cinema;
+            document.getElementById('selectedShowtime').textContent = showtime;
+            document.getElementById('showtimeInput').value = showtime;
+
+            // Update form action, ensuring we use a relative path if possible
+            // The replace('0', detailId) technique is necessary here.
+            form.action = "{% url 'confirm_reservation' 0 %}".replace('0', detailId);
+
+            // Show modal
+            modal.style.display = 'flex';
         });
+    });
 
-        function closeModal() {
-            modal.style.display = 'none';
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
         }
+    }
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
         }
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock extra_js %}
