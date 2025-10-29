@@ -17,7 +17,7 @@ class MovieForm(forms.ModelForm):
     release_date = forms.DateField(widget=DateInput(attrs={'type': 'date'}))
     end_date = forms.DateField(widget=DateInput(attrs={'type': 'date'}))
     showing_times = forms.CharField(
-        widget=Textarea(attrs={'rows': 2, 'placeholder': 'e.g. ["10:00 AM", "1:30 PM", "6:45 PM"]'}),
+        widget=Textarea(attrs={'rows': 2, 'placeholder': 'e.g. [{"time": "10:00 AM", "max_seats": 100}, {"time": "1:30 PM", "max_seats": 120}]'}),
         required=False
     )
     poster = forms.ImageField(required=False)
@@ -53,31 +53,48 @@ class MovieForm(forms.ModelForm):
                 data_list = json.loads(data)
                 if not isinstance(data_list, list):
                     raise forms.ValidationError("Showing times must be a list.")
+                # Ensure each dict has "time" and "max_seats"
+                for i, s in enumerate(data_list):
+                    if 'time' not in s:
+                        raise forms.ValidationError(f'Showtime at index {i} must have a "time" field.')
+                    if 'max_seats' not in s or s['max_seats'] in [None, ""]:
+                        s['max_seats'] = 50  # default seats if not provided
                 return data_list
             except Exception:
-                raise forms.ValidationError("Enter showing times as a JSON list, e.g. [\"10:00 AM\", \"1:30 PM\"]")
+                raise forms.ValidationError(
+                    'Enter showing times as a JSON list, e.g. [{"time": "10:00 AM", "max_seats": 100}]'
+                )
         return data
 
     def save(self, commit=True):
         movie = super().save(commit=commit)
 
-        # Save or create admin details
         if self.admin:
+            # Ensure showing_times is a list of dicts with 'time' and 'max_seats'
+            showing_times = self.cleaned_data.get('showing_times', [])
+            for s in showing_times:
+                if 'time' not in s:
+                    continue  # skip invalid entries
+                if 'max_seats' not in s or s['max_seats'] in [None, ""]:
+                    s['max_seats'] = 50  # default seats if not provided
+
+            # Save or create admin details
             admin_details, created = MovieAdminDetails.objects.get_or_create(
                 movie=movie,
                 admin=self.admin,
                 defaults={
                     'release_date': self.cleaned_data['release_date'],
                     'end_date': self.cleaned_data['end_date'],
-                    'showing_times': self.cleaned_data['showing_times'],
+                    'showing_times': showing_times,
                     'poster': self.cleaned_data.get('poster'),
                 }
             )
+
             if not created:
                 # Update existing admin details
                 admin_details.release_date = self.cleaned_data['release_date']
                 admin_details.end_date = self.cleaned_data['end_date']
-                admin_details.showing_times = self.cleaned_data['showing_times']
+                admin_details.showing_times = showing_times
                 if self.cleaned_data.get('poster'):
                     admin_details.poster = self.cleaned_data['poster']
                 admin_details.save()

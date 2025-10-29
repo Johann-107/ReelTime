@@ -1,22 +1,15 @@
-{% extends 'reel_time/partials/base.html' %} 
-{% load static %} 
+{% extends 'reel_time/partials/base.html' %}
+{% load static %}
 
-{# 1. PAGE TITLE BLOCK #}
 {% block title %}
     Reserve {{ movie.title }} - ReelTime
 {% endblock title %}
 
----
-
-{# 2. PAGE-SPECIFIC CSS BLOCK #}
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/reserve_movie.css' %}">
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/reserve_movie.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock extra_head %}
 
----
-
-{# 3. MAIN CONTENT BLOCK #}
 {% block content %}
 <main class="page-content">
     <div class="container">
@@ -31,21 +24,10 @@
                 <h1 class="movie-title">{{ movie.title }}</h1>
                 <div class="movie-meta">
                     {% if movie.genre %}
-                        <span class="meta-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M7 7h10l4 12H3L7 7z"/>
-                            </svg>
-                            {{ movie.genre }}
-                        </span>
+                        <span class="meta-item">{{ movie.genre }}</span>
                     {% endif %}
                     {% if movie.duration_minutes %}
-                        <span class="meta-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                            {{ movie.duration_minutes }} mins
-                        </span>
+                        <span class="meta-item">{{ movie.duration_minutes }} mins</span>
                     {% endif %}
                     {% if movie.rating %}
                         <span class="meta-item rating">{{ movie.rating }}</span>
@@ -87,33 +69,15 @@
                             {% endif %}
 
                             {% if cinema.has_movie %}
-                                <div class="showtimes-section">
-                                    <h4 class="showtimes-label">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <polyline points="12 6 12 12 16 14"/>
-                                        </svg>
-                                        Available Showtimes
-                                    </h4>
-                                    <div class="showtimes-grid">
-                                        {% for showtime in cinema.showing_times %}
-                                            <button class="showtime-btn" 
-                                                    data-detail-id="{{ cinema.detail_id }}" 
-                                                    data-showtime="{{ showtime }}"
-                                                    data-cinema="{{ cinema.cinema_name }}">
-                                                {{ showtime }}
-                                            </button>
-                                        {% endfor %}
-                                    </div>
-                                </div>
+                                <script id="showtimes-{{ forloop.counter }}" type="application/json">{{ cinema.showing_times|safe }}</script>
+                                <button class="reserve-btn"
+                                        data-detail-id="{{ cinema.detail_id }}"
+                                        data-showtimes-json-id="showtimes-{{ forloop.counter }}">
+                                    Reserve
+                                </button>
                             {% else %}
                                 <div class="movie-not-available">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <line x1="12" y1="8" x2="12" y2="12"/>
-                                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                                    </svg>
-                                    <p>This movie is not available at this cinema</p>
+                                    <p>No showtimes available at this cinema</p>
                                 </div>
                             {% endif %}
                         </div>
@@ -121,11 +85,6 @@
                 </div>
             {% else %}
                 <div class="no-cinemas">
-                    <svg class="no-cinemas-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
                     <h3>No Cinemas Available</h3>
                     <p>This movie is not currently showing at any registered cinemas.</p>
                     <a href="{% url 'user_dashboard' %}" class="btn-primary">Back to Dashboard</a>
@@ -135,10 +94,11 @@
     </div>
 </main>
 
+<!-- Reservation Modal -->
 <div id="reservationModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 class="modal-title">Complete Your Reservation</h2>
+            <h2 class="modal-title">Reserve a Seat</h2>
             <button class="modal-close" onclick="closeModal()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -146,105 +106,128 @@
                 </svg>
             </button>
         </div>
+
         <form id="reservationForm" method="POST">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="reservation-summary">
-                    <div class="summary-item">
-                        <span class="summary-label">Movie:</span>
-                        <span class="summary-value">{{ movie.title }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Cinema:</span>
-                        <span class="summary-value" id="selectedCinema"></span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Showtime:</span>
-                        <span class="summary-value" id="selectedShowtime"></span>
-                    </div>
+                <div class="form-group">
+                    <label for="selectedDate" class="form-label">Choose Date</label>
+                    <input type="date" id="selectedDate" name="selected_date" class="form-input" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="seats" class="form-label">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="8.5" cy="7" r="4"/>
-                            <path d="M20 8v6M23 11h-6"/>
-                        </svg>
-                        Number of Seats
-                    </label>
-                    <input type="number" 
-                           id="seats" 
-                           name="seats" 
-                           class="form-input" 
-                           min="1" 
-                           max="10" 
-                           value="1" 
-                           required>
+                    <label class="form-label">Available Showtimes</label>
+                    <div id="showtimesContainer" class="showtimes-grid">
+                        <!-- dynamically inserted showtimes -->
+                    </div>
+                    <input type="hidden" id="selectedShowtime" name="selected_showtime" required>
                 </div>
 
-                <input type="hidden" name="showtime" id="showtimeInput">
+                <div class="form-group">
+                    <label for="seats" class="form-label">Number of Seats</label>
+                    <input type="number" id="seats" name="number_of_seats" min="1" max="10" value="1" class="form-input" required>
+                </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-primary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    Confirm Reservation
-                </button>
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Confirm Reservation</button>
             </div>
         </form>
     </div>
 </div>
 {% endblock content %}
 
----
-
-{# 4. PAGE-SPECIFIC JAVASCRIPT BLOCK #}
 {% block extra_js %}
 <script>
+function closeModal() {
+    document.getElementById('reservationModal').style.display = 'none';
+}
+
+document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById('reservationModal');
     const form = document.getElementById('reservationForm');
-    const showtimeButtons = document.querySelectorAll('.showtime-btn');
+    const reserveButtons = document.querySelectorAll('.reserve-btn');
+    const showtimesContainer = document.getElementById('showtimesContainer');
+    const selectedShowtimeInput = document.getElementById('selectedShowtime');
+    const seatsInput = document.getElementById('seats');
 
-    showtimeButtons.forEach(button => {
+    // Create seat info display
+    let seatInfo = document.getElementById('seatInfo');
+    if (!seatInfo) {
+        seatInfo = document.createElement('p');
+        seatInfo.id = "seatInfo";
+        seatInfo.style.marginTop = "8px";
+        seatInfo.style.fontWeight = "500";
+        showtimesContainer.parentNode.appendChild(seatInfo);
+    }
+
+    reserveButtons.forEach(button => {
         button.addEventListener('click', function() {
             const detailId = this.getAttribute('data-detail-id');
-            const showtime = this.getAttribute('data-showtime');
-            const cinema = this.getAttribute('data-cinema');
-
-            // Update modal content
-            document.getElementById('selectedCinema').textContent = cinema;
-            document.getElementById('selectedShowtime').textContent = showtime;
-            document.getElementById('showtimeInput').value = showtime;
-
-            // Update form action, ensuring we use a relative path if possible
-            // The replace('0', detailId) technique is necessary here.
             form.action = "{% url 'confirm_reservation' 0 %}".replace('0', detailId);
 
-            // Show modal
+            let showtimes = [];
+            const jsonId = this.getAttribute('data-showtimes-json-id');
+            const showtimesScript = document.getElementById(jsonId);
+
+            if (showtimesScript) {
+                try {
+                    showtimes = JSON.parse(showtimesScript.textContent.trim());
+                } catch (err) {
+                    console.error("Error parsing showtimes JSON:", err);
+                }
+            }
+
+            // Populate showtimes dynamically
+            showtimesContainer.innerHTML = "";
+            seatInfo.textContent = "";
+            seatsInput.value = 1;
+            seatsInput.max = 10; // default max before selecting showtime
+
+            if (showtimes.length === 0) {
+                showtimesContainer.innerHTML = "<p class='no-showtimes'>No showtimes available.</p>";
+            } else {
+                showtimes.forEach(({time, remaining, max_seats}) => {
+                    const btn = document.createElement('button');
+                    btn.type = "button";
+                    btn.textContent = `${time} — ${remaining}/${max_seats} seats`;
+
+                    btn.addEventListener('click', function() {
+                        // Remove selected class from all
+                        document.querySelectorAll('.showtimes-grid button').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+
+                        // Set hidden input
+                        selectedShowtimeInput.value = time;
+
+                        // Update seat info
+                        seatInfo.textContent = `Remaining seats: ${remaining} / ${max_seats}`;
+
+                        // Limit number of seats input
+                        seatsInput.max = remaining > 0 ? remaining : 1;
+                        if (seatsInput.value > seatsInput.max) {
+                            seatsInput.value = seatsInput.max;
+                        }
+                    });
+
+                    showtimesContainer.appendChild(btn);
+                });
+            }
+
+            // Default date to tomorrow
+            const dateInput = document.getElementById('selectedDate');
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            dateInput.valueAsDate = tomorrow;
+
             modal.style.display = 'flex';
         });
     });
 
-    function closeModal() {
-        modal.style.display = 'none';
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            closeModal();
-        }
-    }
-
-    // Close modal on Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
+    // Close modal when clicking outside or pressing ESC
+    window.onclick = function(e){ if (e.target === modal) closeModal(); };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+});
 </script>
 {% endblock extra_js %}

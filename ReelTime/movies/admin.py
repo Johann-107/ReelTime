@@ -15,7 +15,15 @@ class MovieAdminDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'movie_detail', 'cinema_name', 'showtime', 'number_of_seats', 'status', 'reservation_date')
-    list_filter = ('status', 'reservation_date')
-    search_fields = ('user__email', 'cinema_name', 'movie_detail__movie__title')
-    readonly_fields = ('reservation_date',)
+    list_display = (
+        'user',
+        'movie_detail',
+        'cinema_name',
+        'selected_date',
+        'selected_showtime',
+        'number_of_seats',
+        'status',
+        'reservation_date',
+    )
+    list_filter = ('status', 'selected_date', 'cinema_name')
+    search_fields = ('user__email', 'movie_detail__movie__title', 'cinema_name')

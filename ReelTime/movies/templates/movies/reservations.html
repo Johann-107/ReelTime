@@ -1,0 +1,91 @@
+{% extends 'reel_time/partials/base.html' %} 
+{% load static %} 
+
+{# 1. PAGE TITLE BLOCK #}
+{% block title %}
+    Reserve {{ movie.title }} - ReelTime
+{% endblock title %}
+
+---
+
+{# 2. PAGE-SPECIFIC CSS BLOCK #}
+{% block extra_head %}
+{% endblock extra_head %}
+
+---
+
+{# 3. MAIN CONTENT BLOCK #}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">My Reservations</h2>
+
+    {% if reservations %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Movie</th>
+                        <th>Cinema</th>
+                        <th>Showtime</th>
+                        <th>Seats</th>
+                        <th>Selected Day</th>
+                        <th>Selected Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                        <tr>
+                            <td>{{ reservation.movie_detail.movie.title }}</td>
+                            <td>{{ reservation.cinema_name }}</td>
+                            <td>{{ reservation.showtime }}</td>
+                            <td>{{ reservation.number_of_seats }}</td>
+                            <td>{{ reservation.selected_date }}</td>
+                            <td>{{ reservation.selected_showtime }}</td>
+                            <td>
+                                {% if reservation.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif reservation.status == 'confirmed' %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                {% elif reservation.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            You haven’t made any reservations yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}
+
+{# 4. PAGE-SPECIFIC SCRIPTS BLOCK #}
+{% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Example showtimes — you can load these from Django template or API
+    const showtimes = ["10:00 AM", "1:00 PM", "4:00 PM", "7:00 PM", "10:00 PM"];
+    const container = document.getElementById("showtimesContainer");
+    const hiddenInput = document.getElementById("selectedShowtime");
+
+    // Render buttons
+    showtimes.forEach(time => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = time;
+      btn.classList.add("btn", "btn-outline-primary", "showtime-btn");
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".showtime-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        hiddenInput.value = time;
+      });
+      container.appendChild(btn);
+    });
+  });
+</script>
+{% endblock extra_scripts %}

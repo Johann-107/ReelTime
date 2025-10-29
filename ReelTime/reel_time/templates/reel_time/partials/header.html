@@ -32,9 +32,9 @@
                     {% endif %}
                     <a href="{% url 'movie_list' %}" class="nav-link">Movies</a>
                     {% if user.is_admin %}
-                        <a href="{% url 'admin_dashboard' %}" class="nav-link">Reservations</a>
+                        <a href="{% url 'reservations' %}" class="nav-link">Reservations</a>
                     {% else %}
-                        <a href="{% url 'user_dashboard' %}" class="nav-link">Reservations</a>
+                        <a href="{% url 'reservations' %}" class="nav-link">Reservations</a>
                     {% endif %}
                 {% else %}
                     <a href="{% url 'index' %}" class="nav-link">Home</a>
