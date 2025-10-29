@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.contrib import messages
 from .forms import MovieAdminDetailsForm
 from django.db.models import Q
+import json
 
 @admin_required
 def add_movie(request):
@@ -105,7 +106,9 @@ def movie_list_view(request):
 
         # Handle showing_times list
         if isinstance(detail.showing_times, (list, tuple)):
-            showing_times_display = ", ".join(detail.showing_times)
+            showing_times_display = ", ".join(
+                s['time'] for s in detail.showing_times if 'time' in s
+            )
         else:
             showing_times_display = str(detail.showing_times)
 
@@ -139,8 +142,12 @@ def movie_detail_view(request, pk):
 
     release_label = detail.release_date.strftime("%B %d, %Y").replace(" 0", " ")
     end_date_label = detail.end_date.strftime("%B %d, %Y").replace(" 0", " ")
-    showing_times_display = ", ".join(detail.showing_times) if isinstance(detail.showing_times, (list, tuple)) else str(detail.showing_times)
-
+    if isinstance(detail.showing_times, (list, tuple)):
+        showing_times_display = ", ".join(
+            s['time'] for s in detail.showing_times if 'time' in s
+        )
+    else:
+        showing_times_display = str(detail.showing_times)
     context = {
         'detail': detail,
         'release_label': release_label,
@@ -158,77 +165,115 @@ def reserve_movie_view(request, movie_id):
     Show all registered cinemas with their details for this movie
     """
     from django.contrib.auth import get_user_model
+    from django.db.models import Sum
+
     User = get_user_model()
-    
+
     # Get the movie
     movie = get_object_or_404(Movie, id=movie_id)
-    
-    # Get ALL cinema admins (no prefetch since there's no related_name on admin FK)
+
+    # Get all cinema admins
     cinema_admins = User.objects.filter(is_admin=True).order_by('cinema_name')
-    
-    # Get all movie details for this movie in ONE query
+
     movie_details_dict = {}
     for detail in MovieAdminDetails.objects.filter(movie=movie).select_related('admin'):
         movie_details_dict[detail.admin_id] = detail
-    
-    # Prepare cinema data (no more database queries in loop)
+
+    # Prepare cinema data
     cinemas = []
     for admin in cinema_admins:
         movie_detail = movie_details_dict.get(admin.id)
-        
+
         if movie_detail:
-            # Cinema has this movie - show their showtimes and poster
+            # Cinema has this movie - build showtimes with remaining seats
+            showtimes_data = []
+            for s in movie_detail.showing_times:  # this is already a Python list of dicts
+                # Expect each item to be a dict with 'time' and 'max_seats'
+                if isinstance(s, dict):
+                    time = s.get("time")
+                    max_seats = s.get("max_seats", 0)
+                else:
+                    # If legacy string format, assume a default max_seats (e.g., 100)
+                    time = s
+                    max_seats = 100  # arbitrary fallback
+
+                # Calculate reserved seats
+                reserved = Reservation.objects.filter(
+                    movie_detail=movie_detail,
+                    selected_showtime=time
+                ).aggregate(total_reserved=Sum('number_of_seats'))['total_reserved'] or 0
+
+                remaining = max_seats - reserved
+                showtimes_data.append({
+                    "time": time,
+                    "max_seats": max_seats,
+                    "remaining": remaining,
+                })
+
             cinemas.append({
                 'detail_id': movie_detail.id,
                 'cinema_name': admin.cinema_name,
-                'showing_times': movie_detail.showing_times,
+                'showing_times': json.dumps(showtimes_data),
                 'poster': movie_detail.poster,
                 'has_movie': True,
             })
         else:
-            # Cinema doesn't have this movie yet - show as unavailable
+            # Cinema doesn't have this movie yet
             cinemas.append({
                 'detail_id': None,
                 'cinema_name': admin.cinema_name,
-                'showing_times': [],
+                'showing_times': json.dumps([]),
                 'poster': None,
                 'has_movie': False,
             })
-    
+
     context = {
         'movie': movie,
         'cinemas': cinemas,
     }
-    
+
     return render(request, 'movies/reserve_movie.html', context)
 
 
 @login_required
 def confirm_reservation_view(request, detail_id):
     """
-    Confirm the reservation for a specific cinema and showtime
+    Confirm the reservation for a specific cinema and showtime.
     """
     detail = get_object_or_404(MovieAdminDetails, id=detail_id)
-    
+
     if request.method == 'POST':
-        showtime = request.POST.get('showtime')
-        seats = request.POST.get('seats', 1)
-        
-        # Create reservation
+        # Match your form field names from the modal
+        selected_date = request.POST.get('selected_date')
+        selected_showtime = request.POST.get('selected_showtime')
+        number_of_seats = request.POST.get('number_of_seats', 1)
+
+        # Create the reservation record
         reservation = Reservation.objects.create(
             user=request.user,
             movie_detail=detail,
             cinema_name=detail.admin.cinema_name,
-            showtime=showtime,
-            number_of_seats=int(seats),
-            status='confirmed'
+            selected_date=selected_date,
+            selected_showtime=selected_showtime,
+            number_of_seats=int(number_of_seats),
+            status='confirmed',
         )
-        
-        messages.success(request, f"Reservation confirmed for {detail.movie.title} at {detail.admin.cinema_name}!")
+
+        messages.success(
+            request,
+            f"Reservation confirmed for {detail.movie.title} at {detail.admin.cinema_name} "
+            f"on {selected_date} ({selected_showtime})!"
+        )
         return redirect('user_dashboard')
-    
+
     context = {
         'detail': detail,
     }
-    
+
     return render(request, 'movies/confirm_reservation.html', context)
+
+
+@login_required
+def user_reservations_view(request):
+    reservations = Reservation.objects.filter(user=request.user)
+    return render(request, 'movies/reservations.html', {'reservations': reservations})

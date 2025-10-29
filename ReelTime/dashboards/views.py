@@ -40,7 +40,9 @@ def user_dashboard(request):
 
         # Handle showing_times list
         if isinstance(detail.showing_times, (list, tuple)):
-            showing_times_display = ", ".join(detail.showing_times)
+            showing_times_display = ", ".join(
+                s['time'] for s in detail.showing_times if 'time' in s
+            )
         else:
             showing_times_display = str(detail.showing_times)
 
