@@ -3,9 +3,9 @@
 
 {% block title %}All Movies - ReelTime{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/movie_list.css' %}">
-{% endblock %}
+{% endblock extra_head %}
 
 {% block content %}
 <main class="page-content">
@@ -22,53 +22,88 @@
         <option value="action">Action</option>
         <option value="adventure">Adventure</option>
         <option value="thriller">Thriller</option>
-        <option value="sci-fi">Sci-Fi</option>
+        <option value="sci-fi">Sci-fi</option>
         <option value="romance">Romance</option>
         <option value="comedy">Comedy</option>
       </select>
     </div>
 
-    {% for movie in movies %}
-      {% with detail=movie.detail %}
-        <div class="movie-card">
-          {% if user.is_authenticated and user.is_admin %}
-            <a href="{% url 'movie_detail' movie.detail.pk %}" class="movie-link">
-              <h3>{{ movie.detail.movie.title }}</h3>
-            </a>
-          {% else %}
-            <h3>{{ movie.detail.movie.title }}</h3>
-          {% endif %}
+    <div class="movie-grid" id="movieGrid"> 
+      {% for movie in movies %}
+        {% with detail=movie.detail %}
+          <div class="movie-card" data-genre="{{ detail.movie.genre|lower }}"> 
 
-          {% if detail.poster %}
-            <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" width="200px">
-          {% else %}
-            <img src="{% static 'images/default_poster.jpg' %}" alt="No poster available" width="200px">
-          {% endif %}
+            <div class="movie-poster-container">
+                {% if detail.poster %}
+                    <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" class="movie-poster-img">
+                {% else %}
+                    <img src="{% static 'images/default_poster.jpg' %}" alt="No poster available" class="movie-poster-img">
+                {% endif %}
+                {% if detail.movie.genre %}
+                    <span class="genre-badge">{{ detail.movie.genre }}</span>
+                {% endif %}
+            </div>
 
-          <p><strong>Duration:</strong> {{ detail.movie.duration_minutes }} minutes</p>
-          <p><strong>Showtimes:</strong> {{ movie.showing_times_display }}</p>
-          <p><strong>Release Date:</strong> {{ movie.release_label }}</p>
-          <p><strong>End Date:</strong> {{ movie.end_date }}</p>
+            <div class="movie-content">
+                
+                {% if user.is_authenticated and user.is_admin %}
+                    <a href="{% url 'movie_detail' movie.detail.pk %}" class="movie-title-link">
+                        <h3 class="movie-title">{{ movie.detail.movie.title }}</h3>
+                    </a>
+                {% else %}
+                    <h3 class="movie-title">{{ movie.detail.movie.title }}</h3>
+                {% endif %}
 
-          <button class="btn-reserve"
-                  data-movie-title="{{ detail.movie.title }}"
-                  data-movie-id="{{ detail.movie.id }}">
-              Reserve Movie
-          </button>
-        </div>
-      {% endwith %}
-    {% empty %}
-      <p>No movies available at the moment.</p>
-    {% endfor %}
+                <div class="movie-info-grid">
+                    <div class="info-item">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>{{ detail.movie.duration_minutes }} min</span>
+                    </div>
+
+                    <div class="info-item">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>{{ movie.release_label }}</span>
+                    </div>
+                </div>
+
+                <div class="showtimes-container">
+                    <p class="showtimes-label">Available Showtimes:</p>
+                    <p class="showtimes-text">{{ movie.showing_times_display }}</p>
+                </div>
+                
+                <button class="btn-reserve"
+                    data-movie-title="{{ detail.movie.title }}"
+                    data-movie-id="{{ detail.movie.id }}">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                    Reserve Movie
+                </button>
+            </div> 
+          </div>
+        {% endwith %}
+      {% empty %}
+        <p>No movies available at the moment.</p>
+      {% endfor %}
+    </div>
   </div>
 </main>
-{% endblock %}
+{% endblock content %}
 
 {% block extra_js %}
     <script>
         const STATIC_URL = "{% static '' %}";
         
-        // Add event listeners to all reserve buttons
+        // Initial Reservation Button Logic (kept in inline script)
         document.addEventListener('DOMContentLoaded', function() {
             const reserveButtons = document.querySelectorAll('.btn-reserve');
             reserveButtons.forEach(button => {
@@ -81,10 +116,10 @@
         });
         
         function reserveMovie(movieTitle, movieId) {
-            // Redirect to reservation page
             window.location.href = `/movies/reserve/${movieId}/`;
         }
     </script>
+    
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
-{% endblock extra_js %} 
+{% endblock extra_js %}

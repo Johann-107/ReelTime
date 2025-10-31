@@ -1,0 +1,129 @@
+.edit-movie-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    background-color: var(--color-card);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border);
+}
+
+.edit-movie-container h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-text);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* --- 2. Fieldset and Legend (Section Headers) --- */
+
+fieldset {
+    border: 1px solid var(--color-border);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: var(--radius);
+    background-color: var(--color-background); /* Slightly different background for sections */
+}
+
+legend {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary); /* Highlight the legend with primary color */
+    padding: 0 1rem;
+    margin-left: -1rem; /* Adjust position relative to fieldset border */
+    background-color: var(--color-card); /* Ensure legend stands out against fieldset bg */
+    border-radius: 4px;
+}
+
+/* --- 3. Django Form Fields (p tags) --- */
+
+/* Targets the paragraph wrapper created by form.as_p */
+.edit-movie-container form p {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+}
+
+/* Label Styling */
+.edit-movie-container label {
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Input and Select Styling */
+.edit-movie-container input:not([type="checkbox"]):not([type="radio"]),
+.edit-movie-container textarea,
+.edit-movie-container select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-input);
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.edit-movie-container input:focus,
+.edit-movie-container textarea:focus,
+.edit-movie-container select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(199, 62, 29, 0.2); /* Soft primary focus ring */
+    outline: none;
+    background-color: white;
+}
+
+/* --- 4. Form Action Buttons --- */
+
+.edit-movie-container button[type="submit"],
+.edit-movie-container a.btn-secondary {
+    display: inline-block;
+    padding: 0.8rem 1.75rem;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    margin-right: 1rem;
+}
+
+/* Save Changes Button (Success/Primary Theme) */
+.edit-movie-container .btn-success {
+    background: var(--color-primary);
+    color: white;
+}
+
+.edit-movie-container .btn-success:hover {
+    background: var(--color-primary-dark);
+    box-shadow: 0 4px 10px rgba(163, 47, 21, 0.3);
+}
+
+/* Cancel Button (Secondary/Neutral Theme) */
+.edit-movie-container .btn-secondary {
+    background: var(--color-text-muted);
+    color: white;
+}
+
+.edit-movie-container .btn-secondary:hover {
+    background: #555; /* Slightly darker gray */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .edit-movie-container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    .edit-movie-container button[type="submit"],
+    .edit-movie-container a.btn-secondary {
+        display: block;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}
