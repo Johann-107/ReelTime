@@ -1,23 +1,29 @@
-{% extends 'reel_time/partials/base.html' %}
+{% extends 'reel_time/partials/base.html' %} 
+{% load static %} 
+
+{% block extra_head %}
+    {# Linking the new CSS file for the form theme #}
+    <link rel="stylesheet" href="{% static 'css/edit_movie.css' %}">
+{% endblock extra_head %}
 
 {% block content %}
 <div class="edit-movie-container">
-    <h2>Edit Movie: {{ detail.movie.title }}</h2>
+    <h2>Edit Movie: {{ detail.movie.title }}</h2>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <fieldset>
-            <legend>General Information</legend>
-            {{ movie_form.as_p }}
-        </fieldset>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+            <legend>General Information</legend>
+            {{ movie_form.as_p }}
+        </fieldset>
 
-        <fieldset>
-            <legend>Admin Details</legend>
-            {{ detail_form.as_p }}
-        </fieldset>
+        <fieldset>
+            <legend>Admin Details</legend>
+            {{ detail_form.as_p }}
+        </fieldset>
 
-        <button type="submit" class="btn btn-success">Save Changes</button>
-        <a href="{% url 'movie_detail' detail.pk %}" class="btn btn-secondary">Cancel</a>
-    </form>
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{% url 'movie_detail' detail.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
 </div>
 {% endblock %}

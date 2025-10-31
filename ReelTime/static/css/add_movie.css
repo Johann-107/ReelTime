@@ -1,0 +1,123 @@
+.page-content {
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: auto;
+  padding: 0 1rem;
+}
+
+.section-header {
+margin-bottom: 2rem;
+text-align: center;
+}
+
+.section-title {
+font-size: 2rem;
+font-weight: bold;
+color: var(--color-text);
+margin-bottom: 0.5rem;
+}
+
+.title-underline {
+width: 80px;
+height: 4px;
+background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+margin: 0 auto;
+border-radius: 2px;
+}
+
+/* 3. Form Card and Elements (The core styling) */
+
+.form-card {
+    background: var(--color-card);
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 1rem;
+}
+
+/* Style all input, select, and textarea elements inside the form-card */
+.form-card input[type="text"], 
+.form-card input[type="number"], 
+.form-card input[type="file"],
+.form-card select, 
+.form-card textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background-color: var(--color-input);
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.form-card input:focus, 
+.form-card select:focus, 
+.form-card textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(199, 62, 29, 0.15);
+    outline: none;
+    background-color: white;
+}
+
+/* Style for errors and help text */
+.form-error {
+    color: var(--color-primary-dark);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.form-help {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Submit Button */
+.btn-submit {
+    display: block;
+    width: 100%;
+    background: var(--color-accent);
+    color: var(--color-text);
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius);
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1.5rem;
+}
+
+.btn-submit:hover {
+    background: #f7cb5c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 185, 35, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .form-card {
+        padding: 1.5rem;
+    }
+}

@@ -1,0 +1,132 @@
+/* movie_detail.css - FINAL REFINEMENT for Side-by-Side Poster Layout */
+
+/* --- 1. Main Container and Layout --- */
+
+.movie-detail-container {
+    max-width: 960px; /* Overall container width */
+    margin: 3rem auto;
+    padding: 2.5rem; 
+    background-color: var(--color-card);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border);
+
+    display: flex; /* Enables side-by-side layout */
+    flex-wrap: wrap; 
+    gap: 2.5rem; /* Space between poster and info */
+}
+
+/* --- 2. Movie Poster Section (Left Column) --- */
+
+.movie-poster-section {
+    flex-shrink: 0; 
+    width: 250px; /* Fixed width for the poster column */
+    height: auto;
+    overflow: hidden;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    align-self: flex-start; 
+}
+
+.movie-detail-poster {
+    width: 100%;
+    height: auto; 
+    display: block; 
+    object-fit: cover;
+}
+
+/* --- 3. Movie Information Section (Right Column) --- */
+
+.movie-info-section {
+    flex-grow: 1; /* Allows this section to fill the remaining horizontal space */
+    min-width: 350px; 
+}
+
+.movie-info-section h2 {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--color-accent);
+    line-height: 1.2;
+}
+
+/* Information Paragraphs */
+.movie-info-section p {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+    color: var(--color-text);
+}
+
+.movie-info-section p strong {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    display: inline-block;
+    min-width: 130px; 
+}
+
+/* Description paragraph styling */
+.movie-info-section p:last-of-type {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--color-border);
+}
+
+/* --- 4. Admin Actions Section --- */
+
+.actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end; 
+}
+
+.actions a.btn {
+    text-decoration: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-align: center;
+}
+
+/* Edit Button */
+.actions .btn-warning {
+    background: var(--color-accent);
+    color: var(--color-text);
+}
+
+/* Delete Button */
+.actions .btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+/* --- 5. Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .movie-detail-container {
+        flex-direction: column; /* Stack poster and info vertically */
+        align-items: center; 
+        padding: 1.5rem;
+        gap: 1.5rem;
+        margin: 2rem 1rem;
+    }
+    .movie-poster-section {
+        width: 60%; 
+        max-width: 300px;
+    }
+    .movie-info-section {
+        min-width: unset;
+        width: 100%;
+        /* You might want to remove text-align: center if you add it in a previous step */
+    }
+    .actions {
+        justify-content: center; 
+    }
+}
