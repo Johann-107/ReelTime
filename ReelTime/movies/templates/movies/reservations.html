@@ -1,91 +1,102 @@
-{% extends 'reel_time/partials/base.html' %} 
-{% load static %} 
+{% extends 'reel_time/partials/base.html' %}
+{% load static %}
 
-{# 1. PAGE TITLE BLOCK #}
 {% block title %}
-    Reserve {{ movie.title }} - ReelTime
+    {% if user.is_admin %}
+        Customer Reservations - ReelTime
+    {% else %}
+        My Reservations - ReelTime
+    {% endif %}
 {% endblock title %}
 
----
-
-{# 2. PAGE-SPECIFIC CSS BLOCK #}
 {% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
 {% endblock extra_head %}
 
----
-
-{# 3. MAIN CONTENT BLOCK #}
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">My Reservations</h2>
+<div class="page-content">
+    <div class="container">
+        
+        {# Page Header #}
+        <div class="section-header" style="margin-bottom: 2rem;">
+            <h2 class="section-title">
+                {% if user.is_admin %}
+                    All Customer Reservations
+                {% else %}
+                    My Reservations
+                {% endif %}
+            </h2>
+            <div class="title-underline"></div>
+        </div>
 
-    {% if reservations %}
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle text-center">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Movie</th>
-                        <th>Cinema</th>
-                        <th>Showtime</th>
-                        <th>Seats</th>
-                        <th>Selected Day</th>
-                        <th>Selected Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for reservation in reservations %}
+        {% if reservations %}
+            <div class="reservations-table-container">
+                <table class="reservations-table">
+                    <thead>
                         <tr>
-                            <td>{{ reservation.movie_detail.movie.title }}</td>
-                            <td>{{ reservation.cinema_name }}</td>
-                            <td>{{ reservation.showtime }}</td>
-                            <td>{{ reservation.number_of_seats }}</td>
-                            <td>{{ reservation.selected_date }}</td>
-                            <td>{{ reservation.selected_showtime }}</td>
-                            <td>
-                                {% if reservation.status == 'pending' %}
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                {% elif reservation.status == 'confirmed' %}
-                                    <span class="badge bg-success">Confirmed</span>
-                                {% elif reservation.status == 'cancelled' %}
-                                    <span class="badge bg-danger">Cancelled</span>
-                                {% endif %}
-                            </td>
+                            {% if user.is_admin %}
+                                <th>User</th>
+                            {% endif %}
+                            <th>Movie</th>
+                            <th>Cinema</th>
+                            <th>Reserved Date</th>
+                            <th>Showtime</th>
+                            <th>Seats</th>
+                            <th>Booking Date</th>
+                            <th>Status</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="alert alert-info text-center">
-            You haven’t made any reservations yet.
-        </div>
-    {% endif %}
+                    </thead>
+                    <tbody>
+                        {% for reservation in reservations %}
+                            <tr>
+                                {% if user.is_admin %}
+                                    <td>
+                                        <div class="user-info">
+                                            <strong>{{ reservation.user.get_full_name|default:reservation.user.username }}</strong>
+                                            <br><small>{{ reservation.user.email }}</small>
+                                        </div>
+                                    </td>
+                                {% endif %}
+                                <td><strong>{{ reservation.movie_detail.movie.title }}</strong></td>
+                                <td>{{ reservation.cinema_name|default:"N/A" }}</td>
+                                <td>{{ reservation.selected_date|date:"M d, Y" }}</td>
+                                <td>{{ reservation.selected_showtime }}</td>
+                                <td class="text-center">{{ reservation.number_of_seats }}</td>
+                                <td>{{ reservation.reservation_date|date:"M d, Y g:i A" }}</td>
+                                <td>
+                                    {% if reservation.status == 'pending' %}
+                                        <span class="badge badge-warning">Pending</span>
+                                    {% elif reservation.status == 'confirmed' %}
+                                        <span class="badge badge-success">Confirmed</span>
+                                    {% elif reservation.status == 'cancelled' %}
+                                        <span class="badge badge-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state" style="text-align: center; padding: 3rem;">
+                <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 64px; height: 64px; margin: 0 auto 1rem; opacity: 0.5;">
+                    <path d="M9 11l3 3L22 4"></path>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <h3>No Reservations Yet</h3>
+                <p class="text-muted">
+                    {% if user.is_admin %}
+                        No customers have made reservations for your movies yet.
+                    {% else %}
+                        You haven't made any reservations yet.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+
+    </div>
 </div>
 {% endblock content %}
 
-{# 4. PAGE-SPECIFIC SCRIPTS BLOCK #}
-{% block extra_scripts %}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Example showtimes — you can load these from Django template or API
-    const showtimes = ["10:00 AM", "1:00 PM", "4:00 PM", "7:00 PM", "10:00 PM"];
-    const container = document.getElementById("showtimesContainer");
-    const hiddenInput = document.getElementById("selectedShowtime");
-
-    // Render buttons
-    showtimes.forEach(time => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.textContent = time;
-      btn.classList.add("btn", "btn-outline-primary", "showtime-btn");
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".showtime-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        hiddenInput.value = time;
-      });
-      container.appendChild(btn);
-    });
-  });
-</script>
-{% endblock extra_scripts %}
+{% block extra_js %}
+{% endblock extra_js %}

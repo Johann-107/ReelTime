@@ -1,4 +1,4 @@
-// Dashboard JavaScript for filtering database-driven movies
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("movieSearch");
   const genreFilter = document.getElementById("genreFilter");
@@ -20,9 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const matchesGenre = selectedGenre === "all" || genre === selectedGenre;
       
       if (matchesSearch && matchesGenre) {
-        card.style.display = "block";
+card.style.display = "block";
       } else {
-        card.style.display = "none";
+card.style.display = "none";
       }
     });
   }
@@ -36,3 +36,5 @@ document.addEventListener("DOMContentLoaded", () => {
     genreFilter.addEventListener("change", filterMovies);
   }
 });
+
+
