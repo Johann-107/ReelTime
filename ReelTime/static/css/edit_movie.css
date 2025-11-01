@@ -1,3 +1,15 @@
+/* Page content wrapper for proper spacing */
+.page-content {
+    padding: 2rem 0;
+}
+
+.page-content .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
 .edit-movie-container {
     max-width: 800px;
     margin: 2rem auto;
@@ -21,9 +33,13 @@
 fieldset {
     border: 1px solid var(--color-border);
     padding: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem; /* Increased from 2rem to ensure clear separation */
     border-radius: var(--radius);
     background-color: var(--color-background); /* Slightly different background for sections */
+}
+
+fieldset:last-of-type {
+    margin-bottom: 2rem; /* Less margin for the last fieldset before buttons */
 }
 
 legend {
@@ -40,9 +56,11 @@ legend {
 
 /* Targets the paragraph wrapper created by form.as_p */
 .edit-movie-container form p {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1.25rem;
+    display: block;
+    margin-bottom: 2rem;
+    clear: both;
+    overflow: visible; /* Changed from hidden to allow textarea to expand */
+    position: relative; /* Create positioning context */
 }
 
 /* Label Styling */
@@ -51,6 +69,7 @@ legend {
     color: var(--color-text);
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
+    display: block;
 }
 
 /* Input and Select Styling */
@@ -65,6 +84,26 @@ legend {
     color: var(--color-text);
     font-size: 1rem;
     transition: all 0.2s ease;
+    box-sizing: border-box;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Special handling for textarea fields */
+.edit-movie-container textarea {
+    min-height: 150px;
+    height: auto !important; /* Force height to be auto */
+    resize: vertical;
+    font-family: monospace;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-y: auto;
+}
+
+/* Ensure the paragraph containing textarea doesn't collapse */
+.edit-movie-container form p:has(textarea) {
+    margin-bottom: 2.5rem; /* Extra margin for textarea fields */
+    min-height: 200px; /* Minimum height to prevent collapse */
 }
 
 .edit-movie-container input:focus,

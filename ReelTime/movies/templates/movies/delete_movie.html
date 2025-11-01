@@ -1,21 +1,46 @@
-{% extends 'reel_time/partials/base.html' %}
+{% extends 'reel_time/partials/base.html' %}{% extends 'reel_time/partials/base.html' %}
 
-{% load static %}
+{% load static %}{% load static %}
 
-{% block extra_head %}
-    {# Link the custom CSS file for the themed delete confirmation #}
-    <link rel="stylesheet" href="{% static 'css/delete_movie.css' %}">
-{% endblock extra_head %}
 
-{% block content %}
-<div class="delete-movie-container">
-    <h2>Delete Movie</h2>
-    <p>Are you sure you want to delete <strong>{{ detail.movie.title }}</strong>? This action cannot be undone.</p>
 
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        <a href="{% url 'movie_detail' detail.pk %}" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
-{% endblock %}
+{% block title %}Delete Movie - ReelTime{% endblock title %}{% block title %}Delete Movie - ReelTime{% endblock title %}
+
+
+
+{% block extra_head %}{% block extra_head %}
+
+    {# Link the custom CSS file for the themed delete confirmation #}    {# Link the custom CSS file for the themed delete confirmation #}
+
+    <link rel="stylesheet" href="{% static 'css/delete_movie.css' %}">    <link rel="stylesheet" href="{% static 'css/delete_movie.css' %}">
+
+{% endblock extra_head %}{% endblock extra_head %}
+
+
+
+{% block content %}{% block content %}
+
+<div class="delete-movie-container"><div class="delete-movie-container">
+
+    <h2>Delete Movie</h2>    <h2>Delete Movie</h2>
+
+    <p>Are you sure you want to delete <strong>{{ detail.movie.title }}</strong>? This action cannot be undone.</p>    <p>Are you sure you want to delete <strong>{{ detail.movie.title }}</strong>? This action cannot be undone.</p>
+
+
+
+    <form method="POST">    <form method="POST">
+
+        {% csrf_token %}        {% csrf_token %}
+
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+
+        <a href="{% url 'movie_detail' detail.pk %}" class="btn btn-secondary">Cancel</a>        <a href="{% url 'movie_detail' detail.pk %}" class="btn btn-secondary">Cancel</a>
+
+    </form>    </form>
+
+</div></div>
+
+{% endblock content %}{% endblock %}
+
+{% block extra_js %}
+{% endblock extra_js %}

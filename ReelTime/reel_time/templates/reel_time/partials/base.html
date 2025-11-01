@@ -9,11 +9,24 @@
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
     <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/messages.css' %}">
 
     {% block extra_head %}{% endblock extra_head %}
 </head>
 <body>
         {% include 'reel_time/partials/header.html' %}
+
+    <!-- Django Messages Notification Area -->
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.remove();">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <main role="main">
         {% block content %}
@@ -22,6 +35,7 @@
     
     {% include 'reel_time/partials/footer.html' %}
 
+    <script src="{% static 'js/messages.js' %}"></script>
     {% block extra_js %}{% endblock extra_js %}
 </body>
 </html>

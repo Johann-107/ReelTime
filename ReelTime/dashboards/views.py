@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import admin_required
 from django.shortcuts import render
-from movies.models import MovieAdminDetails
+from movies.models import MovieAdminDetails, Reservation
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -67,4 +67,22 @@ def user_dashboard(request):
 
 @admin_required
 def admin_dashboard(request):
-    return render(request, 'dashboards/admin_dashboard.html')
+    movies_count = MovieAdminDetails.objects.filter(admin=request.user).count()
+    reservations_count = Reservation.objects.filter(movie_detail__admin=request.user).count()
+    
+    # Get movies for this admin
+    admin_movies = MovieAdminDetails.objects.filter(
+        admin=request.user
+    ).select_related('movie').order_by('-created_at')
+    
+    # Get all reservations for this admin's movies (limit to 5 most recent)
+    reservations = Reservation.objects.filter(
+        movie_detail__admin=request.user
+    ).select_related('user', 'movie_detail__movie').order_by('-reservation_date')[:5]
+    
+    return render(request, 'dashboards/admin_dashboard.html', {
+        'movies_count': movies_count,
+        'reservations_count': reservations_count,
+        'admin_movies': admin_movies,
+        'recent_reservations': reservations,
+    })

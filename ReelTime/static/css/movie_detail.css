@@ -1,5 +1,17 @@
 /* movie_detail.css - FINAL REFINEMENT for Side-by-Side Poster Layout */
 
+/* --- 0. Page Content Wrapper --- */
+.page-content {
+    padding: 2rem 0;
+}
+
+.page-content .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
 /* --- 1. Main Container and Layout --- */
 
 .movie-detail-container {
@@ -87,25 +99,44 @@
 
 .actions a.btn {
     text-decoration: none;
-    padding: 0.7rem 1.4rem;
-    border-radius: var(--radius);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
     font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     border: none;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
 }
 
-/* Edit Button */
+/* Edit Button - Yellow/Gold */
 .actions .btn-warning {
-    background: var(--color-accent);
-    color: var(--color-text);
+    background: #e6b800;
+    color: #1a1a1a;
+    box-shadow: 0 2px 6px rgba(230, 184, 0, 0.3);
 }
 
-/* Delete Button */
+.actions .btn-warning:hover {
+    background: #ffcc00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 184, 0, 0.4);
+}
+
+/* Delete Button - Red */
 .actions .btn-danger {
     background: #dc3545;
     color: white;
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+.actions .btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
 }
 
 /* --- 5. Responsive Adjustments --- */

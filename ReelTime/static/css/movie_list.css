@@ -303,3 +303,59 @@ body {
     width: 20px;
     height: 20px;
 }
+
+/* ======================================================================
+   Admin Action Buttons (Edit/Delete)
+   ====================================================================== */
+
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-admin {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 2px solid;
+}
+
+.btn-admin .btn-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-edit {
+    background-color: #fff;
+    color: #0066cc;
+    border-color: #0066cc;
+}
+
+.btn-edit:hover {
+    background-color: #0066cc;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+.btn-delete {
+    background-color: #fff;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-delete:hover {
+    background-color: #dc3545;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
