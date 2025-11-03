@@ -25,6 +25,18 @@
     padding: 0 1rem;
 }
 
+body .container {
+    max-width: 1200px !important; 
+    margin-left: auto !important;  
+    margin-right: auto !important; 
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+/* Retain the body overflow fix */
+body {
+    overflow-x: hidden;
+}
 .header-content {
     display: flex;
     align-items: center;
@@ -137,3 +149,4 @@
         font-size: 0.8rem;
     }
 }
+

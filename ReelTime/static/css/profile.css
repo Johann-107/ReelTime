@@ -18,6 +18,21 @@
     box-sizing: border-box;
 }
 
+/* Page content wrapper for proper spacing */
+.page-content {
+    min-height: calc(100vh - 200px); /* Ensure space between header and footer */
+    padding: 2rem 0 3rem 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+.page-content .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
 body {
     font-family: var(--font-sans);
     background-color: var(--color-background);

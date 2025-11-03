@@ -1,0 +1,101 @@
+/* delete_movie.css - REFINED Styling for the Delete Confirmation Page */
+
+/* --- 1. Container and Header --- */
+
+.delete-movie-container {
+    max-width: 450px; /* Reduced max-width for a more focused dialog */
+    margin: 4rem auto;
+    padding: 2.5rem;
+    background-color: var(--color-card);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+    border: 1px solid var(--color-border);
+    text-align: center; /* Ensures all text content is centered */
+}
+
+.delete-movie-container h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+}
+
+/* --- 2. Confirmation Message --- */
+
+.delete-movie-container p {
+    font-size: 1.1rem;
+    color: var(--color-text);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Highlight the movie title strongly with primary color */
+.delete-movie-container p strong {
+    font-weight: bold;
+    color: var(--color-primary); 
+}
+
+/* --- 3. Form and Action Buttons --- */
+
+.delete-movie-container form {
+    display: flex;
+    justify-content: center; /* Center buttons horizontally */
+    gap: 1.25rem; /* Reduced gap slightly for better cohesion */
+    margin-top: 1.5rem;
+}
+
+/* Base button styling - targeting the specific buttons directly */
+.delete-movie-container button[type="submit"],
+.delete-movie-container a.btn-secondary {
+    display: inline-flex; /* Use inline-flex for better alignment and text centering */
+    align-items: center; /* Vertically center text in buttons */
+    justify-content: center; /* Horizontally center text in buttons */
+    padding: 0.8rem 1.5rem; /* Consistent padding */
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    min-width: 140px; /* Increased min-width for more prominent buttons */
+    white-space: nowrap; /* Prevent text wrapping in buttons */
+}
+
+/* Delete Button (Danger/Destructive Action) */
+.delete-movie-container .btn-danger {
+    background: #dc3545; /* Standard red for safety/danger */
+    color: white;
+}
+
+.delete-movie-container .btn-danger:hover {
+    background: #c82333; 
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+
+/* Cancel Button (Secondary/Neutral Theme) */
+.delete-movie-container .btn-secondary {
+    background: var(--color-text-muted); /* Muted gray from theme */
+    color: white;
+}
+
+.delete-movie-container .btn-secondary:hover {
+    background: #555; /* Slightly darker gray on hover */
+}
+
+/* --- Responsive adjustments (if needed, though already present from previous) --- */
+@media (max-width: 600px) {
+    .delete-movie-container {
+        padding: 1.5rem;
+        margin: 2rem 1rem; /* Adjust margin for smaller screens */
+    }
+    .delete-movie-container form {
+        flex-direction: column; /* Stack buttons vertically on small screens */
+        gap: 1rem;
+    }
+    .delete-movie-container button[type="submit"],
+    .delete-movie-container a.btn-secondary {
+        width: 100%; /* Full width buttons on small screens */
+        min-width: unset; /* Remove min-width when stacking */
+    }
+}
