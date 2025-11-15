@@ -9,5 +9,5 @@ urlpatterns = [
     path('<int:pk>/delete/', views.delete_movie_view, name='delete_movie'),
     path('reserve/<int:movie_id>/', views.reserve_movie_view, name='reserve_movie'),
     path('confirm/<int:detail_id>/', views.confirm_reservation_view, name='confirm_reservation'),
-    path('reservations/', views.user_reservations_view, name='reservations'),
+    path('get_seat_map/<int:detail_id>/<str:selected_date>/<str:selected_showtime>/', views.hall_seat_layout_view, name='get_seat_map'),
 ]

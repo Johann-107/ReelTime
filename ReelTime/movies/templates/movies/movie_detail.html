@@ -19,8 +19,8 @@
                     NOTE: Replace 'detail.movie.poster_url' with your actual field name 
                     that holds the URL or path to the movie poster/logo.
                 {% endcomment %}
-                {% if detail.movie.poster_url %} 
-                    <img src="{{ detail.movie.poster_url }}" alt="{{ detail.movie.title }} Poster" class="movie-detail-poster">
+                {% if detail.poster.url %} 
+                    <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" class="movie-detail-poster">
                 {% else %}
                     {# Fallback if no poster URL is available #}
                     <img src="{% static 'images/default_poster.png' %}" alt="Default Movie Poster" class="movie-detail-poster placeholder">

@@ -27,6 +27,7 @@
                 {% if user.is_authenticated %}
                     {% if user.is_admin %}
                         <a href="{% url 'admin_dashboard' %}" class="nav-link">Home</a>
+                        <a href="{% url 'hall_list' %}" class="nav-link">Halls</a>
                     {% else %}
                         <a href="{% url 'user_dashboard' %}" class="nav-link">Home</a>
                     {% endif %}

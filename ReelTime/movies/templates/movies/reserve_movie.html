@@ -16,7 +16,7 @@
 
 ---
 
-{# 3. MAIN CONTENT BLOCK (No changes here, keeping the structure from the last update) #}
+{# 3. MAIN CONTENT BLOCK #}
 {% block content %}
 <main class="page-content">
     <div class="container">
@@ -126,6 +126,7 @@
     </div>
 </main>
 
+{# 4. RESERVATION MODAL WITH SEAT SELECTION #}
 <div id="reservationModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -153,7 +154,12 @@
 
                 <div class="form-group">
                     <label for="selectedDate" class="form-label">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
                         Choose Date
                     </label>
                     <input type="date" id="selectedDate" name="selected_date" class="form-input" required>
@@ -161,7 +167,10 @@
 
                 <div class="form-group">
                     <label class="form-label">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
                         Available Showtimes
                     </label>
                     <div id="showtimesContainer" class="showtimes-grid">
@@ -172,7 +181,11 @@
 
                 <div class="form-group">
                     <label for="seats" class="form-label">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="8.5" cy="7" r="4"/>
+                            <path d="M20 8v6M23 11h-6"/>
+                        </svg>
                         Number of Seats
                     </label>
                     <input type="number" 
@@ -184,6 +197,14 @@
                            value="1" 
                            required>
                 </div>
+
+                {# NEW: Seat Layout #}
+                <div class="form-group">
+                    <label class="form-label">Choose Your Seats</label>
+                    <div id="seatLayoutContainer" class="seat-layout"></div>
+                    <input type="hidden" id="selectedSeatsInput" name="selected_seats" required>
+                </div>
+
             </div>
 
             <div class="modal-footer">
@@ -202,17 +223,13 @@
 
 ---
 
-{# 4. PAGE-SPECIFIC JAVASCRIPT BLOCK #}
 {% block extra_js %}
 <script>
-    // Define closeModal globally so it can be called from onclick="closeModal()"
     function closeModal() {
         document.getElementById('reservationModal').style.display = 'none';
     }
 </script>
 <script>
-    // Define the URL pattern for the JS to use.
-    // It's crucial to pass this Django context to the JS file.
     window.confirmReservationUrlPattern = "{% url 'confirm_reservation' 0 %}";
 </script>
 <script src="{% static 'js/reserve_movie.js' %}"></script>

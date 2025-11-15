@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import MovieForm
-from .models import Movie, MovieAdminDetails, Reservation
+from .models import Movie, MovieAdminDetails
+from reservations.models import Reservation
 from accounts.decorators import admin_required
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.contrib import messages
 from .forms import MovieAdminDetailsForm
-from django.db.models import Q
+from django.http import JsonResponse
 import json
 
 @admin_required
@@ -236,52 +236,101 @@ def reserve_movie_view(request, movie_id):
 
 
 @login_required
+def hall_seat_layout_view(request, detail_id, selected_date, selected_showtime):
+    """
+    Return the seat layout and already reserved seats for a given movie detail, date, and showtime.
+    """
+    detail = get_object_or_404(MovieAdminDetails, id=detail_id)
+
+    # Hall layout: default to empty dict if not set
+    hall_layout = detail.hall.layout or {}
+
+    # Get reserved seats for this showtime and date
+    reserved_qs = Reservation.objects.filter(
+        movie_detail=detail,
+        selected_date=selected_date,
+        selected_showtime=selected_showtime
+    ).values_list('selected_seats', flat=True)
+
+    reserved_seats = []
+    for seats in reserved_qs:
+        if seats:
+            try:
+                if isinstance(seats, str):
+                    seat_list = json.loads(seats)
+                else:
+                    seat_list = seats
+                reserved_seats.extend(seat_list)
+            except (json.JSONDecodeError, TypeError):
+                # Handle case where selected_seats might be stored differently
+                continue
+
+    return JsonResponse({
+        "seat_map": hall_layout,
+        "reserved": reserved_seats,
+    })
+
+@login_required
 def confirm_reservation_view(request, detail_id):
     """
-    Confirm the reservation for a specific cinema and showtime.
+    Confirm the reservation for a specific cinema, date, showtime, and selected seats.
     """
     detail = get_object_or_404(MovieAdminDetails, id=detail_id)
 
     if request.method == 'POST':
-        # Match your form field names from the modal
         selected_date = request.POST.get('selected_date')
         selected_showtime = request.POST.get('selected_showtime')
-        number_of_seats = request.POST.get('number_of_seats', 1)
+        number_of_seats = int(request.POST.get('number_of_seats', 1))
+        selected_seats_json = request.POST.get('selected_seats', '[]')
 
-        # Create the reservation record
+        try:
+            selected_seats = json.loads(selected_seats_json)
+        except json.JSONDecodeError:
+            messages.error(request, "Invalid seat selection.")
+            return redirect('reserve_movie', movie_id=detail.movie.id)
+
+        # Validate number of seats matches selected seats
+        if len(selected_seats) != number_of_seats:
+            messages.error(request, "Number of selected seats does not match your input.")
+            return redirect('reserve_movie', movie_id=detail.movie.id)
+
+        # Check that seats are not already reserved
+        existing_reservations = Reservation.objects.filter(
+            movie_detail=detail,
+            selected_date=selected_date,
+            selected_showtime=selected_showtime
+        ).values_list('selected_seats', flat=True)
+
+        already_reserved = []
+        for seats in existing_reservations:
+            if isinstance(seats, str):
+                seats = json.loads(seats)
+            already_reserved.extend(seats)
+
+        if any(seat in already_reserved for seat in selected_seats):
+            messages.error(request, "One or more of your selected seats have already been reserved.")
+            return redirect('reserve_movie', movie_id=detail.movie.id)
+
+        # Create the reservation
         reservation = Reservation.objects.create(
             user=request.user,
             movie_detail=detail,
             cinema_name=detail.admin.cinema_name,
             selected_date=selected_date,
             selected_showtime=selected_showtime,
-            number_of_seats=int(number_of_seats),
+            number_of_seats=number_of_seats,
+            selected_seats=selected_seats,
             status='confirmed',
         )
 
         messages.success(
             request,
             f"Reservation confirmed for {detail.movie.title} at {detail.admin.cinema_name} "
-            f"on {selected_date} ({selected_showtime})!"
+            f"on {selected_date} ({selected_showtime})! Seats: {', '.join(selected_seats)}"
         )
         return redirect('user_dashboard')
 
     context = {
         'detail': detail,
     }
-
     return render(request, 'movies/confirm_reservation.html', context)
-
-
-@login_required
-def user_reservations_view(request):
-    # If admin, show all customer reservations for their cinema's movies
-    # If regular user, show only their own reservations
-    if request.user.is_admin:
-        reservations = Reservation.objects.filter(
-            movie_detail__admin=request.user
-        ).select_related('user', 'movie_detail__movie').order_by('-reservation_date')
-    else:
-        reservations = Reservation.objects.filter(user=request.user).order_by('-reservation_date')
-    
-    return render(request, 'movies/reservations.html', {'reservations': reservations})

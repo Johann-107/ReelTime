@@ -1,0 +1,309 @@
+{% extends 'reel_time/partials/base.html' %}
+
+{% block title %}{{ hall.name|default:"Add Hall" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .active-tool {
+        border-width: 2px !important;
+        box-shadow: 0px 0px 5px rgba(0,0,0,0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ hall.name|default:"Add / Edit Hall" }}</h2>
+
+    <form id="hall-form" method="POST">
+        {% csrf_token %}
+
+        <!-- Hall name and capacity -->
+        <div class="mb-3">
+            <label class="form-label">Hall Name</label>
+            <input type="text" name="name" class="form-control"
+                   value="{{ hall.name|default:'' }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Capacity (Max number of seats)</label>
+            <input type="number" id="capacity-input" name="capacity" class="form-control"
+                   value="{{ hall.capacity|default:'' }}" min="1" required>
+        </div>
+
+        <!-- NEW: Choose rows & columns -->
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Rows</label>
+                <input type="number" id="rows-input" class="form-control"
+                       value="{{ rows|length }}" min="1" max="30">
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Columns</label>
+                <input type="number" id="cols-input" class="form-control"
+                       value="{{ cols|length }}" min="1" max="30">
+            </div>
+        </div>
+
+        <!-- Hidden layout JSON -->
+        <input type="hidden" name="layout" id="layout-input">
+
+        <!-- Legend -->
+        <div class="mt-3">
+            <h5>Legend</h5>
+            <div><span style="color:#007bff">⬤</span> Seat</div>
+            <div><span style="color:#28a745">⬤</span> Screen</div>
+            <div><span style="color:#ffc107">⬤</span> Entrance</div>
+            <div><span style="color:#dc3545">⬤</span> Exit</div>
+        </div>
+
+        <!-- Tools -->
+        <div class="d-flex mt-4">
+            <div class="me-3">
+                <h5>Tools</h5>
+                <button type="button" class="tool-btn btn btn-outline-primary mb-2" data-type="seat">Seat</button>
+                <button type="button" class="tool-btn btn btn-outline-success mb-2" data-type="screen">Screen</button>
+                <button type="button" class="tool-btn btn btn-outline-warning mb-2" data-type="entrance">Entrance</button>
+                <button type="button" class="tool-btn btn btn-outline-danger mb-2" data-type="exit">Exit</button>
+                <button type="button" class="tool-btn btn btn-outline-dark mb-2" data-type="erase">Eraser</button>
+                <button type="button" class="btn btn-outline-secondary" id="clear-grid">Clear</button>
+            </div>
+
+            <!-- Designer Grid -->
+            <div id="grid-container"
+                 style="display:grid; grid-template-columns: repeat({{ cols|length }}, 40px);
+                        grid-gap:5px; border:1px solid #ccc; padding:5px;">
+                {% for row in rows %}
+                    {% for col in cols %}
+                        <div class="grid-cell"
+                             data-row="{{ row }}"
+                             data-col="{{ col }}"
+                             style="width:40px;height:40px;border:1px dashed #aaa;cursor:pointer;">
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success mt-3">Save Hall</button>
+        <a href="{% url 'hall_list' %}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+
+
+
+
+<!-- JAVASCRIPT -->
+<script>
+
+let currentTool = "seat";
+let seatCount = 0;
+
+const gridContainer = document.getElementById("grid-container");
+const layoutInput = document.getElementById("layout-input");
+const capacityInput = document.getElementById("capacity-input");
+
+// -------------------------------
+// TOOL SELECTOR + ACTIVE BUTTON
+// -------------------------------
+document.querySelectorAll(".tool-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        currentTool = btn.dataset.type;
+
+        // Highlight active button
+        document.querySelectorAll(".tool-btn").forEach(b => b.classList.remove("active-tool"));
+        btn.classList.add("active-tool");
+    });
+});
+
+// Default active tool = seat
+document.querySelector('.tool-btn[data-type="seat"]').classList.add("active-tool");
+
+// -------------------------------
+// CREATE GRID FUNCTION
+// -------------------------------
+function regenerateGrid() {
+    const rows = parseInt(document.getElementById("rows-input").value);
+    const cols = parseInt(document.getElementById("cols-input").value);
+
+    // Read EXISTING layout from current grid BEFORE clearing
+    let currentLayout = [];
+    document.querySelectorAll(".grid-cell").forEach(cell => {
+        if (cell.dataset.type) {
+            currentLayout.push({
+                row: parseInt(cell.dataset.row),
+                col: parseInt(cell.dataset.col),
+                type: cell.dataset.type
+            });
+        }
+    });
+
+    // Rebuild grid UI
+    gridContainer.innerHTML = "";
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
+
+    seatCount = 0; // will recalc below
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            let cell = document.createElement("div");
+            cell.className = "grid-cell";
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            cell.style.width = "40px";
+            cell.style.height = "40px";
+            cell.style.border = "1px dashed #aaa";
+            cell.style.cursor = "pointer";
+            cell.addEventListener("click", handleCellClick);
+            gridContainer.appendChild(cell);
+        }
+    }
+
+    // Restore saved items that still fit in new grid size
+    currentLayout.forEach(item => {
+        if (item.row < rows && item.col < cols) {
+            const selector = `.grid-cell[data-row="${item.row}"][data-col="${item.col}"]`;
+            const cell = document.querySelector(selector);
+            if (cell) {
+                cell.dataset.type = item.type;
+                switch (item.type) {
+                    case "seat":
+                        cell.style.backgroundColor = "#007bff";
+                        seatCount++;
+                        break;
+                    case "screen":
+                        cell.style.backgroundColor = "#28a745";
+                        break;
+                    case "entrance":
+                        cell.style.backgroundColor = "#ffc107";
+                        break;
+                    case "exit":
+                        cell.style.backgroundColor = "#dc3545";
+                        break;
+                }
+            }
+        }
+    });
+}
+
+// Trigger grid rebuild when row/col changes
+document.getElementById("rows-input").addEventListener("change", regenerateGrid);
+document.getElementById("cols-input").addEventListener("change", regenerateGrid);
+
+
+// -------------------------------
+// HANDLE GRID CLICK
+// -------------------------------
+function handleCellClick(e) {
+    const cell = e.target;
+    const capacity = parseInt(capacityInput.value);
+
+    // ⚡ ERASER BEHAVIOR
+    if (currentTool === "erase") {
+        // If removing a seat, reduce count
+        if (cell.dataset.type === "seat") {
+            seatCount--;
+        }
+        delete cell.dataset.type;
+        cell.style.backgroundColor = "";
+        return;
+    }
+
+    // ⚡ Prevent placing too many seats
+    if (currentTool === "seat") {
+        if (!cell.dataset.type && seatCount >= capacity) {
+            alert("You cannot place more seats than the hall capacity!");
+            return;
+        }
+    }
+
+    // If cell currently has a seat and we're changing tool
+    if (cell.dataset.type === "seat" && currentTool !== "seat") {
+        seatCount--;
+    }
+
+    // Reset cell
+    cell.style.backgroundColor = "";
+    delete cell.dataset.type;
+
+    // Apply tool type
+    cell.dataset.type = currentTool;
+
+    switch(currentTool){
+        case "seat":
+            cell.style.backgroundColor = "#007bff";
+            seatCount++;
+            break;
+        case "screen":
+            cell.style.backgroundColor = "#28a745";
+            break;
+        case "entrance":
+            cell.style.backgroundColor = "#ffc107";
+            break;
+        case "exit":
+            cell.style.backgroundColor = "#dc3545";
+            break;
+    }
+}
+
+// -------------------------------
+// CLEAR GRID
+// -------------------------------
+document.getElementById("clear-grid").addEventListener("click", () => {
+    seatCount = 0;
+    regenerateGrid();
+});
+
+// -------------------------------
+// FORM SUBMIT
+// -------------------------------
+document.getElementById("hall-form").addEventListener("submit", function() {
+    const cells = document.querySelectorAll(".grid-cell");
+    const layout = [];
+
+    cells.forEach(c => {
+        if(c.dataset.type){
+            layout.push({
+                row: parseInt(c.dataset.row),
+                col: parseInt(c.dataset.col),
+                type: c.dataset.type
+            });
+        }
+    });
+
+    layoutInput.value = JSON.stringify(layout);
+});
+
+// -------------------------------
+// LOAD EXISTING LAYOUT
+// -------------------------------
+{% if hall and hall.layout %}
+const savedLayout = {{ hall.layout|safe }};
+setTimeout(() => {  // wait for grid to render
+    regenerateGrid();
+
+    savedLayout.forEach(item => {
+        const selector = `.grid-cell[data-row="${item.row}"][data-col="${item.col}"]`;
+        const cell = document.querySelector(selector);
+        if(cell){
+            cell.dataset.type = item.type;
+            switch(item.type){
+                case "seat": 
+                    cell.style.backgroundColor="#007bff"; 
+                    seatCount++; 
+                    break;
+                case "screen": cell.style.backgroundColor="#28a745"; break;
+                case "entrance": cell.style.backgroundColor="#ffc107"; break;
+                case "exit": cell.style.backgroundColor="#dc3545"; break;
+            }
+        }
+    });
+}, 10);
+{% else %}
+setTimeout(regenerateGrid, 10);
+{% endif %}
+
+</script>
+
+{% endblock %}

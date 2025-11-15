@@ -22,7 +22,7 @@
     <div class="container">
         <div class="welcome-banner">
             <div class="welcome-content">
-                <h1 class="welcome-title">Welcome Back, {{ user.username }}! 🎬</h1>
+                <h1 class="welcome-title">Welcome Back, {{ user.first_name }}! 🎬</h1>
                 <p class="welcome-subtitle">Discover amazing movies and reserve your seats today</p>
             </div>
             <div class="welcome-stats">
@@ -37,11 +37,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="section-header">
-            <h2 class="section-title">Now Showing</h2>
-            <div class="title-underline"></div>
         </div>
 
         <div class="search-filter-bar">
@@ -61,6 +56,11 @@
                 <option value="romance">Romance</option>
                 <option value="comedy">Comedy</option>
             </select>
+        </div>
+
+        <div class="section-header">
+            <h2 class="section-title">Now Showing</h2>
+            <div class="title-underline"></div>
         </div>
 
         {% if movies %}

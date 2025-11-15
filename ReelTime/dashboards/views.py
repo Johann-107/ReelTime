@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import admin_required
 from django.shortcuts import render
-from movies.models import MovieAdminDetails, Reservation
+from movies.models import MovieAdminDetails
+from reservations.models import Reservation
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
