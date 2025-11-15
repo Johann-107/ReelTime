@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'accounts',
     'dashboards',
     'movies',
+    'reservations',
+    'halls',
 ]
 
 MIDDLEWARE = [
@@ -59,7 +61,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ReelTime.urls'
+ROOT_URLCONF = 'reeltime.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +78,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ReelTime.wsgi.application'
+WSGI_APPLICATION = 'reeltime.wsgi.application'
 
 
 # Database

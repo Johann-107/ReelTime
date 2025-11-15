@@ -1,11 +1,10 @@
 {% extends 'reel_time/partials/base.html' %}
-
 {% load static %}
 
 {% block title %}Edit Movie - ReelTime{% endblock title %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/edit_movie.css' %}">
+<link rel="stylesheet" href="{% static 'css/edit_movie.css' %}">
 {% endblock extra_head %}
 
 {% block content %}
@@ -16,9 +15,27 @@
 
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
+
                 <fieldset>
                     <legend>General Information</legend>
-                    {{ movie_form.as_p }}
+                    {# Only show movie-related fields, excluding admin-related ones #}
+                    {{ movie_form.title.errors }}
+                    <p>{{ movie_form.title.label_tag }} {{ movie_form.title }}</p>
+
+                    {{ movie_form.description.errors }}
+                    <p>{{ movie_form.description.label_tag }} {{ movie_form.description }}</p>
+
+                    {{ movie_form.genre.errors }}
+                    <p>{{ movie_form.genre.label_tag }} {{ movie_form.genre }}</p>
+
+                    {{ movie_form.director.errors }}
+                    <p>{{ movie_form.director.label_tag }} {{ movie_form.director }}</p>
+
+                    {{ movie_form.duration_minutes.errors }}
+                    <p>{{ movie_form.duration_minutes.label_tag }} {{ movie_form.duration_minutes }}</p>
+
+                    {{ movie_form.rating.errors }}
+                    <p>{{ movie_form.rating.label_tag }} {{ movie_form.rating }}</p>
                 </fieldset>
 
                 <fieldset>
