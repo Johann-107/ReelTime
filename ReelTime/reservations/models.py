@@ -65,10 +65,9 @@ class Reservation(models.Model):
     def send_confirmation_email(self):
         """Send reservation confirmation email"""
         try:
-            from reservations.views import send_reservation_confirmation_email
+            from reservations.utils import send_reservation_confirmation_email  # ✅ Fix import
             send_reservation_confirmation_email(self)
             self.confirmation_sent = True
-            # Save without triggering save method again
             Reservation.objects.filter(pk=self.pk).update(confirmation_sent=True)
             return True
         except Exception as e:
@@ -78,10 +77,9 @@ class Reservation(models.Model):
     def send_reminder_email(self):
         """Send reservation reminder email"""
         try:
-            from reservations.views import send_reservation_reminder_email
+            from reservations.utils import send_reservation_reminder_email  # ✅ Fix import
             send_reservation_reminder_email(self)
             self.reminder_sent = True
-            # Save without triggering save method again
             Reservation.objects.filter(pk=self.pk).update(reminder_sent=True)
             return True
         except Exception as e:

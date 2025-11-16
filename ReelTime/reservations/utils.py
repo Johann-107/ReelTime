@@ -1,15 +1,12 @@
 # reservations/utils.py
 from django.core.mail import send_mail
 from django.conf import settings
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 
 def send_reservation_confirmation_email(reservation):
     """Send reservation confirmation email"""
     user = reservation.user
     subject = f"🎬 Reservation Confirmed - {reservation.movie_detail.movie.title}"
     
-    # Create plain text message
     message = (
         f"Hello {user.first_name or user.username},\n\n"
         f"Your movie reservation has been confirmed!\n\n"
