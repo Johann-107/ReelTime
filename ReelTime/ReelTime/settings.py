@@ -31,6 +31,14 @@ DEBUG = os.getenv("DEBUG", "1") == "1"
 raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(",")]
 
+# Add Render's hostname automatically
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Also add the generic Render domain as a fallback
+if not any('.onrender.com' in host for host in ALLOWED_HOSTS):
+    ALLOWED_HOSTS.append('.onrender.com')
 
 # Application definition
 
