@@ -27,7 +27,8 @@ def create_reservation(request):
     if request.method == "POST":
         try:
             print("🟡 Starting reservation creation...")
-
+            
+            # Create reservation
             reservation = Reservation(
                 user=request.user,
                 movie_detail=request.POST.get('movie_detail'),
@@ -39,15 +40,29 @@ def create_reservation(request):
                 status='confirmed'
             )
             
-            print(f"🟡 About to save reservation for user: {request.user.email}")
-            reservation.save()  # This will trigger the email automatically
-            print("🟢 Reservation saved, email should be sent")
+            print(f"🟡 About to save reservation...")
+            reservation.save()
+            print(f"🟡 Reservation saved with ID: {reservation.id}")
             
-            messages.success(request, "Reservation created successfully! Confirmation email sent.")
+            # 🚨 FORCE EMAIL SENDING - TEMPORARY TEST
+            print("🟡 Force sending email...")
+            from django.core.mail import send_mail
+            from django.conf import settings
+            
+            send_mail(
+                'FORCED TEST: Reservation Confirmed',
+                f'This is a forced test email for reservation {reservation.id}',
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=False,
+            )
+            print("🟢 Force email sent!")
+            
+            messages.success(request, "Reservation created! Check for confirmation email.")
             return redirect('user_reservations')
             
         except Exception as e:
             print(f"🔴 Error: {e}")
-            messages.error(request, f"Error creating reservation: {str(e)}")
+            messages.error(request, f"Error: {str(e)}")
     
     return render(request, 'reservations/create_reservation.html')
