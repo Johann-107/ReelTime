@@ -25,12 +25,12 @@ def user_reservations_view(request):
 @login_required
 def create_reservation(request):
     if request.method == "POST":
-        # Your existing reservation creation logic
         try:
-            # Assuming you have form processing here
+            print("🟡 Starting reservation creation...")
+
             reservation = Reservation(
                 user=request.user,
-                movie_detail=request.POST.get('movie_detail'),  # Adjust based on your actual form
+                movie_detail=request.POST.get('movie_detail'),
                 cinema_name=request.POST.get('cinema_name'),
                 selected_date=request.POST.get('selected_date'),
                 selected_showtime=request.POST.get('selected_showtime'),
@@ -39,75 +39,15 @@ def create_reservation(request):
                 status='confirmed'
             )
             
-            # Save the reservation (this will trigger the confirmation email from model save)
-            reservation.save()
+            print(f"🟡 About to save reservation for user: {request.user.email}")
+            reservation.save()  # This will trigger the email automatically
+            print("🟢 Reservation saved, email should be sent")
             
             messages.success(request, "Reservation created successfully! Confirmation email sent.")
             return redirect('user_reservations')
             
         except Exception as e:
+            print(f"🔴 Error: {e}")
             messages.error(request, f"Error creating reservation: {str(e)}")
-            return redirect('create_reservation')
     
-    # Your existing GET request handling
     return render(request, 'reservations/create_reservation.html')
-
-# --------------------------
-# Send Reservation Confirmation Email
-# --------------------------
-def send_reservation_confirmation_email(reservation):
-    """Send reservation confirmation email - same pattern as admin registration"""
-    user = reservation.user
-    subject = f"🎬 Reservation Confirmed - {reservation.movie_detail.movie.title}"
-    
-    message = (
-        f"Hello {user.first_name or user.username},\n\n"
-        f"Your movie reservation has been confirmed!\n\n"
-        f"📋 Reservation Details:\n"
-        f"Movie: {reservation.movie_detail.movie.title}\n"
-        f"Cinema: {reservation.cinema_name}\n"
-        f"Date: {reservation.selected_date}\n"
-        f"Showtime: {reservation.selected_showtime}\n"
-        f"Number of Seats: {reservation.number_of_seats}\n"
-        f"Seats: {', '.join(reservation.selected_seats)}\n"
-        f"Reservation ID: {reservation.id}\n\n"
-        f"We look forward to seeing you at the cinema!\n\n"
-        f"Thank you for choosing ReelTime!"
-    )
-    
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email],
-        fail_silently=False,
-    )
-
-# --------------------------
-# Send Reservation Reminder Email
-# --------------------------
-def send_reservation_reminder_email(reservation):
-    """Send reservation reminder email for tomorrow's reservation"""
-    user = reservation.user
-    subject = f"⏰ Movie Reminder - {reservation.movie_detail.movie.title} tomorrow!"
-    
-    message = (
-        f"Hello {user.first_name or user.username},\n\n"
-        f"This is a friendly reminder about your movie reservation tomorrow!\n\n"
-        f"🎟️ Your Reservation:\n"
-        f"Movie: {reservation.movie_detail.movie.title}\n"
-        f"Cinema: {reservation.cinema_name}\n"
-        f"Date: {reservation.selected_date}\n"
-        f"Showtime: {reservation.selected_showtime}\n"
-        f"Seats: {', '.join(reservation.selected_seats)}\n\n"
-        f"Please arrive at least 15 minutes before the showtime.\n\n"
-        f"Enjoy your movie experience! 🍿"
-    )
-    
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email],
-        fail_silently=False,
-    )
