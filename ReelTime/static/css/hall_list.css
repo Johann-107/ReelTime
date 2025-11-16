@@ -1,0 +1,319 @@
+/* Hall List Page Styles */
+
+:root {
+    --color-primary: #c73e1d;
+    --color-primary-dark: #a32f15;
+    --color-accent: #e8b923;
+    --color-background: #f9f6f0;
+    --color-card: #ffffff;
+    --color-text: #1a1a1a;
+    --color-text-muted: #6b6b6b;
+    --color-border: #e5e0d8;
+}
+
+.page-content {
+    background-color: var(--color-background);
+    min-height: calc(100vh - 64px);
+    padding: 2rem 0;
+}
+
+.halls-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.halls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 3px solid var(--color-accent);
+}
+
+.halls-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.halls-title svg {
+    width: 40px;
+    height: 40px;
+    stroke: var(--color-primary);
+}
+
+.btn-add-hall {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.75rem;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(199, 62, 29, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-add-hall:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(199, 62, 29, 0.5);
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+}
+
+.btn-add-hall svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 3;
+}
+
+.halls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.hall-card {
+    background: var(--color-card);
+    border: 2px solid var(--color-border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.hall-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.hall-card:hover::before {
+    transform: scaleX(1);
+}
+
+.hall-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(199, 62, 29, 0.2);
+    border-color: var(--color-primary);
+}
+
+.hall-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.hall-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(199, 62, 29, 0.3);
+}
+
+.hall-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: #ffffff;
+    stroke-width: 2.5;
+}
+
+.hall-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.hall-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-text);
+    margin-bottom: 1.75rem;
+    padding: 1rem;
+    background: rgba(232, 185, 35, 0.1);
+    border-radius: 10px;
+    border-left: 4px solid var(--color-accent);
+    font-size: 1rem;
+}
+
+.hall-info svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.hall-info strong {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.hall-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.hall-btn {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hall-btn-edit {
+    background: rgba(232, 185, 35, 0.15);
+    color: var(--color-primary);
+    border: 2px solid var(--color-accent);
+}
+
+.hall-btn-edit:hover {
+    background: var(--color-accent);
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 185, 35, 0.4);
+}
+
+.hall-btn-delete {
+    background: rgba(199, 62, 29, 0.1);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.hall-btn-delete:hover {
+    background: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(199, 62, 29, 0.4);
+}
+
+.hall-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: var(--color-card);
+    border-radius: 20px;
+    border: 2px dashed var(--color-border);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+    opacity: 0.4;
+    stroke: var(--color-primary);
+}
+
+.empty-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.empty-text {
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .halls-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .halls-title {
+        justify-content: center;
+        font-size: 2rem;
+    }
+
+    .btn-add-hall {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .halls-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .hall-actions {
+        flex-direction: column;
+    }
+
+    .hall-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .halls-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .halls-title {
+        font-size: 1.75rem;
+    }
+
+    .hall-card {
+        padding: 1.5rem;
+    }
+
+    .hall-name {
+        font-size: 1.25rem;
+    }
+}
+
+

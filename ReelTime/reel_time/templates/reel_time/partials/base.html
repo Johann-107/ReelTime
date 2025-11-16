@@ -12,6 +12,22 @@
     <link rel="stylesheet" href="{% static 'css/messages.css' %}">
 
     {% block extra_head %}{% endblock extra_head %}
+    
+    <style>
+        /* Ensure footer stays at bottom */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main[role="main"] {
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
         {% include 'reel_time/partials/header.html' %}
