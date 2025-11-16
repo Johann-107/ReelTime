@@ -12,6 +12,13 @@
 <div class="page-content">
     <div class="container">
         <div class="movie-detail-container">
+            {# Back Button inside the card #}
+            <a href="{% url 'movie_list' %}" class="btn-back-small">
+                <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </a>
                 
             {# Section for the Movie Poster #}
             <div class="movie-poster-section">

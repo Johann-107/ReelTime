@@ -33,18 +33,39 @@ def edit_movie_view(request, pk):
         messages.error(request, "You do not have permission to edit this movie.")
         return redirect('movie_detail', pk=pk)
 
-    movie_form = MovieForm(instance=detail.movie)
-    detail_form = MovieAdminDetailsForm(instance=detail)
-
+    # Edited here: Restructured to handle POST with FILES properly
     if request.method == 'POST':
-        movie_form = MovieForm(request.POST, instance=detail.movie)
+        # Edited here: Added request.FILES to movie_form to handle poster uploads
+        movie_form = MovieForm(request.POST, request.FILES, instance=detail.movie)
         detail_form = MovieAdminDetailsForm(request.POST, request.FILES, instance=detail)
+
+        # Check if user wants to clear the poster
+        # Edited here: Added check if poster exists before deletion
+        if request.POST.get('clear_poster') == 'true':
+            if detail.poster:
+                detail.poster.delete(save=False)
+                detail.poster = None
+                detail.save()
 
         if movie_form.is_valid() and detail_form.is_valid():
             movie_form.save()
             detail_form.save()
             messages.success(request, "Movie details updated successfully!")
             return redirect('movie_detail', pk=pk)
+        else:
+            # Edited here: Added detailed error notifications
+            if not movie_form.is_valid():
+                for field, errors in movie_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+            if not detail_form.is_valid():
+                for field, errors in detail_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+    else:
+        # Edited here: Initialize forms in else block for GET requests
+        movie_form = MovieForm(instance=detail.movie)
+        detail_form = MovieAdminDetailsForm(instance=detail)
 
     context = {
         'movie_form': movie_form,

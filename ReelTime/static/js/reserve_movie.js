@@ -192,10 +192,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 <span class="seat-sample seat-entrance-exit">🚪</span>
                 <span>Entrance/Exit</span>
             </div>
-            <div class="legend-item">
-                <span class="seat-sample seat-screen">🎬</span>
-                <span>Screen</span>
-            </div>
         `;
         seatLayoutContainer.appendChild(legend);
     }
