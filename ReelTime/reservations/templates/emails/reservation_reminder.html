@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #fff3cd; padding: 20px; text-align: center; }
+        .details { background: #fff; padding: 20px; border: 1px solid #dee2e6; }
+        .footer { text-align: center; margin-top: 20px; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>⏰ ReelTime - Movie Reminder!</h2>
+        </div>
+        <div class="details">
+            <p>Hello {{ user.first_name|default:user.username }},</p>
+            <p>This is a friendly reminder about your movie reservation <strong>tomorrow</strong>!</p>
+            
+            <h3>🎟️ Your Reservation</h3>
+            <p><strong>Movie:</strong> {{ reservation.movie_detail.movie.title }}</p>
+            <p><strong>Cinema:</strong> {{ reservation.cinema_name }}</p>
+            <p><strong>Date:</strong> {{ reservation.selected_date }}</p>
+            <p><strong>Showtime:</strong> {{ reservation.selected_showtime }}</p>
+            <p><strong>Seats:</strong> {{ reservation.selected_seats|join:", " }}</p>
+            
+            <p>Please arrive at least 15 minutes before the showtime.</p>
+        </div>
+        <div class="footer">
+            <p>Enjoy your movie experience! 🍿</p>
+        </div>
+    </div>
+</body>
+</html>
