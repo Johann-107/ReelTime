@@ -38,41 +38,33 @@ class Reservation(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
+        print(f"🟡 save() called - is_new: {is_new}, status: {self.status}")
         
-        # Only adjust seats on new reservation
-        if is_new:
-            # Remaining seats for this showtime
-            remaining = self.movie_detail.get_remaining_seats(self.selected_showtime)
-
-            # Ensure selected_seats is a list
-            if isinstance(self.selected_seats, str):
-                self.selected_seats = json.loads(self.selected_seats)
-
-            # Validate seat count
-            if len(self.selected_seats) != self.number_of_seats:
-                raise ValueError(f"Number of selected seats ({len(self.selected_seats)}) "
-                                 f"does not match number_of_seats ({self.number_of_seats}).")
-
-            if len(self.selected_seats) > remaining:
-                raise ValueError("Not enough seats available for this showing.")
-
+        # ... your existing save logic ...
         super().save(*args, **kwargs)
         
         # Send confirmation email for new confirmed reservations
         if is_new and self.status == 'confirmed' and not self.confirmation_sent:
+            print(f"🟡 Conditions met! Calling send_confirmation_email()")
             self.send_confirmation_email()
+        else:
+            print(f"🔴 Conditions NOT met: is_new={is_new}, status={self.status}, confirmation_sent={self.confirmation_sent}")
+
 
     def send_confirmation_email(self):
         """Send reservation confirmation email"""
         try:
-            from reservations.utils import send_reservation_confirmation_email  # ✅ Fix import
+            print(f"🟡 send_confirmation_email() called for user: {self.user.email}")
+            from reservations.utils import send_reservation_confirmation_email
             send_reservation_confirmation_email(self)
             self.confirmation_sent = True
             Reservation.objects.filter(pk=self.pk).update(confirmation_sent=True)
+            print("🟢 Confirmation email sent successfully!")
             return True
         except Exception as e:
-            print(f"Failed to send confirmation email: {e}")
+            print(f"🔴 Failed to send confirmation email: {e}")
             return False
+        
 
     def send_reminder_email(self):
         """Send reservation reminder email"""
