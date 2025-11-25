@@ -8,11 +8,12 @@ import json
 class MovieAdminDetailsForm(forms.ModelForm):
     class Meta:
         model = MovieAdminDetails
-        fields = ['release_date', 'end_date', 'hall', 'showing_times', 'poster']
+        fields = ['release_date', 'end_date', 'hall', 'showing_times', 'poster', 'price']  # Added price field
         widgets = {
             'release_date': DateInput(attrs={'type': 'date'}),
             'end_date': DateInput(attrs={'type': 'date'}),
             'showing_times': Textarea(attrs={'rows': 2, 'placeholder': 'e.g. ["10:00 AM", "1:30 PM"]'}),
+            'price': forms.NumberInput(attrs={'step': '1.00', 'min': '0'}),
         }
 
     # Edited here: Added __init__ to convert showing_times format for display
@@ -68,6 +69,14 @@ class MovieForm(forms.ModelForm):
     release_date = forms.DateField(widget=DateInput(attrs={'type': 'date'}))
     end_date = forms.DateField(widget=DateInput(attrs={'type': 'date'}))
     hall = forms.ModelChoiceField(queryset=Hall.objects.all(), required=True)
+    price = forms.DecimalField(  # Added price field
+        max_digits=6, 
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'step': '1.00', 'min': '0'}),
+        required=True,
+        help_text="Price per seat"
+    )
 
     # Admin enters only the showtime list (simple)
     showing_times = forms.CharField(
@@ -96,6 +105,7 @@ class MovieForm(forms.ModelForm):
                 self.fields['release_date'].initial = admin_details.release_date
                 self.fields['end_date'].initial = admin_details.end_date
                 self.fields['hall'].initial = admin_details.hall
+                self.fields['price'].initial = admin_details.price  # Added price field
                 self.fields['poster'].initial = admin_details.poster
 
                 # Convert stored full showtime objects into simple ["10 AM", ...]
@@ -138,6 +148,7 @@ class MovieForm(forms.ModelForm):
         if self.admin:
             hall = self.cleaned_data['hall']
             simple_times = self.cleaned_data['showing_times']
+            price = self.cleaned_data['price']  # Added price field
 
             # Convert to full showtime objects with hall capacity
             full_showtimes = [
@@ -153,6 +164,7 @@ class MovieForm(forms.ModelForm):
                     'release_date': self.cleaned_data['release_date'],
                     'end_date': self.cleaned_data['end_date'],
                     'hall': hall,
+                    'price': price,  # Added price field
                     'showing_times': full_showtimes,
                     'poster': self.cleaned_data.get('poster'),
                 }
@@ -162,6 +174,7 @@ class MovieForm(forms.ModelForm):
                 admin_details.release_date = self.cleaned_data['release_date']
                 admin_details.end_date = self.cleaned_data['end_date']
                 admin_details.hall = hall
+                admin_details.price = price  # Added price field
                 admin_details.showing_times = full_showtimes
 
                 if self.cleaned_data.get('poster'):

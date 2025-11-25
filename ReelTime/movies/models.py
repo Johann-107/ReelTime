@@ -31,6 +31,7 @@ class MovieAdminDetails(models.Model):
     # Admin-specific fields
     release_date = models.DateField()
     end_date = models.DateField()
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)  # Added price field
 
     showing_times = models.JSONField(default=list, blank=True)
 

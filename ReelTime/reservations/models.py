@@ -1,9 +1,9 @@
 # reservations/models.py
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from movies.models import MovieAdminDetails
-from datetime import date, timedelta
-import json
+from datetime import date, timedelta, datetime
 
 def get_tomorrow():
     return date.today() + timedelta(days=1)
@@ -18,7 +18,7 @@ class Reservation(models.Model):
     selected_seats = models.JSONField(default=list, blank=True)
     reservation_date = models.DateTimeField(auto_now_add=True)
     
-    # Add email tracking fields
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     confirmation_sent = models.BooleanField(default=False)
     reminder_sent = models.BooleanField(default=False)
 
@@ -34,38 +34,90 @@ class Reservation(models.Model):
         db_table = 'movies_reservation'
 
     def __str__(self):
-        return f"{self.user.email} - {self.movie_detail.movie.title} ({self.selected_date} {self.selected_showtime})"
+        return f"{self.user.email} - {self.movie_detail.movie.title} ({self.selected_date} {self.selected_showtime}) - ${self.total_cost}"
+
+    def clean(self):
+        """Validate reservation data"""
+        if self.selected_date < date.today():
+            raise ValidationError("Cannot make reservations for past dates.")
+        
+        if self.number_of_seats < 1:
+            raise ValidationError("Number of seats must be at least 1.")
+        
+        if self.number_of_seats > 10:  # Reasonable limit
+            raise ValidationError("Cannot reserve more than 10 seats at once.")
+
+    def calculate_total_cost(self):
+        """Calculate total cost based on price per seat and number of seats"""
+        return self.movie_detail.price * self.number_of_seats
+
+    def can_be_modified(self):
+        """Check if reservation can be modified (not within 2 hours of showtime)"""
+        if self.status == 'cancelled':
+            return False
+            
+        # Parse showtime and date to check if it's within 2 hours
+        try:
+            showtime_dt = datetime.combine(self.selected_date, datetime.strptime(self.selected_showtime, '%I:%M %p').time())
+            now = datetime.now()
+            time_diff = showtime_dt - now
+            return time_diff.total_seconds() > 7200  # 2 hours in seconds
+        except:
+            return True
+
+    def can_be_cancelled(self):
+        """Check if reservation can be cancelled (not within 1 hour of showtime)"""
+        if self.status == 'cancelled':
+            return False
+            
+        try:
+            showtime_dt = datetime.combine(self.selected_date, datetime.strptime(self.selected_showtime, '%I:%M %p').time())
+            now = datetime.now()
+            time_diff = showtime_dt - now
+            return time_diff.total_seconds() > 3600  # 1 hour in seconds
+        except:
+            return True
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
-        print(f"🟡 save() called - is_new: {is_new}, status: {self.status}")
         
-        # ... your existing save logic ...
+        # Calculate total cost before saving
+        if self.movie_detail and self.movie_detail.price is not None:
+            self.total_cost = self.calculate_total_cost()
+        else:
+            self.total_cost = 0.00
+            
+        # Validate before saving
+        self.clean()
+            
         super().save(*args, **kwargs)
         
         # Send confirmation email for new confirmed reservations
         if is_new and self.status == 'confirmed' and not self.confirmation_sent:
-            print(f"🟡 Conditions met! Calling send_confirmation_email()")
             self.send_confirmation_email()
-        else:
-            print(f"🔴 Conditions NOT met: is_new={is_new}, status={self.status}, confirmation_sent={self.confirmation_sent}")
-
 
     def send_confirmation_email(self):
         """Send reservation confirmation email"""
         try:
-            print(f"🟡 send_confirmation_email() called for user: {self.user.email}")
             from reservations.utils import send_reservation_confirmation_email
             send_reservation_confirmation_email(self)
             self.confirmation_sent = True
             Reservation.objects.filter(pk=self.pk).update(confirmation_sent=True)
-            print("🟢 Confirmation email sent successfully!")
             return True
         except Exception as e:
-            print(f"🔴 Failed to send confirmation email: {e}")
+            print(f"Failed to send confirmation email: {e}")
+            return False
+
+    def send_cancellation_email(self):
+        """Send reservation cancellation email"""
+        try:
+            from reservations.utils import send_reservation_cancellation_email
+            send_reservation_cancellation_email(self)
+            return True
+        except Exception as e:
+            print(f"Failed to send cancellation email: {e}")
             return False
         
-
     def send_reminder_email(self):
         """Send reservation reminder email"""
         try:
@@ -76,4 +128,4 @@ class Reservation(models.Model):
             return True
         except Exception as e:
             print(f"Failed to send reminder email: {e}")
-            return False
+            return 
