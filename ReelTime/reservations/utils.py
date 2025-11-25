@@ -1,6 +1,8 @@
 # reservations/utils.py
 from django.core.mail import send_mail
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 def send_reservation_confirmation_email(reservation):
     """Send reservation confirmation email"""
@@ -68,3 +70,29 @@ def send_reservation_reminder_email(reservation):
         [user.email],
         fail_silently=False,
     )
+
+def send_reservation_cancellation_email(reservation):
+    """Send reservation cancellation email"""
+    try:
+        subject = f"Reservation Cancelled - {reservation.movie_detail.movie.title}"
+        context = {
+            'reservation': reservation,
+            'user': reservation.user,
+            'movie': reservation.movie_detail.movie,
+        }
+        
+        html_message = render_to_string('reservations/emails/cancellation_email.html', context)
+        plain_message = strip_tags(html_message)
+        
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[reservation.user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending cancellation email: {e}")
+        return False

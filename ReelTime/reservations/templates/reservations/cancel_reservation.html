@@ -1,0 +1,48 @@
+{% extends 'reel_time/partials/base.html' %}
+{% load static %}
+
+{% block title %}Cancel Reservation - ReelTime{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Cancel Reservation</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="reservation-info mb-4">
+                            <h5>{{ reservation.movie_detail.movie.title }}</h5>
+                            <p class="text-muted mb-1">
+                                {{ reservation.cinema_name }} • 
+                                {{ reservation.selected_date|date:"M d, Y" }} • 
+                                {{ reservation.selected_showtime }}
+                            </p>
+                            <p><strong>Seats:</strong> {{ reservation.number_of_seats }}</p>
+                            <p><strong>Total Cost:</strong> ${{ reservation.total_cost }}</p>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Are you sure you want to cancel this reservation?
+                            {% if not user.is_admin %}
+                                This action cannot be undone and your seats will be released.
+                            {% endif %}
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-warning">Yes, Cancel Reservation</button>
+                                <a href="{% url 'reservations' %}" class="btn btn-outline-secondary">No, Keep Reservation</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

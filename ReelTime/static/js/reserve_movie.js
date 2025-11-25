@@ -12,7 +12,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const seatLayoutContainer = document.getElementById("seatLayoutContainer");
     const selectedSeatsInput = document.getElementById("selectedSeatsInput");
 
+    // Cost display elements
+    const pricePerSeatElement = document.getElementById('pricePerSeat');
+    const totalCostElement = document.getElementById('totalCost');
+
     const confirmReservationUrlPattern = window.confirmReservationUrlPattern;
+
+    // Store current movie price
+    let currentMoviePrice = 0;
+
+    // Function to update cost display
+    function updateCostDisplay() {
+        const numberOfSeats = parseInt(seatsInput.value) || 0;
+        const totalCost = currentMoviePrice * numberOfSeats;
+        
+        pricePerSeatElement.textContent = `$${currentMoviePrice.toFixed(2)}`;
+        totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
+
+    }
 
     // Helper function: render seat layout
     function renderSeatLayout(seatMapArray, reservedSeats, maxSelectable) {
@@ -262,71 +279,17 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // New function to convert seat map object to matrix
-    function convertSeatMapToMatrix(seatMapObject) {
-        if (Array.isArray(seatMapObject)) {
-            // If it's already an array, return as-is
-            return seatMapObject;
-        }
-
-        // If it's an object, convert to matrix format
-        const rows = [];
-        const rowIndices = Object.keys(seatMapObject).sort();
-        
-        rowIndices.forEach(rowKey => {
-            const rowData = seatMapObject[rowKey];
-            const row = [];
-            
-            if (Array.isArray(rowData)) {
-                // If row data is already an array
-                rowData.forEach((seat, colIndex) => {
-                    if (seat && typeof seat === 'object') {
-                        row.push(seat);
-                    } else if (seat) {
-                        row.push({ type: 'seat', label: seat });
-                    } else {
-                        row.push(0); // Empty seat
-                    }
-                });
-            } else if (typeof rowData === 'object') {
-                // If row data is an object with column indices
-                const colIndices = Object.keys(rowData).sort((a, b) => a - b);
-                let lastCol = -1;
-                
-                colIndices.forEach(colKey => {
-                    const colIndex = parseInt(colKey);
-                    const seat = rowData[colKey];
-                    
-                    // Fill gaps with empty seats
-                    while (lastCol < colIndex - 1) {
-                        row.push(0);
-                        lastCol++;
-                    }
-                    
-                    if (seat && typeof seat === 'object') {
-                        row.push(seat);
-                    } else if (seat) {
-                        row.push({ type: 'seat', label: seat });
-                    } else {
-                        row.push(0);
-                    }
-                    lastCol = colIndex;
-                });
-            }
-            
-            rows.push(row);
-        });
-        
-        return rows;
-    }
-
     // Populate showtimes
-    function populateShowtimes(showtimesData, detailId) {
+    function populateShowtimes(showtimesData, detailId, price) {
         showtimesContainer.innerHTML = "";
         selectedShowtimeInput.value = "";
         seatLayoutContainer.innerHTML = "";
         selectedSeatsInput.value = "";
         seatsInput.value = 1;
+
+        // Set the movie price from the data attribute
+        currentMoviePrice = parseFloat(price);
+        updateCostDisplay();
 
         showtimesData.forEach(({time, remaining}) => {
             const btn = document.createElement("button");
@@ -360,7 +323,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Update cost when number of seats changes
     seatsInput.addEventListener("input", () => {
+        updateCostDisplay();
         const detailId = form.action.split("/").slice(-2)[0];
         if (selectedShowtimeInput.value && dateInput.value) {
             loadSeatMap(detailId, dateInput.value, selectedShowtimeInput.value, parseInt(seatsInput.value));
@@ -372,8 +337,11 @@ document.addEventListener("DOMContentLoaded", function () {
         button.addEventListener("click", function () {
             const detailId = this.getAttribute("data-detail-id");
             const cinemaName = this.getAttribute("data-cinema-name");
+            const price = this.getAttribute("data-price"); // GET THE PRICE
             const jsonId = this.getAttribute("data-showtimes-json-id");
             const showtimesScript = document.getElementById(jsonId);
+
+            console.log("Price from data attribute:", price); // Debug log
 
             form.action = confirmReservationUrlPattern.replace("0", detailId);
             selectedCinemaName.textContent = cinemaName;
@@ -386,7 +354,11 @@ document.addEventListener("DOMContentLoaded", function () {
             dateInput.value = new Date().toISOString().slice(0,10);
             dateInput.min = dateInput.value;
 
-            populateShowtimes(showtimes, detailId);
+            // Set the current movie price
+            currentMoviePrice = parseFloat(price) || 0;
+            updateCostDisplay();
+
+            populateShowtimes(showtimes, detailId, price);
 
             modal.style.display = "flex";
         });

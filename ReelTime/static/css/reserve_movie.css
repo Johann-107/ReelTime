@@ -490,6 +490,50 @@ body {
     box-shadow: 0 0 0 3px rgba(199, 62, 29, 0.1);
 }
 
+.cost-display-section {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.cost-item {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.cost-item.total-cost {
+    border-top: 1px solid #dee2e6;
+    padding-top: 12px;
+    margin-top: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.cost-label {
+    flex: 1;
+    color: #495057;
+    font-weight: 500;
+}
+
+.cost-value {
+    font-weight: 600;
+    color: #212529;
+}
+
+.cost-item.total-cost .cost-value {
+    color: #198754;
+    font-size: 1.2em;
+}
+
+#confirmButtonTotal {
+    margin-left: 4px;
+    font-weight: 600;
+}
+
 /* Seat Layout Styles */
 .seat-layout {
     background: #f8f9fa;

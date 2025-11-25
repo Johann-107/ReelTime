@@ -94,7 +94,8 @@
                                 <button class="reserve-btn btn-primary"
                                         data-detail-id="{{ cinema.detail_id }}"
                                         data-cinema-name="{{ cinema.cinema_name }}"
-                                        data-showtimes-json-id="showtimes-{{ forloop.counter }}">
+                                        data-showtimes-json-id="showtimes-{{ forloop.counter }}"
+                                        data-price="{{ cinema.price }}">
                                     Reserve Seats
                                 </button>
                             {% else %}
@@ -198,7 +199,19 @@
                            required>
                 </div>
 
-                {# NEW: Seat Layout #}
+                {# NEW: Cost Display Section #}
+                <div class="cost-display-section">
+                    <div class="cost-item">
+                        <span class="cost-label">Price per Seat:</span>
+                        <span class="cost-value" id="pricePerSeat">$0.00</span>
+                    </div>
+                    <div class="cost-item total-cost">
+                        <span class="cost-label">Total Cost:</span>
+                        <span class="cost-value" id="totalCost">$0.00</span>
+                    </div>
+                </div>
+
+                {# Seat Layout #}
                 <div class="form-group">
                     <label class="form-label">Choose Your Seats</label>
                     <div id="seatLayoutContainer" class="seat-layout"></div>

@@ -1,15 +1,13 @@
-from django.shortcuts import render, redirect
+# reservations/views.py
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 from .models import Reservation
-from django.core.mail import send_mail
-from django.conf import settings
+from .forms import ReservationEditForm
 
-# Create your views here.
 @login_required
 def user_reservations_view(request):
-    # If admin, show all customer reservations for their cinema's movies
-    # If regular user, show only their own reservations
     if request.user.is_admin:
         reservations = Reservation.objects.filter(
             movie_detail__admin=request.user
@@ -19,50 +17,81 @@ def user_reservations_view(request):
     
     return render(request, 'reservations/reservations.html', {'reservations': reservations})
 
-# --------------------------
-# Create Reservation with Email Notification
-# --------------------------
 @login_required
-def create_reservation(request):
-    if request.method == "POST":
-        try:
-            print("🟡 Starting reservation creation...")
-            
-            # Create reservation
-            reservation = Reservation(
-                user=request.user,
-                movie_detail=request.POST.get('movie_detail'),
-                cinema_name=request.POST.get('cinema_name'),
-                selected_date=request.POST.get('selected_date'),
-                selected_showtime=request.POST.get('selected_showtime'),
-                number_of_seats=request.POST.get('number_of_seats'),
-                selected_seats=request.POST.get('selected_seats', []),
-                status='confirmed'
-            )
-            
-            print(f"🟡 About to save reservation...")
-            reservation.save()
-            print(f"🟡 Reservation saved with ID: {reservation.id}")
-            
-            # 🚨 FORCE EMAIL SENDING - TEMPORARY TEST
-            print("🟡 Force sending email...")
-            from django.core.mail import send_mail
-            from django.conf import settings
-            
-            send_mail(
-                'FORCED TEST: Reservation Confirmed',
-                f'This is a forced test email for reservation {reservation.id}',
-                settings.DEFAULT_FROM_EMAIL,
-                [request.user.email],
-                fail_silently=False,
-            )
-            print("🟢 Force email sent!")
-            
-            messages.success(request, "Reservation created! Check for confirmation email.")
-            return redirect('user_reservations')
-            
-        except Exception as e:
-            print(f"🔴 Error: {e}")
-            messages.error(request, f"Error: {str(e)}")
+def edit_reservation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id)
     
-    return render(request, 'reservations/create_reservation.html')
+    # Check permissions
+    if not request.user.is_admin and reservation.user != request.user:
+        messages.error(request, "You don't have permission to edit this reservation.")
+        return redirect('reservations')
+    
+    # Check if reservation can be modified
+    if not reservation.can_be_modified():
+        messages.error(request, "This reservation can no longer be modified (within 2 hours of showtime).")
+        return redirect('reservations')
+    
+    if request.method == 'POST':
+        form = ReservationEditForm(request.POST, instance=reservation)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Reservation updated successfully!")
+            return redirect('reservations')
+    else:
+        form = ReservationEditForm(instance=reservation)
+    
+    return render(request, 'reservations/edit_reservation.html', {
+        'form': form,
+        'reservation': reservation
+    })
+
+@login_required
+def cancel_reservation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id)
+    
+    # Check permissions
+    if not request.user.is_admin and reservation.user != request.user:
+        messages.error(request, "You don't have permission to cancel this reservation.")
+        return redirect('reservations')
+    
+    # Check if reservation can be cancelled
+    if not reservation.can_be_cancelled():
+        messages.error(request, "This reservation can no longer be cancelled (within 1 hour of showtime).")
+        return redirect('reservations')
+    
+    if request.method == 'POST':
+        reservation.status = 'cancelled'
+        reservation.save()
+        
+        # Send cancellation email
+        reservation.send_cancellation_email()
+        
+        messages.success(request, "Reservation cancelled successfully!")
+        return redirect('reservations')
+    
+    return render(request, 'reservations/cancel_reservation.html', {
+        'reservation': reservation
+    })
+
+@login_required
+def delete_reservation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id)
+    
+    # Check permissions - only admin or reservation owner can delete
+    if not request.user.is_admin and reservation.user != request.user:
+        messages.error(request, "You don't have permission to delete this reservation.")
+        return redirect('reservations')
+    
+    if request.method == 'POST':
+        # For admin, allow deletion; for users, only allow if not too close to showtime
+        if request.user.is_admin or reservation.can_be_cancelled():
+            reservation.delete()
+            messages.success(request, "Reservation deleted successfully!")
+        else:
+            messages.error(request, "This reservation can no longer be deleted (within 1 hour of showtime).")
+        
+        return redirect('reservations')
+    
+    return render(request, 'reservations/delete_reservation.html', {
+        'reservation': reservation
+    })

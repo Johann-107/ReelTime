@@ -237,6 +237,7 @@ def reserve_movie_view(request, movie_id):
                 'showing_times': json.dumps(showtimes_data),
                 'poster': movie_detail.poster,
                 'has_movie': True,
+                'price': movie_detail.price,
             })
         else:
             # Cinema doesn't have this movie yet
@@ -255,41 +256,6 @@ def reserve_movie_view(request, movie_id):
 
     return render(request, 'movies/reserve_movie.html', context)
 
-
-@login_required
-def hall_seat_layout_view(request, detail_id, selected_date, selected_showtime):
-    """
-    Return the seat layout and already reserved seats for a given movie detail, date, and showtime.
-    """
-    detail = get_object_or_404(MovieAdminDetails, id=detail_id)
-
-    # Hall layout: default to empty dict if not set
-    hall_layout = detail.hall.layout or {}
-
-    # Get reserved seats for this showtime and date
-    reserved_qs = Reservation.objects.filter(
-        movie_detail=detail,
-        selected_date=selected_date,
-        selected_showtime=selected_showtime
-    ).values_list('selected_seats', flat=True)
-
-    reserved_seats = []
-    for seats in reserved_qs:
-        if seats:
-            try:
-                if isinstance(seats, str):
-                    seat_list = json.loads(seats)
-                else:
-                    seat_list = seats
-                reserved_seats.extend(seat_list)
-            except (json.JSONDecodeError, TypeError):
-                # Handle case where selected_seats might be stored differently
-                continue
-
-    return JsonResponse({
-        "seat_map": hall_layout,
-        "reserved": reserved_seats,
-    })
 
 @login_required
 def confirm_reservation_view(request, detail_id):
@@ -332,6 +298,9 @@ def confirm_reservation_view(request, detail_id):
             messages.error(request, "One or more of your selected seats have already been reserved.")
             return redirect('reserve_movie', movie_id=detail.movie.id)
 
+        # Calculate total cost
+        total_cost = detail.price * number_of_seats
+
         # Create the reservation
         reservation = Reservation.objects.create(
             user=request.user,
@@ -341,13 +310,15 @@ def confirm_reservation_view(request, detail_id):
             selected_showtime=selected_showtime,
             number_of_seats=number_of_seats,
             selected_seats=selected_seats,
+            total_cost=total_cost,  # Add total cost
             status='confirmed',
         )
 
         messages.success(
             request,
             f"Reservation confirmed for {detail.movie.title} at {detail.admin.cinema_name} "
-            f"on {selected_date} ({selected_showtime})! Seats: {', '.join(selected_seats)}"
+            f"on {selected_date} ({selected_showtime})! Seats: {', '.join(selected_seats)} - "
+            f"Total Cost: ${total_cost:.2f}"
         )
         return redirect('user_dashboard')
 
@@ -355,3 +326,39 @@ def confirm_reservation_view(request, detail_id):
         'detail': detail,
     }
     return render(request, 'movies/confirm_reservation.html', context)
+
+
+@login_required
+def hall_seat_layout_view(request, detail_id, selected_date, selected_showtime):
+    """
+    Return the seat layout and already reserved seats for a given movie detail, date, and showtime.
+    """
+    detail = get_object_or_404(MovieAdminDetails, id=detail_id)
+
+    # Hall layout: default to empty dict if not set
+    hall_layout = detail.hall.layout or {}
+
+    # Get reserved seats for this showtime and date
+    reserved_qs = Reservation.objects.filter(
+        movie_detail=detail,
+        selected_date=selected_date,
+        selected_showtime=selected_showtime
+    ).values_list('selected_seats', flat=True)
+
+    reserved_seats = []
+    for seats in reserved_qs:
+        if seats:
+            try:
+                if isinstance(seats, str):
+                    seat_list = json.loads(seats)
+                else:
+                    seat_list = seats
+                reserved_seats.extend(seat_list)
+            except (json.JSONDecodeError, TypeError):
+                # Handle case where selected_seats might be stored differently
+                continue
+
+    return JsonResponse({
+        "seat_map": hall_layout,
+        "reserved": reserved_seats,
+    })
