@@ -98,6 +98,11 @@ document.addEventListener("DOMContentLoaded", function () {
             rowDiv.className = "seat-row";
 
             rowArr.forEach((seat, colIndex) => {
+                // Skip rendering screen cells completely - they're only for admin visualization
+                if (seat.type === 'screen') {
+                    return; // Don't render anything for screen cells
+                }
+
                 const seatId = `${seat.row}-${seat.col}`;
                 const seatBtn = document.createElement("button");
                 seatBtn.type = "button";
@@ -114,9 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         // Get the seat number from our pre-calculated mapping
                         const seatNumber = rowSeatNumbers[rowIndex][colIndex];
                         seatLabel = `${String.fromCharCode(65 + adjustedRowIndex)}${seatNumber}`;
-                        break;
-                    case 'screen':
-                        seatLabel = "🎬";
                         break;
                     case 'entrance':
                         seatLabel = "🚪>";
@@ -140,10 +142,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             seatBtn.classList.add("seat-reserved");
                             seatBtn.disabled = true;
                         }
-                        break;
-                    case 'screen':
-                        seatBtn.classList.add("seat-screen");
-                        seatBtn.disabled = true;
                         break;
                     case 'entrance':
                     case 'exit':
