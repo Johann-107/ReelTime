@@ -38,8 +38,22 @@ class Reservation(models.Model):
 
     def clean(self):
         """Validate reservation data"""
-        if self.selected_date < date.today():
+        # Convert selected_date to date object if it's a string
+        reservation_date = self.selected_date
+        if isinstance(reservation_date, str):
+            # Parse string date in YYYY-MM-DD format
+            reservation_date = datetime.strptime(reservation_date, '%Y-%m-%d').date()
+        
+        if reservation_date < date.today():
             raise ValidationError("Cannot make reservations for past dates.")
+        
+        # Validate against movie end date
+        if self.movie_detail and self.movie_detail.end_date:
+            if reservation_date > self.movie_detail.end_date:
+                raise ValidationError(
+                    f"Cannot make reservations beyond the movie's end date ({self.movie_detail.end_date}). "
+                    f"This movie is only showing until {self.movie_detail.end_date}."
+                )
         
         if self.number_of_seats < 1:
             raise ValidationError("Number of seats must be at least 1.")

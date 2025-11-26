@@ -335,7 +335,8 @@ document.addEventListener("DOMContentLoaded", function () {
         button.addEventListener("click", function () {
             const detailId = this.getAttribute("data-detail-id");
             const cinemaName = this.getAttribute("data-cinema-name");
-            const price = this.getAttribute("data-price"); // GET THE PRICE
+            const price = this.getAttribute("data-price");
+            const endDate = this.getAttribute("data-end-date");
             const jsonId = this.getAttribute("data-showtimes-json-id");
             const showtimesScript = document.getElementById(jsonId);
 
@@ -351,6 +352,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             dateInput.value = new Date().toISOString().slice(0,10);
             dateInput.min = dateInput.value;
+            
+            // Set max date to movie end date
+            if (endDate) {
+                dateInput.max = endDate;
+            }
 
             // Set the current movie price
             currentMoviePrice = parseFloat(price) || 0;
