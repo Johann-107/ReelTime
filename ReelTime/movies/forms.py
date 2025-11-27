@@ -3,6 +3,7 @@ from .models import Movie, MovieAdminDetails
 from django.forms.widgets import DateInput, Textarea
 from halls.models import Hall
 import json
+import cloudinary.uploader
 
 
 class MovieAdminDetailsForm(forms.ModelForm):
@@ -16,7 +17,6 @@ class MovieAdminDetailsForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'step': '1.00', 'min': '0'}),
         }
 
-    # Edited here: Added __init__ to convert showing_times format for display
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -29,30 +29,25 @@ class MovieAdminDetailsForm(forms.ModelForm):
                     # Format as simple readable string
                     self.initial['showing_times'] = str(simple_times)
 
-    # Edited here: Added clean_showing_times to convert simple times to full format with max_seats
     def clean_showing_times(self):
         data = self.cleaned_data.get('showing_times')
         
         if not data:
             return []
         
-        # If it's already a list, check if it needs conversion
         if isinstance(data, list):
             if data and isinstance(data[0], dict):
-                return data  # Already in full format
+                return data
             else:
-                # Convert simple list to full format
                 hall = self.cleaned_data.get('hall') or self.instance.hall
                 return [{"time": t, "max_seats": hall.capacity} for t in data]
         
-        # Parse JSON string
         try:
             parsed = json.loads(data)
             
             if not isinstance(parsed, list):
                 raise forms.ValidationError("Showing times must be a JSON list.")
             
-            # Convert simple times to full format with hall capacity
             hall = self.cleaned_data.get('hall') or self.instance.hall
             full_showtimes = [{"time": t, "max_seats": hall.capacity} for t in parsed]
             
@@ -62,8 +57,7 @@ class MovieAdminDetailsForm(forms.ModelForm):
             raise forms.ValidationError('Enter a valid JSON.')
         except Exception:
             raise forms.ValidationError('Enter showtimes as a JSON list, e.g. ["10:00 AM", "1:30 PM"]')
-
-
+        
 class MovieForm(forms.ModelForm):
     # Extra fields for admin details
     release_date = forms.DateField(widget=DateInput(attrs={'type': 'date'}))
@@ -78,13 +72,15 @@ class MovieForm(forms.ModelForm):
         help_text="Price per seat"
     )
 
-    # Admin enters only the showtime list (simple)
     showing_times = forms.CharField(
         widget=Textarea(attrs={'rows': 2, 'placeholder': 'e.g. ["10:00 AM", "1:30 PM", "6:45 PM"]'}),
         required=False
     )
 
-    poster = forms.ImageField(required=False)
+    pposter = forms.ImageField(
+        required=False,
+        help_text="Upload a poster image (JPG, PNG, WebP, max 5MB)"
+    )
 
     class Meta:
         model = Movie
@@ -97,7 +93,6 @@ class MovieForm(forms.ModelForm):
         self.admin = kwargs.pop('admin', None)
         super().__init__(*args, **kwargs)
 
-        # Load existing MovieAdminDetails data
         if self.instance.pk and self.admin:
             try:
                 admin_details = self.instance.admin_details.get(admin=self.admin)
@@ -105,20 +100,15 @@ class MovieForm(forms.ModelForm):
                 self.fields['release_date'].initial = admin_details.release_date
                 self.fields['end_date'].initial = admin_details.end_date
                 self.fields['hall'].initial = admin_details.hall
-                self.fields['price'].initial = admin_details.price  # Added price field
-                self.fields['poster'].initial = admin_details.poster
+                self.fields['price'].initial = admin_details.price 
+                self.fields['poster'].initial = admin_details.poster 
 
-                # Convert stored full showtime objects into simple ["10 AM", ...]
                 simple_times = [s['time'] for s in admin_details.showing_times]
                 self.fields['showing_times'].initial = json.dumps(simple_times)
 
             except MovieAdminDetails.DoesNotExist:
                 pass
 
-    # ------------------------------
-    # CLEAN SHOWING TIMES INPUT
-    # Admin inputs simple: ["10:00 AM", "1:30 PM"]
-    # ------------------------------
     def clean_showing_times(self):
         data = self.cleaned_data['showing_times']
 
@@ -138,10 +128,23 @@ class MovieForm(forms.ModelForm):
             return parsed  # simple list
         except Exception:
             raise forms.ValidationError('Enter showtimes as a JSON list, e.g. ["10:00 AM", "1:30 PM"]')
+        
+    def clean_poster(self):
+        poster = self.cleaned_data.get('poster')
+        
+        if poster:
+            # Validate file size (max 5MB)
+            if poster.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("Image file too large ( > 5MB )")
+            
+            # Validate file type
+            valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
+            extension = poster.name.split('.')[-1].lower()
+            if extension not in valid_extensions:
+                raise forms.ValidationError("Unsupported file extension. Use JPG, PNG, or WebP.")
+        
+        return poster
 
-    # ------------------------------
-    # SAVE
-    # ------------------------------
     def save(self, commit=True):
         movie = super().save(commit=commit)
 
@@ -149,6 +152,7 @@ class MovieForm(forms.ModelForm):
             hall = self.cleaned_data['hall']
             simple_times = self.cleaned_data['showing_times']
             price = self.cleaned_data['price']  # Added price field
+            poster = self.cleaned_data.get('poster')
 
             # Convert to full showtime objects with hall capacity
             full_showtimes = [
@@ -166,7 +170,7 @@ class MovieForm(forms.ModelForm):
                     'hall': hall,
                     'price': price,  # Added price field
                     'showing_times': full_showtimes,
-                    'poster': self.cleaned_data.get('poster'),
+                    'poster': poster,
                 }
             )
 
@@ -174,11 +178,13 @@ class MovieForm(forms.ModelForm):
                 admin_details.release_date = self.cleaned_data['release_date']
                 admin_details.end_date = self.cleaned_data['end_date']
                 admin_details.hall = hall
-                admin_details.price = price  # Added price field
+                admin_details.price = price 
                 admin_details.showing_times = full_showtimes
 
-                if self.cleaned_data.get('poster'):
-                    admin_details.poster = self.cleaned_data['poster']
+                if poster:
+                    # If there's an existing poster and we're uploading a new one,
+                    # Cloudinary will automatically handle the replacement
+                    admin_details.poster = poster
 
                 admin_details.save()
 

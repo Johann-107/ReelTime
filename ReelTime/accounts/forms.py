@@ -3,7 +3,7 @@ from accounts.models import User
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
 import re
-
+import cloudinary.uploader
 
 class RegistrationForm(forms.ModelForm):
     confirm_password = forms.CharField(
@@ -82,3 +82,42 @@ class RegistrationForm(forms.ModelForm):
             cleaned_data['password'] = make_password(password)
 
         return cleaned_data
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email', 'phone_number', 'profile_picture']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['profile_picture'].required = False
+        self.fields['profile_picture'].help_text = "Upload a profile picture (JPG, PNG, WebP, max 2MB)"
+
+    def clean_profile_picture(self):
+        profile_picture = self.cleaned_data.get('profile_picture')
+        
+        if profile_picture:
+            # Validate file size (max 2MB for profile pictures)
+            if profile_picture.size > 2 * 1024 * 1024:
+                raise forms.ValidationError("Profile picture too large ( > 2MB )")
+            
+            # Validate file type
+            valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
+            extension = profile_picture.name.split('.')[-1].lower()
+            if extension not in valid_extensions:
+                raise forms.ValidationError("Unsupported file extension. Use JPG, PNG, or WebP.")
+        
+        return profile_picture
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if not self.instance.is_admin and ' ' in username:
+            raise forms.ValidationError("Username cannot contain spaces.")
+        return username
