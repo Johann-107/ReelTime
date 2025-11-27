@@ -12,7 +12,6 @@
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'css/reservations.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock extra_head %}
 
 {% block content %}
@@ -34,92 +33,150 @@
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-{{ message.tags }}" role="alert">
                         {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
 
         {% if reservations %}
-            <div class="reservations-table-container">
-                <table class="reservations-table">
-                    <thead>
-                        <tr>
+            <div class="reservations-grid">
+                {% for reservation in reservations %}
+                    <div class="reservation-card">
+                        <div class="reservation-header">
                             {% if user.is_admin %}
-                                <th>User</th>
-                            {% endif %}
-                            <th>Movie</th>
-                            <th>Cinema</th>
-                            <th>Reserved Date</th>
-                            <th>Showtime</th>
-                            <th>Seats</th>
-                            <th>Total Cost</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for reservation in reservations %}
-                            <tr>
-                                {% if user.is_admin %}
-                                    <td>
-                                        <div class="user-info">
-                                            <strong>{{ reservation.user.get_full_name|default:reservation.user.username }}</strong>
-                                            <br><small>{{ reservation.user.email }}</small>
-                                        </div>
-                                    </td>
-                                {% endif %}
-                                <td><strong>{{ reservation.movie_detail.movie.title }}</strong></td>
-                                <td>{{ reservation.cinema_name|default:"N/A" }}</td>
-                                <td>{{ reservation.selected_date|date:"M d, Y" }}</td>
-                                <td>{{ reservation.selected_showtime }}</td>
-                                <td class="text-center">{{ reservation.number_of_seats }}</td>
-                                <td>${{ reservation.total_cost }}</td>
-                                <td>
-                                    {% if reservation.status == 'pending' %}
-                                        <span class="badge badge-warning">Pending</span>
-                                    {% elif reservation.status == 'confirmed' %}
-                                        <span class="badge badge-success">Confirmed</span>
-                                    {% elif reservation.status == 'cancelled' %}
-                                        <span class="badge badge-danger">Cancelled</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        {% if reservation.status != 'cancelled' %}
-                                            {% if not user.is_admin or reservation.can_be_modified %}
-                                                <a href="{% url 'edit_reservation' reservation.id %}" 
-                                                   class="btn btn-sm btn-outline-primary" 
-                                                   title="Edit Reservation">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                            {% endif %}
-                                            
-                                            {% if reservation.can_be_cancelled or user.is_admin %}
-                                                <a href="{% url 'cancel_reservation' reservation.id %}" 
-                                                   class="btn btn-sm btn-outline-warning" 
-                                                   title="Cancel Reservation">
-                                                    <i class="fas fa-times"></i>
-                                                </a>
-                                            {% endif %}
-                                        {% endif %}
-                                        
-                                        {% if user.is_admin or reservation.can_be_cancelled %}
-                                            <a href="{% url 'delete_reservation' reservation.id %}" 
-                                               class="btn btn-sm btn-outline-danger" 
-                                               title="Delete Reservation"
-                                               onclick="return confirm('Are you sure you want to delete this reservation? This action cannot be undone.');">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        {% endif %}
+                                <div class="reservation-user">
+                                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <div class="user-details">
+                                        <strong>{{ reservation.user.get_full_name|default:reservation.user.username }}</strong>
+                                        <small>{{ reservation.user.email }}</small>
                                     </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                </div>
+                            {% endif %}
+                            <span class="badge {% if reservation.status == 'confirmed' %}badge-success{% elif reservation.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                                {{ reservation.status|upper }}
+                            </span>
+                        </div>
+
+                        <div class="reservation-body">
+                            <h3 class="reservation-movie-title">{{ reservation.movie_detail.movie.title }}</h3>
+                            
+                            <div class="reservation-details">
+                                <div class="detail-row">
+                                    <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    <div class="detail-content">
+                                        <span class="detail-label">MOVIE</span>
+                                        <span class="detail-value">{{ reservation.movie_detail.movie.title }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-row">
+                                    <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <div class="detail-content">
+                                        <span class="detail-label">RESERVED DATE</span>
+                                        <span class="detail-value">{{ reservation.selected_date|date:"M d, Y" }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-row">
+                                    <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <div class="detail-content">
+                                        <span class="detail-label">SHOWTIME</span>
+                                        <span class="detail-value">{{ reservation.selected_showtime }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-row">
+                                    <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                    <div class="detail-content">
+                                        <span class="detail-label">SEATS</span>
+                                        <span class="detail-value">{{ reservation.number_of_seats }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-row">
+                                    <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 6v6l4 2"></path>
+                                    </svg>
+                                    <div class="detail-content">
+                                        <span class="detail-label">BOOKING DATE</span>
+                                        <span class="detail-value">{{ reservation.reservation_date|date:"M d, Y g:i A" }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-row">
+                                    <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                    <div class="detail-content">
+                                        <span class="detail-label">STATUS</span>
+                                        <span class="detail-value {% if reservation.status == 'confirmed' %}status-confirmed{% elif reservation.status == 'pending' %}status-pending{% else %}status-cancelled{% endif %}">
+                                            {{ reservation.status|title }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if reservation.status != 'cancelled' %}
+                            <div class="reservation-actions">
+                                {% if not user.is_admin or reservation.can_be_modified %}
+                                    <a href="{% url 'edit_reservation' reservation.id %}" class="btn-action-card btn-edit-card">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        Edit
+                                    </a>
+                                {% endif %}
+                                
+                                {% if reservation.can_be_cancelled or user.is_admin %}
+                                    <a href="{% url 'cancel_reservation' reservation.id %}" class="btn-action-card btn-cancel-card">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                                        </svg>
+                                        Cancel
+                                    </a>
+                                {% endif %}
+
+                                {% if user.is_admin or reservation.can_be_cancelled %}
+                                    <a href="{% url 'delete_reservation' reservation.id %}" class="btn-action-card btn-delete-card">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                        Delete
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="view-all-section">
+                <p class="reservation-count">Showing {{ reservations|length }} reservation{{ reservations|length|pluralize }}</p>
             </div>
         {% else %}
             <div class="empty-state" style="text-align: center; padding: 3rem;">
@@ -136,7 +193,7 @@
                     {% endif %}
                 </p>
                 {% if not user.is_admin %}
-                    <a href="{% url 'movie_list' %}" class="btn btn-primary mt-3">Browse Movies</a>
+                    <a href="{% url 'movie_list' %}" class="btn-reserve" style="margin-top: 1.5rem; display: inline-flex;">Browse Movies</a>
                 {% endif %}
             </div>
         {% endif %}
