@@ -238,6 +238,7 @@ def reserve_movie_view(request, movie_id):
                 'poster': movie_detail.poster,
                 'has_movie': True,
                 'price': movie_detail.price,
+                'end_date': movie_detail.end_date.isoformat(),
             })
         else:
             # Cinema doesn't have this movie yet
