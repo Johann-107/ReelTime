@@ -40,10 +40,27 @@ def hall_form_view(request, pk=None):
             )
 
         return redirect("hall_list")
+    
 
-    # Default grid size (12x12)
+    #EDITED HERE K
+    # Default grid size for new halls (12x12)
     rows = 12
     cols = 12
+    
+    # If editing existing hall, extract rows and cols from layout
+    if hall and hall.layout:
+        try:
+            import json
+            layout_data = hall.layout if isinstance(hall.layout, list) else json.loads(hall.layout) if isinstance(hall.layout, str) else []
+            if layout_data:
+                # Find max row and col from layout
+                max_row = max([item.get('row', 0) for item in layout_data]) if layout_data else 11
+                max_col = max([item.get('col', 0) for item in layout_data]) if layout_data else 11
+                rows = max_row + 1
+                cols = max_col + 1
+        except:
+            # If parsing fails, use defaults
+            pass
 
     return render(
         request,
