@@ -231,11 +231,31 @@ def reserve_movie_view(request, movie_id):
                     "remaining": remaining,
                 })
 
+            # Get the poster URL safely
+            poster_url = None
+            if movie_detail.poster:
+                try:
+                    # Use the model's poster_url property if available
+                    if hasattr(movie_detail, 'poster_url'):
+                        poster_url = movie_detail.poster_url
+                    else:
+                        # Fallback: build URL manually
+                        poster_url = movie_detail.poster.build_url(
+                            width=400,
+                            height=600,
+                            crop="fill",
+                            quality="auto"
+                        )
+                except (AttributeError, Exception):
+                    # If anything fails, use the direct URL
+                    poster_url = movie_detail.poster.url
+
             cinemas.append({
                 'detail_id': movie_detail.id,
                 'cinema_name': admin.cinema_name,
                 'showing_times': json.dumps(showtimes_data),
                 'poster': movie_detail.poster,
+                'poster_url': poster_url,  # Add this line
                 'has_movie': True,
                 'price': movie_detail.price,
                 'end_date': movie_detail.end_date.isoformat(),
@@ -247,6 +267,7 @@ def reserve_movie_view(request, movie_id):
                 'cinema_name': admin.cinema_name,
                 'showing_times': json.dumps([]),
                 'poster': None,
+                'poster_url': None,  # Add this line
                 'has_movie': False,
             })
 

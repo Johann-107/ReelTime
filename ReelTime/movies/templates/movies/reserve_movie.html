@@ -82,7 +82,13 @@
 
                             {% if cinema.poster %}
                                 <div class="cinema-poster">
-                                    <img src="{{ cinema.poster.url }}" alt="{{ movie.title }} poster">
+                                    <img    src="{{ cinema.poster_url }}" 
+                                            alt="{{ movie.title }} poster">
+                                </div>
+                            {% else %}
+                                <div class="cinema-poster">
+                                    <img    src="https://via.placeholder.com/400x600/cccccc/969696?text=No+Poster" 
+                                            alt="No poster available">
                                 </div>
                             {% endif %}
 

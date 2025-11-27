@@ -35,9 +35,13 @@
 
             <div class="movie-poster-container">
                 {% if detail.poster %}
-                    <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" class="movie-poster-img">
+                    <img  src="{{ detail.poster_url }}" 
+                          alt="{{ detail.movie.title }} Poster" 
+                          class="movie-poster-img">
                 {% else %}
-                    <img src="{% static 'images/default_poster.jpg' %}" alt="No poster available" class="movie-poster-img">
+                    <img  src="https://via.placeholder.com/400x600/cccccc/969696?text=No+Poster" 
+                          alt="No poster available" 
+                          class="movie-poster-img">
                 {% endif %}
                 {% if detail.movie.genre %}
                     <span class="genre-badge">{{ detail.movie.genre }}</span>

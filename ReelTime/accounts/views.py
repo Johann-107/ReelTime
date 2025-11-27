@@ -1,6 +1,6 @@
 from accounts.utils import create_default_admin
 from accounts.models import User, PendingAdmin
-from accounts.forms import RegistrationForm
+from accounts.forms import RegistrationForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
@@ -193,29 +193,47 @@ def profile_view(request):
 
 
 # --------------------------
-# Edit Profile
+# Edit Profile (Updated with Cloudinary)
 # --------------------------
 @login_required
 def edit_profile(request):
     user = request.user
 
     if request.method == 'POST':
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.username = request.POST.get('username')
-        user.email = request.POST.get('email')
-        user.phone_number = request.POST.get('phone_number')
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         
-        # Handle profile picture upload
-        if 'profile_picture' in request.FILES:
-            user.profile_picture = request.FILES['profile_picture']
+        # Handle profile picture clearing
+        clear_picture = request.POST.get('clear_profile_picture') == 'true'
         
-        user.save()
+        if form.is_valid():
+            try:
+                # Handle profile picture clearing
+                if clear_picture and user.profile_picture:
+                    user.profile_picture.delete()
+                    user.profile_picture = None
+                    user.save()
+                    messages.success(request, "Profile picture removed successfully!")
+                else:
+                    # Save the form (Cloudinary will handle the upload automatically)
+                    form.save()
+                    messages.success(request, "Profile updated successfully!")
+                
+                request.session['profile_updated'] = True
+                return redirect('profile')
+                
+            except Exception as e:
+                messages.error(request, f"Error updating profile: {str(e)}")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = UserProfileForm(instance=user)
 
-        request.session['profile_updated'] = True
-        return redirect('profile')
-
-    return render(request, 'accounts/edit_profile.html', {'user': user})
+    return render(request, 'accounts/edit_profile.html', {
+        'form': form,
+        'user': user
+    })
 
 
 # --------------------------

@@ -27,7 +27,9 @@
         <div class="profile-picture-upload">
             <div class="current-picture">
                 {% if user.profile_picture %}
-                    <img src="{{ user.profile_picture.url }}" alt="Current Profile Picture" id="preview-image">
+                    <img    src="{{ user.profile_picture_url }}" 
+                            alt="Current Profile Picture" 
+                            id="preview-image">
                 {% else %}
                     <div class="profile-picture-placeholder" id="preview-image">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

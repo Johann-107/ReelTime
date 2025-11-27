@@ -22,15 +22,14 @@
                 
             {# Section for the Movie Poster #}
             <div class="movie-poster-section">
-                {% comment %} 
-                    NOTE: Replace 'detail.movie.poster_url' with your actual field name 
-                    that holds the URL or path to the movie poster/logo.
-                {% endcomment %}
                 {% if detail.poster.url %} 
-                    <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" class="movie-detail-poster">
+                    <img    src="{{ detail.poster_url }}" 
+                            alt="{{ detail.movie.title }} Poster" 
+                            class="movie-detail-poster">
                 {% else %}
-                    {# Fallback if no poster URL is available #}
-                    <img src="{% static 'images/default_poster.png' %}" alt="Default Movie Poster" class="movie-detail-poster placeholder">
+                    <img    src="https://via.placeholder.com/400x600/cccccc/969696?text=No+Poster" 
+                            alt="Default Movie Poster" 
+                            class="movie-detail-poster placeholder">
                 {% endif %}
             </div>
 

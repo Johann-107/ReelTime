@@ -17,7 +17,9 @@
             <div class="profile-picture-section">
                 {% if user.profile_picture %}
                     <div class="profile-picture-container">
-                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }} Profile Picture" class="profile-picture">
+                        <img    src="{{ user.profile_picture_url }}" 
+                                alt="{{ user.username }} Profile Picture" 
+                                class="profile-picture">
                     </div>
                 {% else %}
                     <div class="profile-picture-placeholder">

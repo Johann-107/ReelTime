@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.conf import settings
 from datetime import date, timedelta
 from halls.models import Hall
-
+from cloudinary.models import CloudinaryField
 
 def get_tomorrow():
     return date.today() + timedelta(days=1)
@@ -35,12 +35,22 @@ class MovieAdminDetails(models.Model):
 
     showing_times = models.JSONField(default=list, blank=True)
 
-    poster = models.ImageField(upload_to='movies/posters/', blank=True, null=True)
+    poster = CloudinaryField(
+        'poster', 
+        folder='movies/posters/', 
+        blank=True, 
+        null=True,
+        transformation={
+            'quality': 'auto:low',
+            'width': 400,
+            'height': 600,
+            'crop': 'fill'
+        }
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('movie', 'admin', 'release_date', 'end_date')  # Prevent same admin adding same movie twice
-
+        unique_together = ('movie', 'admin', 'release_date', 'end_date')
 
     @property
     def is_now_showing(self):
@@ -48,10 +58,51 @@ class MovieAdminDetails(models.Model):
         today = timezone.now().date()
         return self.release_date <= today <= self.end_date
 
+    @property
+    def poster_url(self):
+        """Return the Cloudinary URL for the poster with transformations."""
+        if self.poster:
+            # Check if it's a Cloudinary resource or an uploaded file
+            if hasattr(self.poster, 'build_url'):
+                return self.poster.build_url(
+                    width=400,
+                    height=600,
+                    crop="fill",
+                    quality="auto",
+                    format="webp"
+                )
+            else:
+                # It's an uploaded file during form processing
+                # Return the URL directly or handle appropriately
+                try:
+                    # For form preview, you might need to handle this differently
+                    return str(self.poster)
+                except:
+                    return None
+        return None
+
+    @property
+    def poster_thumbnail_url(self):
+        """Return a thumbnail version of the poster."""
+        if self.poster:
+            if hasattr(self.poster, 'build_url'):
+                return self.poster.build_url(
+                    width=200,
+                    height=300,
+                    crop="fill",
+                    quality="auto",
+                    format="webp"
+                )
+            else:
+                try:
+                    return str(self.poster)
+                except:
+                    return None
+        return None
     
     def get_remaining_seats(self, showtime):
         """Return the remaining number of seats for the given showtime."""
-        from reservations.models import Reservation  # local import to avoid circular dependency
+        from reservations.models import Reservation
 
         showtime_info = next((s for s in self.showing_times if s["time"] == showtime), None)
         if not showtime_info:
@@ -60,8 +111,8 @@ class MovieAdminDetails(models.Model):
         total = showtime_info.get("max_seats", 0)
 
         reserved = Reservation.objects.filter(
-            movie_detail=self,          # correct field name
-            selected_showtime=showtime  # correct field name
+            movie_detail=self,
+            selected_showtime=showtime
         ).aggregate(total_reserved=models.Sum('number_of_seats'))['total_reserved'] or 0
 
         return total - reserved
