@@ -1,5 +1,4 @@
-import random
-import string
+from .models import User
 import threading
 import re
 import logging
@@ -105,7 +104,6 @@ def _send_admin_credentials_email_thread(email, cinema_name, username):
             f"Password: admin123\n\n"
             f"🔐 Important Security Notice:\n"
             f"Please log in immediately and change your password.\n"
-            f"Login URL: {settings.BASE_URL}/accounts/login/\n\n"
             f"For security reasons, do not share these credentials with anyone.\n\n"
             f"Best regards,\nReelTime Team"
         )
