@@ -1,12 +1,15 @@
-from accounts.utils import create_default_admin
 from accounts.models import User, PendingAdmin
 from accounts.forms import RegistrationForm, UserProfileForm
+from accounts.utils import (
+    create_default_admin, 
+    send_admin_confirmation_email, 
+    send_admin_credentials_email
+)
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.utils.crypto import get_random_string
 from django.conf import settings
-from django.core.mail import send_mail
 from django.contrib import messages
 
 
@@ -45,17 +48,10 @@ def register_admin(request):
         else:
             messages.success(request, "A confirmation email has been sent. Please check your inbox.")
 
-        # Send or resend confirmation email
+        # Send or resend confirmation email using threading
         confirmation_link = request.build_absolute_uri(f"/accounts/confirm-admin/{pending.token}/")
-        subject = "Confirm your admin registration - ReelTime"
-        message = (
-            f"Hello!\n\n"
-            f"Did you register as admin for ReelTime?\n\n"
-            f"If yes, please confirm by clicking this link:\n{confirmation_link}\n\n"
-            f"If not, you can ignore this email."
-        )
-
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+        send_admin_confirmation_email(email, confirmation_link, cinema_name)
+        
         return redirect("register_admin")
 
     return render(request, "accounts/register_admin.html")
@@ -71,27 +67,23 @@ def confirm_admin(request, token):
         messages.error(request, "Invalid or expired confirmation link.")
         return redirect("register_admin")
 
+    # Check if already confirmed
+    if pending.is_confirmed:
+        messages.info(request, "This admin account has already been confirmed.")
+        return redirect("login")
+
     # Create the default admin
     admin = create_default_admin(pending.cinema_name, pending.email)
 
-    # Send credentials to the admin email
-    subject = "Your ReelTime Admin Account Credentials"
-    message = (
-        f"Your admin account for '{pending.cinema_name}' has been created!\n\n"
-        f"Username: {admin.username}\n"
-        f"Password: admin123\n\n"
-        f"Please log in and change your password immediately."
-    )
-
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pending.email])
+    # Send credentials to the admin email using threading
+    send_admin_credentials_email(pending.email, pending.cinema_name, admin.username)
 
     # Mark as confirmed instead of deleting
     pending.is_confirmed = True
     pending.save()
 
-    messages.success(request, "Admin account confirmed! Login details sent to your email.")
+    messages.success(request, "Admin account confirmed! Login details have been sent to your email.")
     return redirect("login")
-
 
 
 # --------------------------
@@ -101,8 +93,13 @@ def register_user(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            
+            # Optional: Send welcome email using threading
+            # send_welcome_email(user.email, user.username)
+            
             request.session['registration_success'] = True
+            messages.success(request, "Registration successful! Please log in.")
             return redirect('login')
     else:
         form = RegistrationForm()
@@ -118,8 +115,12 @@ def login_user(request):
     logout_success = request.session.pop('logout_success', False)
 
     if request.method == 'POST':
-        username_or_email = request.POST.get('username_or_email').strip()
-        password = request.POST.get('password').strip()
+        username_or_email = request.POST.get('username_or_email', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        if not username_or_email or not password:
+            messages.error(request, "Please provide both username/email and password.")
+            return render(request, 'accounts/login.html')
 
         # Try username first
         user = authenticate(request, username=username_or_email, password=password)
@@ -135,13 +136,16 @@ def login_user(request):
         if user is not None:
             login(request, user)
             if user.must_change_password:
+                messages.info(request, "Please change your password to continue.")
                 return redirect('change_password')
             elif user.is_admin:
+                messages.success(request, f"Welcome back, {user.cinema_name} Admin!")
                 return redirect('admin_dashboard')
             else:
+                messages.success(request, f"Welcome back, {user.username}!")
                 return redirect('user_dashboard')
 
-        # Invalid credentials → reload login page
+        messages.error(request, "Invalid username/email or password.")
         return render(request, 'accounts/login.html', {'invalid_credentials': True})
 
     return render(
@@ -166,15 +170,27 @@ def change_password(request):
         new_password = request.POST.get('new_password')
         confirm_password = request.POST.get('confirm_password')
 
-        if new_password and confirm_password and new_password == confirm_password:
-            user.set_password(new_password)
-            user.must_change_password = False
-            user.save()
+        if not new_password or not confirm_password:
+            messages.error(request, "Please fill in all password fields.")
+            return render(request, 'accounts/change_password.html')
 
-            # Keep user logged in
-            update_session_auth_hash(request, user)
+        if new_password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return render(request, 'accounts/change_password.html')
 
-            return redirect('admin_dashboard' if user.is_admin else 'user_dashboard')
+        if len(new_password) < 8:
+            messages.error(request, "Password must be at least 8 characters long.")
+            return render(request, 'accounts/change_password.html')
+
+        user.set_password(new_password)
+        user.must_change_password = False
+        user.save()
+
+        # Keep user logged in
+        update_session_auth_hash(request, user)
+
+        messages.success(request, "Password changed successfully!")
+        return redirect('admin_dashboard' if user.is_admin else 'user_dashboard')
 
     return render(request, 'accounts/change_password.html')
 
@@ -185,6 +201,9 @@ def change_password(request):
 @login_required
 def profile_view(request):
     profile_updated = request.session.pop('profile_updated', False)
+    
+    if profile_updated:
+        messages.success(request, "Profile updated successfully!")
 
     return render(request, 'accounts/profile.html', {
         'user': request.user,
@@ -226,7 +245,7 @@ def edit_profile(request):
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    messages.error(request, f"{field}: {error}")
+                    messages.error(request, f"{field.title().replace('_', ' ')}: {error}")
     else:
         form = UserProfileForm(instance=user)
 
@@ -241,7 +260,9 @@ def edit_profile(request):
 # --------------------------
 @login_required
 def logout_user(request):
+    username = request.user.username
     logout(request)
     request.session.flush()
     request.session['logout_success'] = True
+    messages.info(request, f"Goodbye {username}! You have been logged out successfully.")
     return redirect('login')
