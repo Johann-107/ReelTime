@@ -77,7 +77,7 @@ class MovieForm(forms.ModelForm):
         required=False
     )
 
-    pposter = forms.ImageField(
+    poster = forms.ImageField(
         required=False,
         help_text="Upload a poster image (JPG, PNG, WebP, max 5MB)"
     )
