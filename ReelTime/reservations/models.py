@@ -106,40 +106,39 @@ class Reservation(models.Model):
             
         super().save(*args, **kwargs)
         
-        # Send confirmation email for new confirmed reservations
+        # Send confirmation email for new confirmed reservations using background task
         if is_new and self.status == 'confirmed' and not self.confirmation_sent:
             self.send_confirmation_email()
 
     def send_confirmation_email(self):
-        """Send reservation confirmation email"""
+        """Send reservation confirmation email using background task"""
         try:
-            from reservations.utils import send_reservation_confirmation_email
-            send_reservation_confirmation_email(self)
-            self.confirmation_sent = True
-            Reservation.objects.filter(pk=self.pk).update(confirmation_sent=True)
+            from .tasks import send_reservation_confirmation_email_task
+            send_reservation_confirmation_email_task(self.id)
+            print(f"🟡 Confirmation email task queued for reservation {self.id}")
             return True
         except Exception as e:
-            print(f"Failed to send confirmation email: {e}")
+            print(f"🔴 Failed to queue confirmation email task: {e}")
             return False
 
     def send_cancellation_email(self):
-        """Send reservation cancellation email"""
+        """Send reservation cancellation email using background task"""
         try:
-            from reservations.utils import send_reservation_cancellation_email
-            send_reservation_cancellation_email(self)
+            from .tasks import send_reservation_cancellation_email_task
+            send_reservation_cancellation_email_task(self.id)
+            print(f"🟡 Cancellation email task queued for reservation {self.id}")
             return True
         except Exception as e:
-            print(f"Failed to send cancellation email: {e}")
+            print(f"🔴 Failed to queue cancellation email task: {e}")
             return False
         
     def send_reminder_email(self):
-        """Send reservation reminder email"""
+        """Send reservation reminder email using background task"""
         try:
-            from reservations.utils import send_reservation_reminder_email  # ✅ Fix import
-            send_reservation_reminder_email(self)
-            self.reminder_sent = True
-            Reservation.objects.filter(pk=self.pk).update(reminder_sent=True)
+            from .tasks import send_reservation_reminder_email_task
+            send_reservation_reminder_email_task(self.id)
+            print(f"🟡 Reminder email task queued for reservation {self.id}")
             return True
         except Exception as e:
-            print(f"Failed to send reminder email: {e}")
-            return 
+            print(f"🔴 Failed to queue reminder email task: {e}")
+            return False
