@@ -1,9 +1,10 @@
-# reservations/models.py
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from movies.models import MovieAdminDetails
 from datetime import date, timedelta, datetime
+import threading
+from .utils import send_reservation_confirmation_email, send_reservation_cancellation_email, send_reservation_reminder_email
 
 def get_tomorrow():
     return date.today() + timedelta(days=1)
@@ -106,39 +107,54 @@ class Reservation(models.Model):
             
         super().save(*args, **kwargs)
         
-        # Send confirmation email for new confirmed reservations using background task
+        # Send confirmation email for new confirmed reservations using threading
         if is_new and self.status == 'confirmed' and not self.confirmation_sent:
             self.send_confirmation_email()
 
     def send_confirmation_email(self):
-        """Send reservation confirmation email using background task"""
+        """Send reservation confirmation email using threading"""
         try:
-            from .tasks import send_reservation_confirmation_email_task
-            send_reservation_confirmation_email_task(self.id)
-            print(f"🟡 Confirmation email task queued for reservation {self.id}")
+            # Start email sending in a separate thread
+            email_thread = threading.Thread(
+                target=send_reservation_confirmation_email,
+                args=(self.id,)
+            )
+            email_thread.daemon = True  # Thread will close when main program exits
+            email_thread.start()
+            print(f"🟡 Confirmation email thread started for reservation {self.id}")
             return True
         except Exception as e:
-            print(f"🔴 Failed to queue confirmation email task: {e}")
+            print(f"🔴 Failed to start confirmation email thread: {e}")
             return False
 
     def send_cancellation_email(self):
-        """Send reservation cancellation email using background task"""
+        """Send reservation cancellation email using threading"""
         try:
-            from .tasks import send_reservation_cancellation_email_task
-            send_reservation_cancellation_email_task(self.id)
-            print(f"🟡 Cancellation email task queued for reservation {self.id}")
+            # Start email sending in a separate thread
+            email_thread = threading.Thread(
+                target=send_reservation_cancellation_email,
+                args=(self.id,)
+            )
+            email_thread.daemon = True
+            email_thread.start()
+            print(f"🟡 Cancellation email thread started for reservation {self.id}")
             return True
         except Exception as e:
-            print(f"🔴 Failed to queue cancellation email task: {e}")
+            print(f"🔴 Failed to start cancellation email thread: {e}")
             return False
         
     def send_reminder_email(self):
-        """Send reservation reminder email using background task"""
+        """Send reservation reminder email using threading"""
         try:
-            from .tasks import send_reservation_reminder_email_task
-            send_reservation_reminder_email_task(self.id)
-            print(f"🟡 Reminder email task queued for reservation {self.id}")
+            # Start email sending in a separate thread
+            email_thread = threading.Thread(
+                target=send_reservation_reminder_email,
+                args=(self.id,)
+            )
+            email_thread.daemon = True
+            email_thread.start()
+            print(f"🟡 Reminder email thread started for reservation {self.id}")
             return True
         except Exception as e:
-            print(f"🔴 Failed to queue reminder email task: {e}")
+            print(f"🔴 Failed to start reminder email thread: {e}")
             return False
