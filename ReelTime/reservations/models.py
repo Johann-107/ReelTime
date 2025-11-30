@@ -92,6 +92,11 @@ class Reservation(models.Model):
             return time_diff.total_seconds() > 3600  # 1 hour in seconds
         except:
             return True
+    
+    def is_same_day_showing(self):
+        """Check if the showing date is today"""
+        from datetime import date
+        return self.selected_date == date.today()
 
     def save(self, *args, **kwargs):
         is_new = not self.pk

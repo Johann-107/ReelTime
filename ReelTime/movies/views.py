@@ -307,7 +307,8 @@ def confirm_reservation_view(request, detail_id):
         existing_reservations = Reservation.objects.filter(
             movie_detail=detail,
             selected_date=selected_date,
-            selected_showtime=selected_showtime
+            selected_showtime=selected_showtime,
+            status__in=['pending', 'confirmed']
         ).values_list('selected_seats', flat=True)
 
         already_reserved = []
@@ -360,11 +361,12 @@ def hall_seat_layout_view(request, detail_id, selected_date, selected_showtime):
     # Hall layout: default to empty dict if not set
     hall_layout = detail.hall.layout or {}
 
-    # Get reserved seats for this showtime and date
+    # Get reserved seats for this showtime and date (exclude cancelled reservations)
     reserved_qs = Reservation.objects.filter(
         movie_detail=detail,
         selected_date=selected_date,
-        selected_showtime=selected_showtime
+        selected_showtime=selected_showtime,
+        status__in=['pending', 'confirmed']  # Only include active reservations
     ).values_list('selected_seats', flat=True)
 
     reserved_seats = []
