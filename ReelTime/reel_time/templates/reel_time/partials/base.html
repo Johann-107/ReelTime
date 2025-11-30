@@ -8,13 +8,13 @@
 
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
     <link rel="stylesheet" href="{% static 'css/footer.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal.css' %}">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <link rel="stylesheet" href="{% static 'css/messages.css' %}">
 
     {% block extra_head %}{% endblock extra_head %}
     
     <style>
-        /* Ensure footer stays at bottom */
         html, body {
             height: 100%;
             margin: 0;
@@ -27,12 +27,16 @@
         main[role="main"] {
             flex: 1;
         }
+
+        .checkbox-label span {
+        color: red !important; /* Make it obvious */
+        font-size: 0.9rem !important;
+        }
     </style>
 </head>
 <body>
-        {% include 'reel_time/partials/header.html' %}
+    {% include 'reel_time/partials/header.html' %}
 
-    <!-- Django Messages Notification Area -->
     {% if messages %}
         <div class="messages-container">
             {% for message in messages %}
@@ -51,7 +55,200 @@
     
     {% include 'reel_time/partials/footer.html' %}
 
+    <!-- Global Login Modal -->
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeLoginModal">&times;</button>
+            <div class="auth-page">
+                <div class="card auth-card">
+                    <div class="card-header auth-header">
+                        <h1 class="auth-title">Welcome Back</h1>
+                        <p class="auth-description">Sign in to your ReelTime account</p>
+                    </div>
+                    <div class="card-content">
+                        <form id="loginFormModal" class="auth-form" method="POST" action="{% url 'login' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="username_or_email_modal" class="form-label">Email</label>
+                                <input type="text" id="username_or_email_modal" name="username_or_email" class="form-input" placeholder="Enter your username or email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login_password_modal" class="form-label">Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="login_password_modal" name="password" class="form-input" placeholder="Enter your password" required>
+                                    <button type="button" class="password-toggle" id="toggleLoginPassword">
+                                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="remember_modal" name="remember">
+                                    <span>Remember me</span>
+                                </label>
+                                <a href="{% url 'change_password' %}" class="link-primary">Forgot password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                        </form>
+                    </div>
+                    <div class="card-footer auth-footer">
+                        <p>Don't have an account? <a href="#" onclick="closeLoginModal(); openRegisterModal(); return false;" class="link-primary link-bold">Create one here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Register Modal -->
+    <div id="registerModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeRegisterModal">&times;</button>
+            
+            <div class="auth-page">
+                <div class="card auth-card">
+                    <div class="card-header auth-header">
+                        <h1 class="auth-title">Create Account</h1>
+                        <p class="auth-description">Join ReelTime to manage your bookings</p>
+                    </div>
+
+                    <div class="card-content">
+                        <form id="registerFormModal" class="auth-form" method="POST" action="{% url 'register' %}">
+                            {% csrf_token %}
+
+                            <!-- Username -->
+                            <div class="form-group">
+                                <label for="username_modal" class="form-label">Username</label>
+                                <input type="text" id="username_modal" name="username" class="form-input" placeholder="Enter your username" required>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="form-group">
+                                <label for="email_modal" class="form-label">Email</label>
+                                <input type="email" id="email_modal" name="email" class="form-input" placeholder="Enter your email" required>
+                            </div>
+
+                            <!-- First Name -->
+                            <div class="form-group">
+                                <label for="first_name_modal" class="form-label">First Name</label>
+                                <input type="text" id="first_name_modal" name="first_name" class="form-input" placeholder="Enter your first name" required>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="form-group">
+                                <label for="last_name_modal" class="form-label">Last Name</label>
+                                <input type="text" id="last_name_modal" name="last_name" class="form-input" placeholder="Enter your last name" required>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="form-group">
+                                <label for="phone_number_modal" class="form-label">Phone Number</label>
+                                <input type="tel" id="phone_number_modal" name="phone_number" class="form-input" placeholder="Enter your phone number" required>
+                            </div>
+
+                            <!-- Date of Birth -->
+                            <div class="form-group">
+                                <label for="date_of_birth_modal" class="form-label">Date of Birth</label>
+                                <input type="date" id="date_of_birth_modal" name="date_of_birth" class="form-input" required>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="form-group">
+                                <label for="address_modal" class="form-label">Address</label>
+                                <textarea id="address_modal" name="address" class="form-input" placeholder="Enter your address" rows="3" required></textarea>
+                            </div>
+
+                            <!-- Password with toggle -->
+                            <div class="form-group">
+                                <label for="register_password_modal" class="form-label">Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="register_password_modal" name="password" class="form-input" placeholder="Enter your password" required>
+                                    <button type="button" class="password-toggle" id="toggleRegisterPassword">
+                                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password with toggle -->
+                            <div class="form-group">
+                                <label for="confirm_password_modal" class="form-label">Confirm Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="confirm_password_modal" name="confirm_password" class="form-input" placeholder="Confirm your password" required>
+                                    <button type="button" class="password-toggle" id="toggleRegisterConfirmPassword">
+                                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Terms Agreement -->
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="terms_modal" name="terms" required>
+                                    <span>
+                                        I agree to the <a href="#" class="link-primary">Terms of Service</a> 
+                                        and <a href="#" class="link-primary">Privacy Policy</a>.
+                                    </span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-full">Register</button>
+                        </form>
+                    </div>
+                    
+                    <div class="card-footer auth-footer">
+                        <p>Already have an account? <a href="#" onclick="closeRegisterModal(); openLoginModal(); return false;" class="link-primary link-bold">Log In here</a></p>
+                        <p>Register as an Admin? <a href="#" onclick="closeRegisterModal(); openAdminRegisterModal(); return false;" class="link-primary link-bold">Admin Sign Up</a></p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+
+    <!-- Global Admin Registration Modal -->
+    <div id="adminRegisterModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeAdminRegisterModal">&times;</button>
+            <div class="auth-page">
+                <div class="card auth-card">
+                    <div class="card-header auth-header">
+                        <h1 class="auth-title">Create Default Admin</h1>
+                        <p class="auth-description">Enter the cinema name and a default admin account will be created.</p>
+                    </div>
+                    <div class="card-content">
+                        <form id="adminRegisterFormModal" class="auth-form" method="POST" action="{% url 'register_admin' %}" novalidate>
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="cinema_name_modal" class="form-label">Cinema Name</label>
+                                <input type="text" name="cinema_name" id="cinema_name_modal" class="form-input" placeholder="e.g. Grand Cinema" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email_modal" class="form-label">Email Address</label>
+                                <input type="email" name="email" id="email_modal" class="form-input" placeholder="e.g. example@cinema.com" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-full">Register Admin</button>
+                        </form>
+                    </div>
+                    <div class="card-footer auth-footer">
+                        <p><a href="#" onclick="closeAdminRegisterModal(); openLoginModal(); return false;" class="link-primary">Back to Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{% static 'js/messages.js' %}"></script>
+    <script src="{% static 'js/modal.js' %}"></script>
     {% block extra_js %}{% endblock extra_js %}
 </body>
 </html>

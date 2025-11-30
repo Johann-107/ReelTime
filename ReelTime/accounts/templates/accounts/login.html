@@ -1,88 +1,54 @@
-{% extends 'reel_time/partials/base.html' %} 
-
+{% extends 'reel_time/partials/base.html' %}
 {% load static %}
 
-{% block title %}Login - ReelTime{% endblock title %}
-
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-{% endblock extra_head %}
-
 {% block content %}
-    <main class="auth-page">
-        <div class="card auth-card">
-            <div class="card-header auth-header">
-                <h1 class="auth-title">Welcome Back</h1>
-                <p class="auth-description">Sign in to your ReelTime account</p>
-            </div>
-            <div class="card-content">
-                <form id="loginForm" class="auth-form" method="POST" action="{% url 'login' %}">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="username_or_email" class="form-label">Email</label>
-                        <input type="text" id="username_or_email" name="username_or_email" class="form-input" placeholder="Enter your username or email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password" class="form-label">Password</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
-                            <button type="button" class="password-toggle" id="togglePassword">
-                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="remember" name="remember">
-                            <span>Remember me</span>
-                        </label>
-                        <a href="{% url 'change_password' %}" class="link-primary">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full">Sign In</button>
-                </form>
-            </div>
-            <div class="card-footer auth-footer">
-                <p>Don't have an account? <a href="{% url 'register' %}" class="link-primary link-bold">Create one here</a></p>
-            </div>
-        </div>
-    </main>
-{% endblock content %}
+<div style="text-align: center; padding: 100px; font-family: Arial, sans-serif;">
+    <h2>Please log in to continue</h2>
+    <p>Opening login...</p>
+    <div style="margin-top: 20px;">
+        <div class="spinner"></div>
+    </div>
+</div>
 
-{% block extra_js %}
-    {% if registration_success %}
-    <script>
-        alert("Account created successfully! Please log in.");
-    </script>
-    {% endif %}
-
-    {% if admin_registration_success %}
-    <script>
-        alert("Admin account created successfully! Please log in to change your password.");
-    </script>
-    {% endif %}
-
-    {% if user_not_found %}
-    <script>
-        alert("Account does not exist.");
-    </script>
-    {% endif %}
-
-    {% if invalid_credentials %}
-    <script>
-        alert("Incorrect password. Please try again.");
-    </script>
-    {% endif %}
-
-    {% if logout_success %}
-    <script>alert("You have logged out successfully!");</script>
-    {% endif %}
+<style>
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #c73e1d;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 2s linear infinite;
+        margin: 0 auto;
+    }
     
-    <script>
-        const STATIC_URL = "{% static '' %}";
-    </script>
-    <script src="{% static 'js/script.js' %}"></script>
-    <script src="{% static 'js/auth.js' %}"></script>
-{% endblock extra_js %}
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    // Store the intended destination for after login
+    const nextUrl = '{{ request.GET.next }}';
+    if (nextUrl) {
+        sessionStorage.setItem('after_login_redirect', nextUrl);
+    }
+    
+    // Open login modal immediately
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof openLoginModal === 'function') {
+            openLoginModal();
+        } else {
+            // If modal function isn't available yet, wait a bit and try again
+            setTimeout(() => {
+                if (typeof openLoginModal === 'function') {
+                    openLoginModal();
+                } else {
+                    // Final fallback
+                    window.location.href = '/?show_login=true';
+                }
+            }, 100);
+        }
+    });
+</script>
+{% endblock %}
