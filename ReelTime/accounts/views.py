@@ -11,6 +11,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.utils.crypto import get_random_string
 from django.conf import settings
 from django.contrib import messages
+from django.http import JsonResponse
 
 
 # --------------------------
@@ -22,8 +23,15 @@ def register_admin(request):
         email = request.POST.get("email")
 
         if not cinema_name or not email:
-            messages.error(request, "Please provide both cinema name and email.")
-            return redirect("register_admin")
+            message = "Please provide both cinema name and email."
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'message': message
+                }, status=400)
+            else:
+                messages.error(request, message)
+                return redirect("register_admin")
 
         # Check if email already exists in PendingAdmin
         pending, created = PendingAdmin.objects.get_or_create(
@@ -36,26 +44,59 @@ def register_admin(request):
 
         if not created:
             if pending.is_confirmed:
-                messages.error(request, "This email is already confirmed as an admin.")
-                return redirect("login")
+                message = "This email is already confirmed as an admin."
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'message': message,
+                        'redirect_url': reverse('login')
+                    })
+                else:
+                    messages.error(request, message)
+                    return redirect("login")
             else:
                 # Update cinema name and regenerate token in case they want to retry
                 pending.cinema_name = cinema_name
                 pending.token = get_random_string(48)
                 pending.save()
-                messages.info(request, "A new confirmation link has been sent to your email.")
+                message = "A new confirmation link has been sent to your email."
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'message': message
+                    })
+                else:
+                    messages.info(request, message)
 
         else:
-            messages.success(request, "A confirmation email has been sent. Please check your inbox.")
+            message = "A confirmation email has been sent. Please check your inbox."
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': message
+                })
+            else:
+                messages.success(request, message)
 
         # Send or resend confirmation email using threading
         confirmation_link = request.build_absolute_uri(f"/accounts/confirm-admin/{pending.token}/")
         send_admin_confirmation_email(email, confirmation_link, cinema_name)
         
-        return redirect("register_admin")
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': message
+            })
+        else:
+            return redirect("register_admin")
 
-    return render(request, "accounts/register_admin.html")
-
+    # Handle GET requests
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'error': 'GET request not allowed'}, status=405)
+    else:
+        return render(request, "accounts/register_admin.html")
+    
+    
 
 # --------------------------
 # Confirm Admin Registration
@@ -89,20 +130,54 @@ def confirm_admin(request, token):
 # --------------------------
 # User Registration
 # --------------------------
+
 def register_user(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            
-            # Optional: Send welcome email using threading
-            # send_welcome_email(user.email, user.username)
-            
-            request.session['registration_success'] = True
-            messages.success(request, "Registration successful! Please log in.")
-            return redirect('login')
+            try:
+                user = form.save()
+                print("User created:", user.username)
+                
+                messages.success(request, "Registration successful! Please log in.")
+                
+                # Check if it's an AJAX request
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Registration successful! Please log in.',
+                        'redirect_url': '/?show_login=true'
+                    })
+                else:
+                    # Regular form submission
+                    return redirect('login')
+                    
+            except Exception as e:
+                print("Error during user creation:", str(e))
+                # Handle unique constraint errors (like duplicate email)
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'errors': {'email': [{'message': 'This email is already registered. Please use a different email or log in.'}]}
+                    }, status=400)
+                else:
+                    messages.error(request, "This email is already registered. Please use a different email or log in.")
+                    return render(request, 'accounts/register.html', {'form': form})
+        else:
+            # Form has errors
+            print("Form errors:", form.errors)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON errors for AJAX
+                return JsonResponse({
+                    'success': False,
+                    'errors': form.errors.get_json_data()
+                }, status=400)
+            else:
+                # Regular form submission with errors
+                return render(request, 'accounts/register.html', {'form': form})
     else:
         form = RegistrationForm()
+    
     return render(request, 'accounts/register.html', {'form': form})
 
 
@@ -120,7 +195,7 @@ def login_user(request):
 
         if not username_or_email or not password:
             messages.error(request, "Please provide both username/email and password.")
-            return render(request, 'accounts/login.html')
+            return redirect('/?show_login=true')  # Redirect to index with login modal
 
         # Try username first
         user = authenticate(request, username=username_or_email, password=password)
@@ -146,7 +221,7 @@ def login_user(request):
                 return redirect('user_dashboard')
 
         messages.error(request, "Invalid username/email or password.")
-        return render(request, 'accounts/login.html', {'invalid_credentials': True})
+        return redirect('/?show_login=true&login_error=1')  # Redirect to index with login modal
 
     return render(
         request,
@@ -157,7 +232,6 @@ def login_user(request):
             'logout_success': logout_success,
         }
     )
-
 
 # --------------------------
 # Change Password
@@ -259,10 +333,13 @@ def edit_profile(request):
 # Logout
 # --------------------------
 @login_required
+# --------------------------
+# Logout
+# --------------------------
+@login_required
 def logout_user(request):
     username = request.user.username
     logout(request)
     request.session.flush()
-    request.session['logout_success'] = True
     messages.info(request, f"Goodbye {username}! You have been logged out successfully.")
-    return redirect('login')
+    return redirect('index')

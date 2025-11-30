@@ -173,33 +173,45 @@
     <script>
         const STATIC_URL = "{% static '' %}";
         
-        // Initial Reservation Button Logic (kept in inline script)
+        // Reserve Movie Functionality
         document.addEventListener('DOMContentLoaded', function() {
             const reserveButtons = document.querySelectorAll('.btn-reserve');
             reserveButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const movieTitle = this.getAttribute('data-movie-title');
-                    const movieId = this.getAttribute('data-movie-id');
-                    reserveMovie(movieTitle, movieId);
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    {% if user.is_authenticated %}
+                        // If user is logged in, redirect to reservation page
+                        const movieId = this.getAttribute('data-movie-id');
+                        window.location.href = `/movies/reserve/${movieId}/`;
+                    {% else %}
+                        // If user is not logged in, open login modal
+                        const movieTitle = this.getAttribute('data-movie-title');
+                        const movieId = this.getAttribute('data-movie-id');
+                        
+                        // Store movie info for after login
+                        sessionStorage.setItem('pending_reservation_movie_id', movieId);
+                        sessionStorage.setItem('pending_reservation_movie_title', movieTitle);
+                        
+                        // Open login modal
+                        openLoginModal();
+                    {% endif %}
                 });
             });
         });
-        
-        function reserveMovie(movieTitle, movieId) {
-            window.location.href = `/movies/reserve/${movieId}/`;
-        }
 
         // Delete Modal Functions
         function openDeleteModal(movieTitle, deleteUrl) {
             document.getElementById('movieTitleToDelete').textContent = movieTitle;
             document.getElementById('deleteForm').action = deleteUrl;
             document.getElementById('deleteModal').classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
         }
 
         function closeDeleteModal() {
             document.getElementById('deleteModal').classList.remove('active');
-            document.body.style.overflow = ''; // Restore scrolling
+            document.body.style.overflow = '';
         }
 
         // Close modal on Escape key
@@ -217,6 +229,9 @@
         });
     </script>
     
+    <!-- ADD MODAL.JS HERE -->
+    <script src="{% static 'js/modal.js' %}"></script>
+    
+    <!-- Only load script.js, NOT dashboard.js -->
     <script src="{% static 'js/script.js' %}"></script>
-    <script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock extra_js %}

@@ -1,0 +1,468 @@
+/* Modal Overlay */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+/* Modal Content */
+.modal-content {
+    background: linear-gradient(135deg, #1a0a0a 0%, #2d1b1b 50%, #1a0a0a 100%);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 440px;
+    box-shadow: 0 20px 40px rgba(199, 62, 29, 0.2);
+    position: relative;
+    max-height: 90vh;
+    margin: 0 auto;
+    border: 1px solid rgba(199, 62, 29, 0.3);
+    overflow: hidden;
+}
+
+/* Register Modal - Scrollable */
+#registerModal .modal-content {
+    overflow-y: auto;
+}
+
+/* Custom scrollbar for register modal */
+#registerModal .modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#registerModal .modal-content::-webkit-scrollbar-track {
+    background: rgba(199, 62, 29, 0.1);
+    border-radius: 3px;
+}
+
+#registerModal .modal-content::-webkit-scrollbar-thumb {
+    background: rgba(199, 62, 29, 0.5);
+    border-radius: 3px;
+}
+
+#registerModal .modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(199, 62, 29, 0.7);
+}
+
+/* Cinematic top accent */
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #c73e1d, #a32f15, #c73e1d);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: -200% 0; }
+    50% { background-position: 200% 0; }
+}
+
+/* Modal Close Button */
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(199, 62, 29, 0.2);
+    border: 1px solid rgba(199, 62, 29, 0.4);
+    font-size: 20px;
+    cursor: pointer;
+    color: #c73e1d;
+    z-index: 1001;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(199, 62, 29, 0.3);
+    border-color: #c73e1d;
+    color: white;
+    transform: rotate(90deg);
+}
+
+/* Auth Card Styling */
+.auth-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.auth-header {
+    text-align: center;
+    padding: 2rem 2rem 1rem;
+    background: transparent;
+    border: none;
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #c73e1d 0%, #ff6b4a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-description {
+    color: #000000;
+    font-size: 0.95rem;
+}
+
+.card-content {
+    padding: 0 2rem 1rem;
+}
+
+/* Form Styling */
+.auth-form {
+    background: rgba(199, 62, 29, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(199, 62, 29, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    color: #c73e1d;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(199, 62, 29, 0.3);
+    border-radius: 8px;
+    background: rgba(199, 62, 29, 0.05);
+    color: white;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+/* Dark placeholder text */
+.form-input::placeholder {
+    color: #666666;
+    opacity: 0.9;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #c73e1d;
+    background: rgba(199, 62, 29, 0.1);
+    box-shadow: 0 0 0 3px rgba(199, 62, 29, 0.2);
+}
+
+/* Password Wrapper */
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(199, 62, 29, 0.7);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #c73e1d;
+    background: rgba(199, 62, 29, 0.1);
+}
+
+.eye-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Form Row */
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #c73e1d;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: #c73e1d;
+}
+
+.link-primary {
+    color: #c73e1d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.link-primary:hover {
+    color: #ff6b4a;
+    text-decoration: underline;
+}
+
+/* Submit Button - WHITE TEXT for ALL buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #c73e1d 0%, #a32f15 100%);
+    color: white;
+    border: none;
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(199, 62, 29, 0.4);
+    background: linear-gradient(135deg, #d44a28 0%, #b3361a 100%);
+}
+
+/* Footer */
+.auth-footer {
+    text-align: center;
+    padding: 1.5rem 2rem 2rem;
+    background: transparent;
+    border: none;
+    color: #000000;
+}
+
+.link-bold {
+    font-weight: 700;
+    color: #c73e1d;
+}
+
+.link-bold:hover {
+    color: #ff6b4a;
+}
+
+/* Body lock when modal is open */
+.modal-open {
+    overflow: hidden;
+    padding-right: var(--scrollbar-width, 0px);
+}
+
+/* Modal animations */
+.modal-overlay {
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive modal */
+@media (max-width: 480px) {
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .auth-header {
+        padding: 1.5rem 1rem 0.5rem;
+    }
+    
+    .card-content {
+        padding: 0 1rem 1rem;
+    }
+    
+    .auth-form {
+        padding: 1rem;
+    }
+}
+
+/* Textarea specific styling */
+textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+/* Date input styling */
+input[type="date"].form-input {
+    color-scheme: dark;
+}
+
+/* Consistent input styling */
+input[type="text"].form-input,
+input[type="email"].form-input,
+input[type="tel"].form-input,
+input[type="date"].form-input,
+input[type="password"].form-input,
+textarea.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(199, 62, 29, 0.3);
+    border-radius: 8px;
+    background: rgba(199, 62, 29, 0.05);
+    color: white;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+/* Dark placeholder for all input types */
+input[type="text"].form-input::placeholder,
+input[type="email"].form-input::placeholder,
+input[type="tel"].form-input::placeholder,
+input[type="date"].form-input::placeholder,
+input[type="password"].form-input::placeholder,
+textarea.form-input::placeholder {
+    color: #666666;
+    opacity: 0.9;
+}
+
+input[type="text"].form-input:focus,
+input[type="email"].form-input:focus,
+input[type="tel"].form-input:focus,
+input[type="date"].form-input:focus,
+input[type="password"].form-input:focus,
+textarea.form-input:focus {
+    outline: none;
+    border-color: #c73e1d;
+    background: rgba(199, 62, 29, 0.1);
+    box-shadow: 0 0 0 3px rgba(199, 62, 29, 0.2);
+}
+
+/* Error states */
+.form-input.error {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Ensure modal visibility */
+.modal-overlay {
+    z-index: 9999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+}
+
+.modal-overlay[style*="display: flex"] {
+    display: flex;
+}
+
+/* Consistent text colors for ALL modals */
+#loginModal .auth-card,
+#registerModal .auth-card,
+#adminRegisterModal .auth-card {
+    color: #000000;
+}
+
+/* Ensure ALL buttons have white text */
+#loginModal .btn-primary,
+#registerModal .btn-primary,
+#adminRegisterModal .btn-primary {
+    color: white;
+}
+
+/* Ensure checkbox labels are red */
+#loginModal .checkbox-label,
+#registerModal .checkbox-label,
+#adminRegisterModal .checkbox-label {
+    color: #c73e1d;
+}
+
+/* Ensure footer text is black */
+#loginModal .auth-footer,
+#registerModal .auth-footer,
+#adminRegisterModal .auth-footer {
+    color: #000000;
+}
+
+/* When modal is open, ensure body doesn't have overlays */
+body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}

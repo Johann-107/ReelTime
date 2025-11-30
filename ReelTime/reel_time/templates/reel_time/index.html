@@ -6,24 +6,21 @@
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    {% endblock extra_head %}
+{% endblock extra_head %}
 
 {% block content %}
     <section class="hero-new-design">
         <div class="container hero-split-content">
             <div class="hero-text-content">
                 <h1 class="hero-title">Your Movie <span class="hero-accent">ReelTime</span> Starts Now</h1>
-                <p class="hero-description">
-                    Book your favorite movies in under 2 minutes. Choose your seats, pick your showtime, and enjoy the magic of cinema.
-                </p>
+                <p class="hero-description">Book your favorite movies in under 2 minutes. Choose your seats, pick your showtime, and enjoy the magic of cinema.</p>
                 <div class="hero-buttons">
-                    <a href="{% url 'index' %}" class="btn btn-start-watching btn-lg">
-                        Start Watching 
+                    <a href="{% url 'index' %}" class="btn btn-start-watching btn-lg">Start Watching 
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-left: 8px;">
                             <path d="M5 12h14M12 5l7 7-7 7"></path>
                         </svg>
                     </a>
-                    <a href="{% url 'login' %}" class="btn btn-ghost-dark btn-lg">Sign In</a>
+                    <a href="#" onclick="openLoginModal(); return false;" class="btn btn-ghost-dark btn-lg">Sign In</a>
                 </div>
             </div>
 
@@ -37,7 +34,6 @@
                     </svg>
                     Coming Soon
                 </h2>
-                
                 <div class="coming-soon-list">
                     <a href="{% url 'index' %}" class="coming-soon-item">
                         <img src="{% static 'images/futuristic-sci-fi-movie-poster-tron-ares.jpeg' %}" alt="Tron: Ares" class="coming-soon-poster">
@@ -70,7 +66,6 @@
             <div class="recommendations-section">
                 <h2 class="section-title-white">Movie Recommendations</h2>
                 <p class="section-subtitle-white">Discover amazing movies handpicked just for you</p>
-                
                 <div class="movie-grid" id="moviesGrid">
                     <div class="movie-card-new">
                         <img src="{% static 'images/comedy-movie-the-roses.jpg' %}" alt="The Roses" class="movie-poster-new">
@@ -82,7 +77,7 @@
                                 <span>4.7/5</span>
                             </div>
                             <div class="movie-actions">
-                                <a href="{% url 'login' %}" class="btn btn-accent btn-book">Book Now</a>
+                                <a href="#" onclick="openLoginModal(); return false;" class="btn btn-accent btn-book">Book Now</a>
                                 <a href="{% url 'index' %}" class="btn btn-info">More Info</a>
                             </div>
                         </div>
@@ -97,7 +92,7 @@
                                 <span>4.8/5</span>
                             </div>
                             <div class="movie-actions">
-                                <a href="{% url 'login' %}" class="btn btn-accent btn-book">Book Now</a>
+                                <a href="#" onclick="openLoginModal(); return false;" class="btn btn-accent btn-book">Book Now</a>
                                 <a href="{% url 'index' %}" class="btn btn-info">More Info</a>
                             </div>
                         </div>
@@ -112,7 +107,7 @@
                                 <span>4.8/5</span>
                             </div>
                             <div class="movie-actions">
-                                <a href="{% url 'login' %}" class="btn btn-accent btn-book">Book Now</a>
+                                <a href="#" onclick="openLoginModal(); return false;" class="btn btn-accent btn-book">Book Now</a>
                                 <a href="{% url 'index' %}" class="btn btn-info">More Info</a>
                             </div>
                         </div>
@@ -124,8 +119,8 @@
                 <h3 class="booking-cta-title">Ready to Book Your Movie?</h3>
                 <p class="booking-cta-subtitle">Sign up now to reserve your seats and enjoy the ultimate cinema experience.</p>
                 <div class="booking-cta-actions">
-                    <a href="{% url 'register' %}" class="btn btn-accent btn-lg">Create Account</a>
-                    <a href="{% url 'login' %}" class="btn btn-info btn-lg">Sign In</a> 
+                    <a href="#" onclick="openRegisterModal(); return false;" class="btn btn-accent btn-lg">Create Account</a>
+                    <a href="#" onclick="openLoginModal(); return false;" class="btn btn-info btn-lg">Sign In</a> 
                 </div>
             </div>
         </div>
@@ -139,9 +134,28 @@
     </section>
 {% endblock content %}
 
-    {% block extra_js %}
+{% block extra_js %}
     <script>
         const STATIC_URL = "{% static '' %}"; 
     </script>
     <script src="{% static 'js/script.js' %}"></script>
-    {% endblock extra_js %}
+    <script src="{% static 'js/modal.js' %}"></script>
+
+    <script>
+    // Force modal open on page load if URL parameter exists
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('show_login') === 'true') {
+            console.log('Opening login modal from base.html');
+            // Small delay to ensure all scripts are loaded
+            setTimeout(() => {
+                if (typeof openLoginModal === 'function') {
+                    openLoginModal();
+                } else {
+                    console.error('openLoginModal function not found');
+                }
+            }, 100);
+        }
+    });
+    </script>
+{% endblock extra_js %}
