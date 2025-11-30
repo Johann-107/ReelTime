@@ -1,9 +1,9 @@
+# reservations/models.py
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from movies.models import MovieAdminDetails
 from datetime import date, timedelta, datetime
-import threading
 from .utils import send_reservation_confirmation_email, send_reservation_cancellation_email, send_reservation_reminder_email
 
 def get_tomorrow():
@@ -112,54 +112,43 @@ class Reservation(models.Model):
             
         super().save(*args, **kwargs)
         
-        # Send confirmation email for new confirmed reservations using threading
+        # Send confirmation email for new confirmed reservations (synchronous)
         if is_new and self.status == 'confirmed' and not self.confirmation_sent:
             self.send_confirmation_email()
 
     def send_confirmation_email(self):
-        """Send reservation confirmation email using threading"""
+        """Send reservation confirmation email using SendGrid"""
         try:
-            # Start email sending in a separate thread
-            email_thread = threading.Thread(
-                target=send_reservation_confirmation_email,
-                args=(self.id,)
-            )
-            email_thread.daemon = True  # Thread will close when main program exits
-            email_thread.start()
-            print(f"🟡 Confirmation email thread started for reservation {self.id}")
-            return True
+            success = send_reservation_confirmation_email(self.id)
+            if success:
+                self.confirmation_sent = True
+                self.save(update_fields=['confirmation_sent'])
+                print(f"🟢 Confirmation email sent successfully for reservation {self.id}")
+            return success
         except Exception as e:
-            print(f"🔴 Failed to start confirmation email thread: {e}")
+            print(f"🔴 Failed to send confirmation email: {e}")
             return False
 
     def send_cancellation_email(self):
-        """Send reservation cancellation email using threading"""
+        """Send reservation cancellation email using SendGrid"""
         try:
-            # Start email sending in a separate thread
-            email_thread = threading.Thread(
-                target=send_reservation_cancellation_email,
-                args=(self.id,)
-            )
-            email_thread.daemon = True
-            email_thread.start()
-            print(f"🟡 Cancellation email thread started for reservation {self.id}")
-            return True
+            success = send_reservation_cancellation_email(self.id)
+            if success:
+                print(f"🟢 Cancellation email sent successfully for reservation {self.id}")
+            return success
         except Exception as e:
-            print(f"🔴 Failed to start cancellation email thread: {e}")
+            print(f"🔴 Failed to send cancellation email: {e}")
             return False
         
     def send_reminder_email(self):
-        """Send reservation reminder email using threading"""
+        """Send reservation reminder email using SendGrid"""
         try:
-            # Start email sending in a separate thread
-            email_thread = threading.Thread(
-                target=send_reservation_reminder_email,
-                args=(self.id,)
-            )
-            email_thread.daemon = True
-            email_thread.start()
-            print(f"🟡 Reminder email thread started for reservation {self.id}")
-            return True
+            success = send_reservation_reminder_email(self.id)
+            if success:
+                self.reminder_sent = True
+                self.save(update_fields=['reminder_sent'])
+                print(f"🟢 Reminder email sent successfully for reservation {self.id}")
+            return success
         except Exception as e:
-            print(f"🔴 Failed to start reminder email thread: {e}")
+            print(f"🔴 Failed to send reminder email: {e}")
             return False
