@@ -1,10 +1,10 @@
+# accounts/utils.py
 from .models import User
-import threading
 import re
 import logging
-from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
+from .sendgrid_utils import send_sendgrid_email
 
 logger = logging.getLogger(__name__)
 
@@ -29,30 +29,16 @@ def get_logged_in_user(request):
     user_id = request.session.get('user_id')
     return User.objects.filter(id=user_id).first()
 
-# Email sending functions with threading
+# Email sending functions using SendGrid (synchronous)
 def send_admin_confirmation_email(email, confirmation_link, cinema_name):
-    """Send admin confirmation email in a thread"""
+    """Send admin confirmation email using SendGrid"""
     try:
-        email_thread = threading.Thread(
-            target=_send_admin_confirmation_email_thread,
-            args=(email, confirmation_link, cinema_name)
-        )
-        email_thread.daemon = True
-        email_thread.start()
-        print(f"🟡 Admin confirmation email thread started for {email}")
-        return True
-    except Exception as e:
-        print(f"🔴 Failed to start admin confirmation email thread: {e}")
-        logger.error(f"Failed to start admin confirmation email thread for {email}: {e}")
-        return False
-
-def _send_admin_confirmation_email_thread(email, confirmation_link, cinema_name):
-    """Thread function to send admin confirmation email"""
-    try:
-        print(f"🟡 Thread: Sending admin confirmation email to {email}")
+        print(f"🟡 Sending admin confirmation email to {email}")
         
         subject = "Confirm your admin registration - ReelTime"
-        message = (
+        
+        # Plain text content
+        plain_text_message = (
             f"Hello!\n\n"
             f"Did you register as admin for '{cinema_name}' on ReelTime?\n\n"
             f"If yes, please confirm by clicking this link:\n{confirmation_link}\n\n"
@@ -60,43 +46,68 @@ def _send_admin_confirmation_email_thread(email, confirmation_link, cinema_name)
             f"Best regards,\nReelTime Team"
         )
         
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
+        # HTML content
+        html_message = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .header {{ background-color: #f8f9fa; padding: 20px; text-align: center; }}
+                .content {{ padding: 20px; }}
+                .button {{ background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+                .footer {{ padding: 20px; text-align: center; color: #666; font-size: 14px; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Confirm Your Admin Registration</h1>
+            </div>
+            <div class="content">
+                <p>Hello!</p>
+                <p>Did you register as admin for <strong>{cinema_name}</strong> on ReelTime?</p>
+                <p>If yes, please confirm by clicking the button below:</p>
+                <p style="text-align: center; margin: 30px 0;">
+                    <a href="{confirmation_link}" class="button">Confirm Admin Registration</a>
+                </p>
+                <p>If not, you can safely ignore this email.</p>
+            </div>
+            <div class="footer">
+                <p>Best regards,<br>ReelTime Team</p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Send email using SendGrid
+        success = send_sendgrid_email(
+            to_email=email,
+            subject=subject,
+            plain_text_content=plain_text_message,
+            html_content=html_message
         )
         
-        print(f"🟢 Thread: Admin confirmation email sent successfully to {email}")
+        if success:
+            print(f"🟢 Admin confirmation email sent successfully to {email}")
+        else:
+            print(f"🔴 Failed to send admin confirmation email to {email}")
+            
+        return success
         
     except Exception as e:
-        print(f"🔴 Thread: Error sending admin confirmation email to {email}: {e}")
+        print(f"🔴 Error sending admin confirmation email to {email}: {e}")
         logger.error(f"Error sending admin confirmation email to {email}: {e}")
-
-def send_admin_credentials_email(email, cinema_name, username):
-    """Send admin credentials email in a thread"""
-    try:
-        email_thread = threading.Thread(
-            target=_send_admin_credentials_email_thread,
-            args=(email, cinema_name, username)
-        )
-        email_thread.daemon = True
-        email_thread.start()
-        print(f"🟡 Admin credentials email thread started for {email}")
-        return True
-    except Exception as e:
-        print(f"🔴 Failed to start admin credentials email thread: {e}")
-        logger.error(f"Failed to start admin credentials email thread for {email}: {e}")
         return False
 
-def _send_admin_credentials_email_thread(email, cinema_name, username):
-    """Thread function to send admin credentials email"""
+def send_admin_credentials_email(email, cinema_name, username):
+    """Send admin credentials email using SendGrid"""
     try:
-        print(f"🟡 Thread: Sending admin credentials email to {email}")
+        print(f"🟡 Sending admin credentials email to {email}")
         
         subject = "Your ReelTime Admin Account Credentials"
-        message = (
+        
+        # Plain text content
+        plain_text_message = (
             f"Your admin account for '{cinema_name}' has been created!\n\n"
             f"📋 Account Details:\n"
             f"Cinema: {cinema_name}\n"
@@ -108,61 +119,63 @@ def _send_admin_credentials_email_thread(email, cinema_name, username):
             f"Best regards,\nReelTime Team"
         )
         
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
+        # HTML content
+        html_message = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .header {{ background-color: #28a745; color: white; padding: 20px; text-align: center; }}
+                .content {{ padding: 20px; }}
+                .credentials {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #28a745; }}
+                .security {{ background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #ffc107; }}
+                .footer {{ padding: 20px; text-align: center; color: #666; font-size: 14px; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Admin Account Created Successfully!</h1>
+            </div>
+            <div class="content">
+                <p>Your admin account for <strong>{cinema_name}</strong> has been created!</p>
+                
+                <div class="credentials">
+                    <h3>📋 Account Details:</h3>
+                    <p><strong>Cinema:</strong> {cinema_name}</p>
+                    <p><strong>Username:</strong> {username}</p>
+                    <p><strong>Password:</strong> admin123</p>
+                </div>
+                
+                <div class="security">
+                    <h3>🔐 Important Security Notice:</h3>
+                    <p>Please log in immediately and change your password.</p>
+                    <p>For security reasons, do not share these credentials with anyone.</p>
+                </div>
+            </div>
+            <div class="footer">
+                <p>Best regards,<br><strong>ReelTime Team</strong></p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Send email using SendGrid
+        success = send_sendgrid_email(
+            to_email=email,
+            subject=subject,
+            plain_text_content=plain_text_message,
+            html_content=html_message
         )
         
-        print(f"🟢 Thread: Admin credentials email sent successfully to {email}")
+        if success:
+            print(f"🟢 Admin credentials email sent successfully to {email}")
+        else:
+            print(f"🔴 Failed to send admin credentials email to {email}")
+            
+        return success
         
     except Exception as e:
-        print(f"🔴 Thread: Error sending admin credentials email to {email}: {e}")
+        print(f"🔴 Error sending admin credentials email to {email}: {e}")
         logger.error(f"Error sending admin credentials email to {email}: {e}")
-
-# Enhanced email sending with retry logic
-class AccountsEmailThread(threading.Thread):
-    """
-    Enhanced email thread for accounts with error handling and retry logic
-    """
-    def __init__(self, email_function, *args, max_retries=3):
-        threading.Thread.__init__(self)
-        self.email_function = email_function
-        self.args = args
-        self.max_retries = max_retries
-        self.daemon = True
-        
-    def run(self):
-        retries = 0
-        while retries < self.max_retries:
-            try:
-                self.email_function(*self.args)
-                break  # Success, exit retry loop
-            except Exception as e:
-                retries += 1
-                if retries < self.max_retries:
-                    print(f"🟡 Accounts email retry {retries}/{self.max_retries}")
-                    import time
-                    time.sleep(2 ** retries)  # Exponential backoff
-                else:
-                    print(f"🔴 All account email retries failed: {e}")
-                    logger.error(f"All account email retries failed: {e}")
-
-# Enhanced email sending functions
-def send_admin_confirmation_email_enhanced(email, confirmation_link, cinema_name):
-    """Enhanced version with retry logic"""
-    email_thread = AccountsEmailThread(
-        _send_admin_confirmation_email_thread, 
-        email, confirmation_link, cinema_name
-    )
-    email_thread.start()
-
-def send_admin_credentials_email_enhanced(email, cinema_name, username):
-    """Enhanced version with retry logic"""
-    email_thread = AccountsEmailThread(
-        _send_admin_credentials_email_thread,
-        email, cinema_name, username
-    )
-    email_thread.start()
+        return False

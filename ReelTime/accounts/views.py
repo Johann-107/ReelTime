@@ -1,3 +1,4 @@
+# accounts/views.py
 from accounts.models import User, PendingAdmin
 from accounts.forms import RegistrationForm, UserProfileForm
 from accounts.utils import (
@@ -12,6 +13,7 @@ from django.utils.crypto import get_random_string
 from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
+from django.urls import reverse
 
 
 # --------------------------
@@ -42,6 +44,9 @@ def register_admin(request):
             },
         )
 
+        # Send or resend confirmation email (synchronous)
+        confirmation_link = request.build_absolute_uri(f"/accounts/confirm-admin/{pending.token}/")
+
         if not created:
             if pending.is_confirmed:
                 message = "This email is already confirmed as an admin."
@@ -55,11 +60,11 @@ def register_admin(request):
                     messages.error(request, message)
                     return redirect("login")
             else:
-                # Update cinema name and regenerate token in case they want to retry
                 pending.cinema_name = cinema_name
                 pending.token = get_random_string(48)
                 pending.save()
                 message = "A new confirmation link has been sent to your email."
+                email_sent = send_admin_confirmation_email(email, confirmation_link, cinema_name)
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                     return JsonResponse({
                         'success': True,
@@ -70,6 +75,7 @@ def register_admin(request):
 
         else:
             message = "A confirmation email has been sent. Please check your inbox."
+            email_sent = send_admin_confirmation_email(email, confirmation_link, cinema_name)
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True,
@@ -77,10 +83,17 @@ def register_admin(request):
                 })
             else:
                 messages.success(request, message)
-
-        # Send or resend confirmation email using threading
-        confirmation_link = request.build_absolute_uri(f"/accounts/confirm-admin/{pending.token}/")
-        send_admin_confirmation_email(email, confirmation_link, cinema_name)
+        
+        if not email_sent:
+            message = "Confirmation email could not be sent. Please try again."
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'message': message
+                }, status=500)
+            else:
+                messages.error(request, message)
+                return redirect("register_admin")
         
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
@@ -116,14 +129,18 @@ def confirm_admin(request, token):
     # Create the default admin
     admin = create_default_admin(pending.cinema_name, pending.email)
 
-    # Send credentials to the admin email using threading
-    send_admin_credentials_email(pending.email, pending.cinema_name, admin.username)
-
+    # Send credentials to the admin email (synchronous)
+    email_sent = send_admin_credentials_email(pending.email, pending.cinema_name, admin.username)
+    
+    if not email_sent:
+        messages.warning(request, "Admin account created but credentials email failed to send. Please contact support.")
+    else:
+        messages.success(request, "Admin account confirmed! Login details have been sent to your email.")
+    
     # Mark as confirmed instead of deleting
     pending.is_confirmed = True
     pending.save()
 
-    messages.success(request, "Admin account confirmed! Login details have been sent to your email.")
     return redirect("login")
 
 
