@@ -51,10 +51,20 @@
                 <option value="all">All Genres</option>
                 <option value="action">Action</option>
                 <option value="adventure">Adventure</option>
-                <option value="thriller">Thriller</option>
-                <option value="sci-fi">Sci-Fi</option>
-                <option value="romance">Romance</option>
+                <option value="animation">Animation</option>
                 <option value="comedy">Comedy</option>
+                <option value="crime">Crime</option>
+                <option value="documentary">Documentary</option>
+                <option value="drama">Drama</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="horror">Horror</option>
+                <option value="musical">Musical</option>
+                <option value="mystery">Mystery</option>
+                <option value="romance">Romance</option>
+                <option value="sci-fi">Sci-Fi</option>
+                <option value="thriller">Thriller</option>
+                <option value="war">War</option>
+                <option value="western">Western</option>
             </select>
         </div>
 
@@ -67,15 +77,22 @@
             <div class="movie-grid" id="movieGrid">
                 {% for movie in movies %}
                     {% with detail=movie.detail %}
-                        <div class="movie-card" data-genre="{{ detail.movie.genre|lower }}">
+                        <div class="movie-card" data-genre="{{ detail.movie.genre|join:',' }}">
                             <div class="movie-poster-container">
                                 {% if detail.poster %}
                                     <img src="{{ detail.poster.url }}" alt="{{ detail.movie.title }} Poster" class="movie-poster-img">
                                 {% else %}
                                     <img src="{% static 'images/default_poster.jpg' %}" alt="No poster available" class="movie-poster-img">
                                 {% endif %}
-                                {% if detail.movie.genre %}
-                                    <span class="genre-badge">{{ detail.movie.genre }}</span>
+                                {% if detail.movie.genre.0 %}
+                                    <div class="genre-badges-container">
+                                        {% for genre in detail.movie.genre|slice:":3" %}
+                                            <span class="genre-badge">{{ genre|title }}</span>
+                                        {% endfor %}
+                                        {% if detail.movie.genre|length > 3 %}
+                                            <span class="genre-badge genre-more">+{{ detail.movie.genre|length|add:"-3" }}</span>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
                             </div>
                             
@@ -164,6 +181,6 @@
             window.location.href = `/movies/reserve/${movieId}/`;
         }
     </script>
-    <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
 {% endblock extra_js %}

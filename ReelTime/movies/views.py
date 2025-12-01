@@ -40,10 +40,14 @@ def edit_movie_view(request, pk):
         detail_form = MovieAdminDetailsForm(request.POST, request.FILES, instance=detail)
 
         # Check if user wants to clear the poster
-        # Edited here: Added check if poster exists before deletion
+        # Edited here: Added check if poster exists and has delete method before deletion
         if request.POST.get('clear_poster') == 'true':
-            if detail.poster:
+            if detail.poster and hasattr(detail.poster, 'delete'):
                 detail.poster.delete(save=False)
+                detail.poster = None
+                detail.save()
+            elif detail.poster:
+                # If it's a CloudinaryResource without delete method, just set to None
                 detail.poster = None
                 detail.save()
 

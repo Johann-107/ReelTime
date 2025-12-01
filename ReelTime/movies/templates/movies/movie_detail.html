@@ -40,7 +40,15 @@
                 <p><strong>Release Date:</strong> {{ release_label }}</p>
                 <p><strong>End Date:</strong> {{ end_date_label }}</p>
                 <p><strong>Showing Times:</strong> {{ showing_times_display }}</p>
-                <p><strong>Genre:</strong> {{ detail.movie.genre }}</p>
+                <p><strong>Genre:</strong> 
+                    {% if detail.movie.genre %}
+                        {% for genre in detail.movie.genre %}
+                            {{ genre|title }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Not specified
+                    {% endif %}
+                </p>
                 <p><strong>Description:</strong> {{ detail.movie.description }}</p>
 
                 {% if can_manage %}
