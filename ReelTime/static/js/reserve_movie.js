@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const numberOfSeats = parseInt(seatsInput.value) || 0;
         const totalCost = currentMoviePrice * numberOfSeats;
         
-        pricePerSeatElement.textContent = `$${currentMoviePrice.toFixed(2)}`;
-        totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
+        pricePerSeatElement.textContent = `₱${currentMoviePrice.toFixed(2)}`;
+        totalCostElement.textContent = `₱${totalCost.toFixed(2)}`;
 
     }
 

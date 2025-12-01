@@ -30,6 +30,7 @@ class Movie(models.Model):
     ]
     
     RATING_CHOICES = [
+        ('G', 'G - General Audiences'),
         ('PG', 'PG - Parental Guidance'),
         ('SPG', 'SPG - Strict Parental Guidance'),
     ]

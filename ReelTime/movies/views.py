@@ -36,8 +36,8 @@ def edit_movie_view(request, pk):
     # Edited here: Restructured to handle POST with FILES properly
     if request.method == 'POST':
         # Edited here: Added request.FILES to movie_form to handle poster uploads
-        movie_form = MovieForm(request.POST, request.FILES, instance=detail.movie)
-        detail_form = MovieAdminDetailsForm(request.POST, request.FILES, instance=detail)
+        movie_form = MovieForm(request.POST, request.FILES, instance=detail.movie, admin=request.user)
+        detail_form = MovieAdminDetailsForm(request.POST, request.FILES, instance=detail, admin=request.user)
 
         # Check if user wants to clear the poster
         # Edited here: Added check if poster exists and has delete method before deletion
@@ -68,8 +68,8 @@ def edit_movie_view(request, pk):
                         messages.error(request, f"{field}: {error}")
     else:
         # Edited here: Initialize forms in else block for GET requests
-        movie_form = MovieForm(instance=detail.movie)
-        detail_form = MovieAdminDetailsForm(instance=detail)
+        movie_form = MovieForm(instance=detail.movie, admin=request.user)
+        detail_form = MovieAdminDetailsForm(instance=detail, admin=request.user)
 
     context = {
         'movie_form': movie_form,
@@ -106,15 +106,25 @@ def movie_list_view(request):
     # ✅ Filter: only show movies added by the current admin
     if user.is_authenticated and user.is_admin:
         admin_details_qs = MovieAdminDetails.objects.select_related('movie').filter(admin=user)
+        movies_list = admin_details_qs
     else:
-        # 👥 Non-admin: only now showing and coming soon
+        # 👥 Non-admin: only now showing and coming soon, get unique movies by title
         admin_details_qs = MovieAdminDetails.objects.select_related('movie').filter(
             end_date__gte=today  # excludes already ended movies
         )
+        
+        # Get unique movie titles (case-insensitive)
+        seen_titles = set()
+        movies_list = []
+        for detail in admin_details_qs:
+            title_lower = detail.movie.title.lower().strip()
+            if title_lower not in seen_titles:
+                seen_titles.add(title_lower)
+                movies_list.append(detail)
 
     movies = []
 
-    for detail in admin_details_qs:
+    for detail in movies_list:
         release_date = detail.release_date
         end_date = detail.end_date
         days_diff = (release_date - today).days
@@ -187,7 +197,7 @@ def movie_detail_view(request, pk):
 @login_required
 def reserve_movie_view(request, movie_id):
     """
-    Show all registered cinemas with their details for this movie
+    Show all cinemas that have movies with the same title
     """
     from django.contrib.auth import get_user_model
     from django.db.models import Sum
@@ -196,84 +206,70 @@ def reserve_movie_view(request, movie_id):
 
     # Get the movie
     movie = get_object_or_404(Movie, id=movie_id)
+    
+    # Get ALL movie details for movies with the same title (case-insensitive)
+    # This includes all cinemas showing a movie with this title
+    movie_details = MovieAdminDetails.objects.filter(
+        movie__title__iexact=movie.title
+    ).select_related('admin', 'movie').order_by('admin__cinema_name')
 
-    # Get all cinema admins
-    cinema_admins = User.objects.filter(is_admin=True).order_by('cinema_name')
-
-    movie_details_dict = {}
-    for detail in MovieAdminDetails.objects.filter(movie=movie).select_related('admin'):
-        movie_details_dict[detail.admin_id] = detail
-
-    # Prepare cinema data
+    # Prepare cinema data - only for cinemas that have the movie
     cinemas = []
-    for admin in cinema_admins:
-        movie_detail = movie_details_dict.get(admin.id)
+    for movie_detail in movie_details:
+        # Cinema has this movie - build showtimes with remaining seats
+        showtimes_data = []
+        for s in movie_detail.showing_times:  # this is already a Python list of dicts
+            # Expect each item to be a dict with 'time' and 'max_seats'
+            if isinstance(s, dict):
+                time = s.get("time")
+                max_seats = s.get("max_seats", 0)
+            else:
+                # If legacy string format, assume a default max_seats (e.g., 100)
+                time = s
+                max_seats = 100  # arbitrary fallback
 
-        if movie_detail:
-            # Cinema has this movie - build showtimes with remaining seats
-            showtimes_data = []
-            for s in movie_detail.showing_times:  # this is already a Python list of dicts
-                # Expect each item to be a dict with 'time' and 'max_seats'
-                if isinstance(s, dict):
-                    time = s.get("time")
-                    max_seats = s.get("max_seats", 0)
+            # Calculate reserved seats
+            reserved = Reservation.objects.filter(
+                movie_detail=movie_detail,
+                selected_showtime=time
+            ).aggregate(total_reserved=Sum('number_of_seats'))['total_reserved'] or 0
+
+            remaining = max_seats - reserved
+            showtimes_data.append({
+                "time": time,
+                "max_seats": max_seats,
+                "remaining": remaining,
+            })
+
+        # Get the poster URL safely
+        poster_url = None
+        if movie_detail.poster:
+            try:
+                # Use the model's poster_url property if available
+                if hasattr(movie_detail, 'poster_url'):
+                    poster_url = movie_detail.poster_url
                 else:
-                    # If legacy string format, assume a default max_seats (e.g., 100)
-                    time = s
-                    max_seats = 100  # arbitrary fallback
+                    # Fallback: build URL manually
+                    poster_url = movie_detail.poster.build_url(
+                        width=400,
+                        height=600,
+                        crop="fill",
+                        quality="auto"
+                    )
+            except (AttributeError, Exception):
+                # If anything fails, use the direct URL
+                poster_url = movie_detail.poster.url
 
-                # Calculate reserved seats
-                reserved = Reservation.objects.filter(
-                    movie_detail=movie_detail,
-                    selected_showtime=time
-                ).aggregate(total_reserved=Sum('number_of_seats'))['total_reserved'] or 0
-
-                remaining = max_seats - reserved
-                showtimes_data.append({
-                    "time": time,
-                    "max_seats": max_seats,
-                    "remaining": remaining,
-                })
-
-            # Get the poster URL safely
-            poster_url = None
-            if movie_detail.poster:
-                try:
-                    # Use the model's poster_url property if available
-                    if hasattr(movie_detail, 'poster_url'):
-                        poster_url = movie_detail.poster_url
-                    else:
-                        # Fallback: build URL manually
-                        poster_url = movie_detail.poster.build_url(
-                            width=400,
-                            height=600,
-                            crop="fill",
-                            quality="auto"
-                        )
-                except (AttributeError, Exception):
-                    # If anything fails, use the direct URL
-                    poster_url = movie_detail.poster.url
-
-            cinemas.append({
-                'detail_id': movie_detail.id,
-                'cinema_name': admin.cinema_name,
-                'showing_times': json.dumps(showtimes_data),
-                'poster': movie_detail.poster,
-                'poster_url': poster_url,  # Add this line
-                'has_movie': True,
-                'price': movie_detail.price,
-                'end_date': movie_detail.end_date.isoformat(),
-            })
-        else:
-            # Cinema doesn't have this movie yet
-            cinemas.append({
-                'detail_id': None,
-                'cinema_name': admin.cinema_name,
-                'showing_times': json.dumps([]),
-                'poster': None,
-                'poster_url': None,  # Add this line
-                'has_movie': False,
-            })
+        cinemas.append({
+            'detail_id': movie_detail.id,
+            'cinema_name': movie_detail.admin.cinema_name,
+            'showing_times': json.dumps(showtimes_data),
+            'poster': movie_detail.poster,
+            'poster_url': poster_url,
+            'has_movie': True,
+            'price': movie_detail.price,
+            'end_date': movie_detail.end_date.isoformat(),
+        })
 
     context = {
         'movie': movie,

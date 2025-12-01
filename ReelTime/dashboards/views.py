@@ -16,15 +16,25 @@ def user_dashboard(request):
     # Get movies based on user type
     if user.is_authenticated and user.is_admin:
         admin_details_qs = MovieAdminDetails.objects.select_related('movie').filter(admin=user)
+        movies_list = admin_details_qs
     else:
-        # Non-admin: only now showing and coming soon
+        # Non-admin: only now showing and coming soon, get unique movies by title
         admin_details_qs = MovieAdminDetails.objects.select_related('movie').filter(
             end_date__gte=today  # excludes already ended movies
         )
+        
+        # Get unique movie titles (case-insensitive)
+        seen_titles = set()
+        movies_list = []
+        for detail in admin_details_qs:
+            title_lower = detail.movie.title.lower().strip()
+            if title_lower not in seen_titles:
+                seen_titles.add(title_lower)
+                movies_list.append(detail)
 
     movies = []
 
-    for detail in admin_details_qs:
+    for detail in movies_list:
         release_date = detail.release_date
         end_date = detail.end_date
         days_diff = (release_date - today).days
