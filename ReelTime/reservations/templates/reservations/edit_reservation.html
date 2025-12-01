@@ -200,7 +200,7 @@
                         <strong>Current Seats:</strong> {{ reservation.number_of_seats }} seat(s)
                     </p>
                     <p>
-                        <strong>Current Total:</strong> ${{ reservation.total_cost }}
+                        <strong>Current Total:</strong> ₱{{ reservation.total_cost }}
                     </p>
                 </div>
 
@@ -218,11 +218,11 @@
                     <div class="cost-display-section">
                         <div class="cost-item">
                             <span class="cost-label">Price per Seat:</span>
-                            <span class="cost-value" id="pricePerSeat">${{ reservation.movie_detail.price }}</span>
+                            <span class="cost-value" id="pricePerSeat">₱{{ reservation.movie_detail.price }}</span>
                         </div>
                         <div class="cost-item total-cost">
                             <span class="cost-label">New Total Cost:</span>
-                            <span class="cost-value" id="newTotalCost">${{ reservation.total_cost }}</span>
+                            <span class="cost-value" id="newTotalCost">₱{{ reservation.total_cost }}</span>
                         </div>
                     </div>
 
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateTotalCost() {
         const total = selectedSeats.length * pricePerSeat;
-        newTotalCostElement.textContent = `$${total.toFixed(2)}`;
+        newTotalCostElement.textContent = `₱${total.toFixed(2)}`;
     }
 
     function renderSeatLayout(seatMapArray, reservedSeatsArray, currentSelectedSeats) {

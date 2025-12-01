@@ -28,7 +28,12 @@ class MovieAdminDetailsForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.admin = kwargs.pop('admin', None)
         super().__init__(*args, **kwargs)
+        
+        # Filter halls to show only those belonging to the current admin
+        if self.admin:
+            self.fields['hall'].queryset = Hall.objects.filter(admin=self.admin)
         
         # Convert showing_times to simple format for display
         if self.instance.pk and self.instance.showing_times:
@@ -67,6 +72,19 @@ class MovieAdminDetailsForm(forms.ModelForm):
             raise forms.ValidationError('Enter a valid JSON.')
         except Exception:
             raise forms.ValidationError('Enter showtimes as a JSON list, e.g. ["10:00 AM", "1:30 PM"]')
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        release_date = cleaned_data.get('release_date')
+        end_date = cleaned_data.get('end_date')
+        
+        if release_date and end_date:
+            if end_date < release_date:
+                raise forms.ValidationError({
+                    'end_date': 'End date cannot be before the release date.'
+                })
+        
+        return cleaned_data
     
     def clean_genre(self):
         genres = self.cleaned_data.get('genre')
@@ -138,6 +156,10 @@ class MovieForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.admin = kwargs.pop('admin', None)
         super().__init__(*args, **kwargs)
+        
+        # Filter halls to show only those belonging to the current admin
+        if self.admin:
+            self.fields['hall'].queryset = Hall.objects.filter(admin=self.admin)
 
         if self.instance.pk and self.admin:
             try:
@@ -174,6 +196,19 @@ class MovieForm(forms.ModelForm):
             return parsed  # simple list
         except Exception:
             raise forms.ValidationError('Enter showtimes as a JSON list, e.g. ["10:00 AM", "1:30 PM"]')
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        release_date = cleaned_data.get('release_date')
+        end_date = cleaned_data.get('end_date')
+        
+        if release_date and end_date:
+            if end_date < release_date:
+                raise forms.ValidationError({
+                    'end_date': 'End date cannot be before the release date.'
+                })
+        
+        return cleaned_data
         
     def clean_genre(self):
         genres = self.cleaned_data.get('genre')
