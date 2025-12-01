@@ -14,10 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
     
     movieCards.forEach((card) => {
       const title = card.querySelector("h3").textContent.toLowerCase();
-      const genre = card.getAttribute("data-genre") || "";
+      const genresData = card.getAttribute("data-genre") || "";
+      
+      // Parse genres as comma-separated list
+      const genres = genresData.split(',').map(g => g.trim().toLowerCase());
       
       const matchesSearch = title.includes(searchTerm);
-      const matchesGenre = selectedGenre === "all" || genre === selectedGenre;
+      const matchesGenre = selectedGenre === "all" || genres.includes(selectedGenre);
       
       if (matchesSearch && matchesGenre) {
 card.style.display = "block";

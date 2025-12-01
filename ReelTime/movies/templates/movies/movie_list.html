@@ -21,17 +21,27 @@
         <option value="all">All Genres</option>
         <option value="action">Action</option>
         <option value="adventure">Adventure</option>
-        <option value="thriller">Thriller</option>
-        <option value="sci-fi">Sci-fi</option>
-        <option value="romance">Romance</option>
+        <option value="animation">Animation</option>
         <option value="comedy">Comedy</option>
+        <option value="crime">Crime</option>
+        <option value="documentary">Documentary</option>
+        <option value="drama">Drama</option>
+        <option value="fantasy">Fantasy</option>
+        <option value="horror">Horror</option>
+        <option value="musical">Musical</option>
+        <option value="mystery">Mystery</option>
+        <option value="romance">Romance</option>
+        <option value="sci-fi">Sci-Fi</option>
+        <option value="thriller">Thriller</option>
+        <option value="war">War</option>
+        <option value="western">Western</option>
       </select>
     </div>
 
     <div class="movie-grid" id="movieGrid"> 
       {% for movie in movies %}
         {% with detail=movie.detail %}
-          <div class="movie-card" data-genre="{{ detail.movie.genre|lower }}" onclick="window.location.href='{% url 'movie_detail' detail.pk %}';">
+          <div class="movie-card" data-genre="{{ detail.movie.genre|join:',' }}" onclick="window.location.href='{% url 'movie_detail' detail.pk %}';">
 
             <div class="movie-poster-container">
                 {% if detail.poster %}
@@ -43,8 +53,15 @@
                           alt="No poster available" 
                           class="movie-poster-img">
                 {% endif %}
-                {% if detail.movie.genre %}
-                    <span class="genre-badge">{{ detail.movie.genre }}</span>
+                {% if detail.movie.genre.0 %}
+                    <div class="genre-badges-container">
+                        {% for genre in detail.movie.genre|slice:":3" %}
+                            <span class="genre-badge">{{ genre|title }}</span>
+                        {% endfor %}
+                        {% if detail.movie.genre|length > 3 %}
+                            <span class="genre-badge genre-more">+{{ detail.movie.genre|length|add:"-3" }}</span>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
 
@@ -232,6 +249,7 @@
     <!-- ADD MODAL.JS HERE -->
     <script src="{% static 'js/modal.js' %}"></script>
     
-    <!-- Only load script.js, NOT dashboard.js -->
+    <!-- Load dashboard.js for search and filter functionality -->
+    <script src="{% static 'js/dashboard.js' %}"></script>
     <script src="{% static 'js/script.js' %}"></script>
 {% endblock extra_js %}

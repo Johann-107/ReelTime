@@ -371,4 +371,86 @@ document.addEventListener("DOMContentLoaded", function () {
     window.onclick = e => { if(e.target===modal) closeModal(); };
     document.addEventListener('keydown', e => { if(e.key==="Escape") closeModal(); });
 
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const numberOfSeats = parseInt(seatsInput.value) || 0;
+        const selectedSeatsJson = selectedSeatsInput.value;
+        
+        let selectedSeatsArray = [];
+        try {
+            selectedSeatsArray = JSON.parse(selectedSeatsJson);
+        } catch(err) {
+            selectedSeatsArray = [];
+        }
+
+        // Validation: Check if number of selected seats matches the number input
+        if (selectedSeatsArray.length !== numberOfSeats) {
+            // Show error message in modal
+            showValidationError(`You selected ${selectedSeatsArray.length} seat(s), but requested ${numberOfSeats} seat(s). Please select exactly ${numberOfSeats} seat(s).`);
+            return false;
+        }
+
+        // Validation: Check if seats are actually selected
+        if (selectedSeatsArray.length === 0) {
+            showValidationError('Please select your seats from the seat map.');
+            return false;
+        }
+
+        // Validation: Check if showtime is selected
+        if (!selectedShowtimeInput.value) {
+            showValidationError('Please select a showtime.');
+            return false;
+        }
+
+        // Validation: Check if date is selected
+        if (!dateInput.value) {
+            showValidationError('Please select a date.');
+            return false;
+        }
+
+        // If all validations pass, submit the form
+        form.submit();
+    });
+
+    function showValidationError(message) {
+        // Remove any existing error message
+        const existingError = document.querySelector('.validation-error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Create error message element
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'validation-error-message';
+        errorDiv.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>${message}</span>
+        `;
+
+        // Insert error message below the selected seats display
+        const selectedSeatsDisplay = document.getElementById('selectedSeatsDisplay');
+        if (selectedSeatsDisplay && selectedSeatsDisplay.parentNode) {
+            selectedSeatsDisplay.parentNode.insertBefore(errorDiv, selectedSeatsDisplay.nextSibling);
+        } else {
+            // Fallback: insert after seat layout container
+            seatLayoutContainer.parentNode.insertBefore(errorDiv, seatLayoutContainer.nextSibling);
+        }
+
+        // Scroll to error message
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Auto-remove error after 5 seconds
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.remove();
+            }
+        }, 5000);
+    }
+
 });

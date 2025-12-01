@@ -182,20 +182,51 @@ body {
     transform: scale(1.05);
 }
 
-/* Genre Badge (Top Right) */
-.genre-badge {
+/* Genre Badges Container */
+.genre-badges-container {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: var(--color-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+    z-index: 10;
+}
+
+/* Genre Badge */
+.genre-badge {
+    background: rgba(199, 62, 29, 0.95);
     color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    z-index: 10; /* Ensure it's above the image */
+    letter-spacing: 0.8px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.genre-badge:hover {
+    transform: translateX(-5px) scale(1.05);
+    background: rgba(199, 62, 29, 1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* More genres indicator */
+.genre-badge.genre-more {
+    background: rgba(26, 26, 26, 0.9);
+    border-color: rgba(255, 255, 255, 0.3);
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.genre-badge.genre-more:hover {
+    transform: translateX(-5px) scale(1.05);
+    background: rgba(26, 26, 26, 1);
 }
 
 .movie-content {

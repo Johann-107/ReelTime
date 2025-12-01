@@ -10,17 +10,48 @@ def get_tomorrow():
 
 
 class Movie(models.Model):
+    GENRE_CHOICES = [
+        ('action', 'Action'),
+        ('adventure', 'Adventure'),
+        ('animation', 'Animation'),
+        ('comedy', 'Comedy'),
+        ('crime', 'Crime'),
+        ('documentary', 'Documentary'),
+        ('drama', 'Drama'),
+        ('fantasy', 'Fantasy'),
+        ('horror', 'Horror'),
+        ('musical', 'Musical'),
+        ('mystery', 'Mystery'),
+        ('romance', 'Romance'),
+        ('sci-fi', 'Sci-Fi'),
+        ('thriller', 'Thriller'),
+        ('war', 'War'),
+        ('western', 'Western'),
+    ]
+    
+    RATING_CHOICES = [
+        ('PG', 'PG - Parental Guidance'),
+        ('SPG', 'SPG - Strict Parental Guidance'),
+    ]
+    
     title = models.CharField(max_length=255)
     description = models.TextField()
 
     # Optional attributes
-    genre = models.CharField(max_length=100, blank=True)
+    genre = models.JSONField(default=list, blank=True)  # Store multiple genres as a list
     director = models.CharField(max_length=255, blank=True)
     duration_minutes = models.PositiveIntegerField(blank=True, null=True)
-    rating = models.CharField(max_length=10, blank=True)  # e.g., "PG-13", "R", etc.
+    rating = models.CharField(max_length=10, choices=RATING_CHOICES, blank=True)  # PG or SPG
     
     def __str__(self):
         return self.title
+    
+    def get_genres_display(self):
+        """Return comma-separated genre display names."""
+        if not self.genre:
+            return ""
+        genre_dict = dict(self.GENRE_CHOICES)
+        return ", ".join([genre_dict.get(g, g.title()) for g in self.genre])
     
 
 class MovieAdminDetails(models.Model):

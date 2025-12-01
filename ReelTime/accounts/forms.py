@@ -98,17 +98,23 @@ class UserProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['profile_picture'].required = False
-        self.fields['profile_picture'].help_text = "Upload a profile picture (JPG, PNG, WebP, max 2MB)"
+        self.fields['profile_picture'].help_text = "Upload a profile picture (JPG, PNG only, max 2MB)"
 
     def clean_profile_picture(self):
         profile_picture = self.cleaned_data.get('profile_picture')
         
         if profile_picture:
-            # Validate file type
-            valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
-            extension = profile_picture.name.split('.')[-1].lower()
-            if extension not in valid_extensions:
-                raise forms.ValidationError("Unsupported file extension. Use JPG, PNG, or WebP.")
+            # Check if it's a new upload (has size attribute) or existing Cloudinary resource
+            if hasattr(profile_picture, 'size'):
+                # Validate file size (max 2MB for profile pictures)
+                if profile_picture.size > 2 * 1024 * 1024:
+                    raise forms.ValidationError("Profile picture too large ( > 2MB )")
+                
+                # Validate file type
+                valid_extensions = ['jpg', 'jpeg', 'png']
+                extension = profile_picture.name.split('.')[-1].lower()
+                if extension not in valid_extensions:
+                    raise forms.ValidationError("Unsupported file extension. Only JPG and PNG are allowed.")
         
         return profile_picture
 

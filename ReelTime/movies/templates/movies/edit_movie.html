@@ -32,7 +32,10 @@
                     <p>{{ movie_form.description.label_tag }} {{ movie_form.description }}</p>
 
                     {{ movie_form.genre.errors }}
-                    <p>{{ movie_form.genre.label_tag }} {{ movie_form.genre }}</p>
+                    <div class="genre-field-wrapper">
+                        <p>{{ movie_form.genre.label_tag }} {{ movie_form.genre }}</p>
+                        <small class="form-help genre-limit-text" style="display: block; margin-top: 0.5rem; color: #666; font-size: 0.875rem;">✓ Select only a maximum of 3 genres (<span id="genre-count">0</span>/3 selected)</small>
+                    </div>
 
                     {{ movie_form.director.errors }}
                     <p>{{ movie_form.director.label_tag }} {{ movie_form.director }}</p>
@@ -108,6 +111,39 @@
 <script>
     // Use the improved JavaScript code from above
     document.addEventListener('DOMContentLoaded', function() {
+        // Genre selection limit
+        const genreCheckboxes = document.querySelectorAll('input[name="genre"]');
+        const genreCount = document.getElementById('genre-count');
+        const MAX_GENRES = 3;
+        
+        function updateGenreCount() {
+            const checkedCount = Array.from(genreCheckboxes).filter(cb => cb.checked).length;
+            if (genreCount) {
+                genreCount.textContent = checkedCount;
+                genreCount.style.color = checkedCount > MAX_GENRES ? '#dc3545' : '#28a745';
+                genreCount.style.fontWeight = 'bold';
+            }
+            
+            // Disable unchecked boxes if limit reached
+            genreCheckboxes.forEach(checkbox => {
+                if (!checkbox.checked && checkedCount >= MAX_GENRES) {
+                    checkbox.disabled = true;
+                    checkbox.parentElement.style.opacity = '0.5';
+                } else if (!checkbox.checked) {
+                    checkbox.disabled = false;
+                    checkbox.parentElement.style.opacity = '1';
+                }
+            });
+        }
+        
+        genreCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateGenreCount);
+        });
+        
+        // Initial count
+        updateGenreCount();
+        
+        // Poster handling
         const posterInput = document.querySelector('input[name="poster"]');
         const posterPreview = document.getElementById('poster-preview');
         const clearPosterBtn = document.getElementById('clear-poster-btn');

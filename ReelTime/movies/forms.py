@@ -7,6 +7,13 @@ import cloudinary.uploader
 
 
 class MovieAdminDetailsForm(forms.ModelForm):
+    genre = forms.MultipleChoiceField(
+        choices=Movie.GENRE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        help_text="Select up to 3 genres"
+    )
+    
     class Meta:
         model = MovieAdminDetails
         fields = ['release_date', 'end_date', 'hall', 'showing_times', 'poster', 'price']  # Added price field
@@ -15,6 +22,9 @@ class MovieAdminDetailsForm(forms.ModelForm):
             'end_date': DateInput(attrs={'type': 'date'}),
             'showing_times': Textarea(attrs={'rows': 2, 'placeholder': 'e.g. ["10:00 AM", "1:30 PM"]'}),
             'price': forms.NumberInput(attrs={'step': '1.00', 'min': '0'}),
+        }
+        help_texts = {
+            'poster': 'Upload a poster image (JPG, PNG only, max 5MB)',
         }
 
     def __init__(self, *args, **kwargs):
@@ -57,6 +67,28 @@ class MovieAdminDetailsForm(forms.ModelForm):
             raise forms.ValidationError('Enter a valid JSON.')
         except Exception:
             raise forms.ValidationError('Enter showtimes as a JSON list, e.g. ["10:00 AM", "1:30 PM"]')
+    
+    def clean_genre(self):
+        genres = self.cleaned_data.get('genre')
+        if genres and len(genres) > 3:
+            raise forms.ValidationError("You can select a maximum of 3 genres.")
+        return genres
+    
+    def clean_poster(self):
+        poster = self.cleaned_data.get('poster')
+        
+        if poster and hasattr(poster, 'size'):
+            # Validate file size (max 5MB)
+            if poster.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("Image file too large ( > 5MB )")
+            
+            # Validate file type
+            valid_extensions = ['jpg', 'jpeg', 'png']
+            extension = poster.name.split('.')[-1].lower()
+            if extension not in valid_extensions:
+                raise forms.ValidationError("Unsupported file extension. Only JPG and PNG are allowed.")
+        
+        return poster
         
 class MovieForm(forms.ModelForm):
     # Extra fields for admin details
@@ -79,7 +111,21 @@ class MovieForm(forms.ModelForm):
 
     poster = forms.ImageField(
         required=False,
-        help_text="Upload a poster image (JPG, PNG, WebP, max 5MB)"
+        help_text="Upload a poster image (JPG, PNG only, max 5MB)"
+    )
+    
+    genre = forms.MultipleChoiceField(
+        choices=Movie.GENRE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        help_text="Select up to 3 genres"
+    )
+    
+    rating = forms.ChoiceField(
+        choices=[('', 'Select Rating')] + Movie.RATING_CHOICES,
+        widget=forms.Select,
+        required=False,
+        help_text="Select movie rating"
     )
 
     class Meta:
@@ -129,19 +175,25 @@ class MovieForm(forms.ModelForm):
         except Exception:
             raise forms.ValidationError('Enter showtimes as a JSON list, e.g. ["10:00 AM", "1:30 PM"]')
         
+    def clean_genre(self):
+        genres = self.cleaned_data.get('genre')
+        if genres and len(genres) > 3:
+            raise forms.ValidationError("You can select a maximum of 3 genres.")
+        return genres
+    
     def clean_poster(self):
         poster = self.cleaned_data.get('poster')
         
-        if poster:
+        if poster and hasattr(poster, 'size'):
             # Validate file size (max 5MB)
             if poster.size > 5 * 1024 * 1024:
                 raise forms.ValidationError("Image file too large ( > 5MB )")
             
             # Validate file type
-            valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
+            valid_extensions = ['jpg', 'jpeg', 'png']
             extension = poster.name.split('.')[-1].lower()
             if extension not in valid_extensions:
-                raise forms.ValidationError("Unsupported file extension. Use JPG, PNG, or WebP.")
+                raise forms.ValidationError("Unsupported file extension. Only JPG and PNG are allowed.")
         
         return poster
 
