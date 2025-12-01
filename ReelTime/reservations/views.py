@@ -3,18 +3,40 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.utils import timezone
+from django.db.models import Case, When, Value, IntegerField
 from .models import Reservation
 from .forms import ReservationEditForm
 import json
+from datetime import datetime
 
 @login_required
 def user_reservations_view(request):
+    today = timezone.now().date()
+    
     if request.user.is_admin:
+        # Get only future reservations for admin view
         reservations = Reservation.objects.filter(
-            movie_detail__admin=request.user
-        ).select_related('user', 'movie_detail__movie', 'movie_detail__hall').order_by('-reservation_date')
+            movie_detail__admin=request.user,
+            selected_date__gte=today
+        ).select_related('user', 'movie_detail__movie', 'movie_detail__hall')
     else:
-        reservations = Reservation.objects.filter(user=request.user).select_related('movie_detail__movie', 'movie_detail__hall').order_by('-reservation_date')
+        # Get only future reservations for regular users
+        reservations = Reservation.objects.filter(
+            user=request.user,
+            selected_date__gte=today
+        ).select_related('movie_detail__movie', 'movie_detail__hall')
+    
+    # Use Django's Case/When for custom status ordering
+    reservations = reservations.annotate(
+        status_order=Case(
+            When(status='confirmed', then=Value(0)),
+            When(status='pending', then=Value(1)),
+            When(status='cancelled', then=Value(2)),
+            default=Value(99),
+            output_field=IntegerField()
+        )
+    ).order_by('status_order', 'selected_date', 'selected_showtime')
     
     # Process each reservation to add formatted seat labels
     for reservation in reservations:
@@ -45,7 +67,6 @@ def user_reservations_view(request):
                         # Find min row for seats
                         seat_rows = [s['row'] for s in seat_map if s.get('type') == 'seat']
                         min_seat_row = min(seat_rows) if seat_rows else 0
-                        max_col = max([s['col'] for s in seat_map])
                         
                         # Group seats by row to calculate right-to-left numbering
                         rows_dict = {}
