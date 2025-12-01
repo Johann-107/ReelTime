@@ -160,7 +160,7 @@
     border: 1px solid rgba(199, 62, 29, 0.3);
     border-radius: 8px;
     background: rgba(199, 62, 29, 0.05);
-    color: white;
+    color: black;
     font-size: 0.95rem;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
@@ -356,10 +356,6 @@ textarea.form-input {
     font-family: inherit;
 }
 
-/* Date input styling */
-input[type="date"].form-input {
-    color-scheme: dark;
-}
 
 /* Consistent input styling */
 input[type="text"].form-input,
@@ -373,7 +369,7 @@ textarea.form-input {
     border: 1px solid rgba(199, 62, 29, 0.3);
     border-radius: 8px;
     background: rgba(199, 62, 29, 0.05);
-    color: white;
+    color: black;
     font-size: 0.95rem;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
