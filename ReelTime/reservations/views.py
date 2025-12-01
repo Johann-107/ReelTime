@@ -38,8 +38,43 @@ def user_reservations_view(request):
         )
     ).order_by('status_order', 'selected_date', 'selected_showtime')
     
-    # Process each reservation to add formatted seat labels
     for reservation in reservations:
+        try:
+            showtime_str = reservation.selected_showtime
+            showtime = datetime.strptime(showtime_str, '%I:%M %p').time()
+            showtime_dt = datetime.combine(reservation.selected_date, showtime)
+            
+            # Only include future reservations
+            if showtime_dt >= now:
+                future_reservations.append(reservation)
+        except (ValueError, AttributeError):
+            future_reservations.append(reservation)
+    
+    # --- Sort by date ascending AND confirmed first ---
+    def get_sort_key(reservation):
+        try:
+            # Get datetime for sorting
+            showtime_str = reservation.selected_showtime
+            showtime = datetime.strptime(showtime_str, '%I:%M %p').time()
+            showtime_dt = datetime.combine(reservation.selected_date, showtime)
+            
+            # Status order: confirmed (0), pending (1), cancelled (2)
+            status_order = {'confirmed': 0, 'pending': 1, 'cancelled': 2}
+            
+            # Sort by status first (confirmed), then datetime
+            status_value = status_order.get(reservation.status, 3)
+            return (status_value, showtime_dt)
+        except (ValueError, AttributeError):
+            # Status then date
+            status_order = {'confirmed': 0, 'pending': 1, 'cancelled': 2}
+            status_value = status_order.get(reservation.status, 3)
+            return (status_value, reservation.selected_date, reservation.selected_showtime)
+    
+    # Sort the reservations
+    sorted_reservations = sorted(future_reservations, key=get_sort_key)
+    
+    # Process each reservation to add formatted seat labels
+    for reservation in sorted_reservations:
         if reservation.selected_seats and reservation.movie_detail.hall:
             formatted_seats = []
             
@@ -95,13 +130,12 @@ def user_reservations_view(request):
                                 pass
                 except:
                     pass
-            
             # Store formatted seats as a new attribute
             reservation.formatted_seat_labels = ', '.join(formatted_seats) if formatted_seats else ''
         else:
             reservation.formatted_seat_labels = ''
     
-    return render(request, 'reservations/reservations.html', {'reservations': reservations})
+    return render(request, 'reservations/reservations.html', {'reservations': sorted_reservations})  # Changed from 'reservations' to 'sorted_reservations'
 
 @login_required
 def edit_reservation(request, reservation_id):
