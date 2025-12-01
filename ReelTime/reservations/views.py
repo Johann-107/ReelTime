@@ -1,14 +1,13 @@
-# reservations/views.py
+# re# reservations/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
-from django.db.models import Case, When, Value, IntegerField
+from datetime import datetime, date
 from .models import Reservation
 from .forms import ReservationEditForm
 import json
-from datetime import datetime
 
 @login_required
 def user_reservations_view(request):
@@ -27,54 +26,40 @@ def user_reservations_view(request):
             selected_date__gte=today
         ).select_related('movie_detail__movie', 'movie_detail__hall')
     
-    # Use Django's Case/When for custom status ordering
-    reservations = reservations.annotate(
-        status_order=Case(
-            When(status='confirmed', then=Value(0)),
-            When(status='pending', then=Value(1)),
-            When(status='cancelled', then=Value(2)),
-            default=Value(99),
-            output_field=IntegerField()
+    # Sort reservations: confirmed first, then by selected_date ascending, then by selected_showtime
+    # We'll sort in Python to handle complex ordering
+    reservations_list = list(reservations)
+    
+    # Define a key function for sorting
+    def reservation_sort_key(res):
+        # Primary sort: status (confirmed comes first)
+        status_order = {'confirmed': 0, 'pending': 1, 'cancelled': 2}
+        
+        # Convert selected_showtime to comparable format if it's a time
+        showtime_str = str(res.selected_showtime)
+        # Handle different time formats
+        try:
+            # Try to parse as time
+            from datetime import datetime as dt
+            showtime = dt.strptime(showtime_str, '%H:%M:%S').time()
+        except:
+            try:
+                showtime = dt.strptime(showtime_str, '%H:%M').time()
+            except:
+                # If parsing fails, use string comparison
+                showtime = showtime_str
+        
+        return (
+            status_order.get(res.status, 99),  # Sort by status order
+            res.selected_date,                  # Then by date ascending
+            showtime                           # Then by showtime
         )
-    ).order_by('status_order', 'selected_date', 'selected_showtime')
-    
-    for reservation in reservations:
-        try:
-            showtime_str = reservation.selected_showtime
-            showtime = datetime.strptime(showtime_str, '%I:%M %p').time()
-            showtime_dt = datetime.combine(reservation.selected_date, showtime)
-            
-            # Only include future reservations
-            if showtime_dt >= now:
-                future_reservations.append(reservation)
-        except (ValueError, AttributeError):
-            future_reservations.append(reservation)
-    
-    # --- Sort by date ascending AND confirmed first ---
-    def get_sort_key(reservation):
-        try:
-            # Get datetime for sorting
-            showtime_str = reservation.selected_showtime
-            showtime = datetime.strptime(showtime_str, '%I:%M %p').time()
-            showtime_dt = datetime.combine(reservation.selected_date, showtime)
-            
-            # Status order: confirmed (0), pending (1), cancelled (2)
-            status_order = {'confirmed': 0, 'pending': 1, 'cancelled': 2}
-            
-            # Sort by status first (confirmed), then datetime
-            status_value = status_order.get(reservation.status, 3)
-            return (status_value, showtime_dt)
-        except (ValueError, AttributeError):
-            # Status then date
-            status_order = {'confirmed': 0, 'pending': 1, 'cancelled': 2}
-            status_value = status_order.get(reservation.status, 3)
-            return (status_value, reservation.selected_date, reservation.selected_showtime)
     
     # Sort the reservations
-    sorted_reservations = sorted(future_reservations, key=get_sort_key)
+    reservations_list.sort(key=reservation_sort_key)
     
     # Process each reservation to add formatted seat labels
-    for reservation in sorted_reservations:
+    for reservation in reservations_list:
         if reservation.selected_seats and reservation.movie_detail.hall:
             formatted_seats = []
             
@@ -130,12 +115,13 @@ def user_reservations_view(request):
                                 pass
                 except:
                     pass
+            
             # Store formatted seats as a new attribute
             reservation.formatted_seat_labels = ', '.join(formatted_seats) if formatted_seats else ''
         else:
             reservation.formatted_seat_labels = ''
     
-    return render(request, 'reservations/reservations.html', {'reservations': sorted_reservations})  # Changed from 'reservations' to 'sorted_reservations'
+    return render(request, 'reservations/reservations.html', {'reservations': reservations_list})
 
 @login_required
 def edit_reservation(request, reservation_id):
