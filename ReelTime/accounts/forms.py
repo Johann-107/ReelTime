@@ -104,10 +104,6 @@ class UserProfileForm(forms.ModelForm):
         profile_picture = self.cleaned_data.get('profile_picture')
         
         if profile_picture:
-            # Validate file size (max 2MB for profile pictures)
-            if profile_picture.size > 2 * 1024 * 1024:
-                raise forms.ValidationError("Profile picture too large ( > 2MB )")
-            
             # Validate file type
             valid_extensions = ['jpg', 'jpeg', 'png', 'webp']
             extension = profile_picture.name.split('.')[-1].lower()
