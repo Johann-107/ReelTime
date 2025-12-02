@@ -73,9 +73,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // -------------------------------
     // FORM SUBMIT
     // -------------------------------
-    document.getElementById("hall-form").addEventListener("submit", function() {
+    document.getElementById("hall-form").addEventListener("submit", function(e) {
         const cells = document.querySelectorAll(".grid-cell");
         const layout = [];
+        let actualSeatCount = 0;
 
         cells.forEach(c => {
             if (c.dataset.type) {
@@ -84,8 +85,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     col: parseInt(c.dataset.col),
                     type: c.dataset.type
                 });
+                
+                // Count actual seats placed on grid
+                if (c.dataset.type === "seat") {
+                    actualSeatCount++;
+                }
             }
         });
+
+        // Validate: Actual seats on grid cannot exceed capacity
+        const capacityValue = parseInt(capacityInput.value);
+        if (actualSeatCount > capacityValue) {
+            e.preventDefault();
+            alert(`You have placed ${actualSeatCount} seats on the grid, but the maximum capacity is set to ${capacityValue}. Please remove ${actualSeatCount - capacityValue} seat(s) or increase the capacity.`);
+            return false;
+        }
 
         layoutInput.value = JSON.stringify(layout);
     });
