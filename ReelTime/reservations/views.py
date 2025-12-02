@@ -142,14 +142,20 @@ def edit_reservation(request, reservation_id):
         messages.error(request, "Bookings within the day can only be edited by administrators. Please contact admin for seat selection changes.")
         return redirect('reservations')
     
+    # Track changes for email
+    changes = {}
+    old_seats = reservation.selected_seats.copy() if reservation.selected_seats else []
+    old_seat_count = reservation.number_of_seats
+    old_total_cost = reservation.total_cost
+    
     if request.method == 'POST':
         # Get the selected seats from the form
         selected_seats_json = request.POST.get('selected_seats', '[]')
-        print(f"DEBUG: Received selected_seats: {selected_seats_json}")  # Debug line
+        print(f"DEBUG: Received selected_seats: {selected_seats_json}")
         
         try:
             selected_seats = json.loads(selected_seats_json)
-            print(f"DEBUG: Parsed seats: {selected_seats}, Count: {len(selected_seats)}")  # Debug line
+            print(f"DEBUG: Parsed seats: {selected_seats}, Count: {len(selected_seats)}")
             
             # Validate that seats were actually selected
             if not selected_seats or len(selected_seats) == 0:
@@ -177,20 +183,43 @@ def edit_reservation(request, reservation_id):
                     messages.error(request, "Some of the selected seats are already reserved by other users. Please select different seats.")
                 else:
                     # All validations passed, update the reservation
+                    # Record changes if seats changed
+                    if set(selected_seats) != set(old_seats):
+                        old_seats_str = ', '.join(old_seats) if old_seats else 'None'
+                        new_seats_str = ', '.join(selected_seats) if selected_seats else 'None'
+                        changes['seats'] = (old_seats_str, new_seats_str)
+                    
+                    # Record changes if seat count changed
+                    new_seat_count = len(selected_seats)
+                    if new_seat_count != old_seat_count:
+                        changes['number_of_seats'] = (str(old_seat_count), str(new_seat_count))
+                    
+                    # Update reservation
                     reservation.selected_seats = selected_seats
-                    reservation.number_of_seats = len(selected_seats)
+                    reservation.number_of_seats = new_seat_count
                     reservation.total_cost = reservation.calculate_total_cost()
+                    
+                    # Record total cost change if different
+                    if reservation.total_cost != old_total_cost:
+                        changes['total_cost'] = (f"${old_total_cost}", f"${reservation.total_cost}")
+                    
                     reservation.save()
                     
-                    print(f"DEBUG: Reservation saved successfully!")  # Debug line
+                    print(f"DEBUG: Reservation saved successfully!")
+                    
+                    # Send edit confirmation email if there were changes
+                    if changes:
+                        from .utils import send_reservation_edit_email
+                        send_reservation_edit_email(reservation.id, changes)
+                    
                     messages.success(request, "Reservation updated successfully!")
                     return redirect('reservations')
                     
         except json.JSONDecodeError as e:
-            print(f"DEBUG: JSON decode error: {e}")  # Debug line
+            print(f"DEBUG: JSON decode error: {e}")
             messages.error(request, "Invalid seat selection data.")
         except Exception as e:
-            print(f"DEBUG: Unexpected error: {e}")  # Debug line
+            print(f"DEBUG: Unexpected error: {e}")
             messages.error(request, f"An error occurred: {str(e)}")
     
     # If we get here, either GET request or POST with validation errors

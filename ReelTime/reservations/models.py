@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from movies.models import MovieAdminDetails
 from datetime import date, timedelta, datetime
-from .utils import send_reservation_confirmation_email, send_reservation_cancellation_email, send_reservation_reminder_email
+from .utils import send_reservation_confirmation_email, send_reservation_cancellation_email, send_reservation_reminder_email, send_reservation_edit_email
 
 def get_tomorrow():
     return date.today() + timedelta(days=1)
@@ -151,4 +151,15 @@ class Reservation(models.Model):
             return success
         except Exception as e:
             print(f"🔴 Failed to send reminder email: {e}")
+            return False
+        
+    def send_edit_email(self, changes=None):
+        """Send reservation edit confirmation email using SendGrid"""
+        try:
+            success = send_reservation_edit_email(self.id, changes)
+            if success:
+                print(f"🟢 Edit confirmation email sent successfully for reservation {self.id}")
+            return success
+        except Exception as e:
+            print(f"🔴 Failed to send edit confirmation email: {e}")
             return False

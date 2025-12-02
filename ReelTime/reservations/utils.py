@@ -298,3 +298,131 @@ def send_reservation_cancellation_email(reservation_id):
         print(f"🔴 SendGrid: Error sending cancellation email: {e}")
         logger.error(f"Error sending cancellation email for reservation {reservation_id}: {e}")
         return False
+
+def send_reservation_edit_email(reservation_id, changes=None):
+    """
+    Send reservation edit confirmation email using SendGrid
+    """
+    from .models import Reservation
+    
+    try:
+        print(f"🟡 SendGrid: Sending edit confirmation email for reservation {reservation_id}")
+        reservation = Reservation.objects.get(id=reservation_id)
+        user = reservation.user
+        
+        subject = f"✏️ Reservation Updated - {reservation.movie_detail.movie.title}"
+        
+        # Prepare changes summary
+        changes_summary = ""
+        if changes:
+            changes_summary = "\n\n📝 Changes Made:\n"
+            for field, (old_value, new_value) in changes.items():
+                changes_summary += f"{field}: {old_value} → {new_value}\n"
+        
+        # Plain text content
+        plain_text_message = (
+            f"Hello {user.first_name or user.username},\n\n"
+            f"Your movie reservation has been successfully updated!\n\n"
+            f"📋 Updated Reservation Details:\n"
+            f"Movie: {reservation.movie_detail.movie.title}\n"
+            f"Cinema: {reservation.cinema_name}\n"
+            f"Date: {reservation.selected_date}\n"
+            f"Showtime: {reservation.selected_showtime}\n"
+            f"Number of Seats: {reservation.number_of_seats}\n"
+            f"Seats: {', '.join(reservation.selected_seats) if reservation.selected_seats else 'Not specified'}\n"
+            f"Total Cost: ${reservation.total_cost}\n"
+            f"Reservation ID: {reservation.id}\n"
+            f"{changes_summary}"
+            f"\nIf you did not make these changes, please contact our support team immediately.\n\n"
+            f"We look forward to seeing you at the cinema!\n\n"
+            f"Thank you for choosing ReelTime!"
+        )
+        
+        # HTML content
+        html_changes = ""
+        if changes:
+            html_changes = """
+            <div class="changes">
+                <h4>📝 Changes Made:</h4>
+                <ul>
+            """
+            for field, (old_value, new_value) in changes.items():
+                field_name = field.replace('_', ' ').title()
+                html_changes += f'<li><strong>{field_name}:</strong> {old_value} → <strong>{new_value}</strong></li>'
+            html_changes += """
+                </ul>
+            </div>
+            """
+        
+        html_message = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .header {{ background-color: #e3f2fd; padding: 20px; text-align: center; }}
+                .content {{ padding: 20px; }}
+                .details {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }}
+                .changes {{ background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #ffc107; }}
+                .warning {{ background-color: #fff3cd; padding: 10px; border-radius: 5px; margin: 15px 0; text-align: center; }}
+                .footer {{ padding: 20px; text-align: center; color: #666; font-size: 14px; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>✏️ Reservation Updated!</h1>
+            </div>
+            <div class="content">
+                <p>Hello <strong>{user.first_name or user.username}</strong>,</p>
+                <p>Your movie reservation has been successfully updated!</p>
+                
+                <div class="details">
+                    <h3>📋 Updated Reservation Details:</h3>
+                    <p><strong>Movie:</strong> {reservation.movie_detail.movie.title}</p>
+                    <p><strong>Cinema:</strong> {reservation.cinema_name}</p>
+                    <p><strong>Date:</strong> {reservation.selected_date}</p>
+                    <p><strong>Showtime:</strong> {reservation.selected_showtime}</p>
+                    <p><strong>Number of Seats:</strong> {reservation.number_of_seats}</p>
+                    <p><strong>Seats:</strong> {', '.join(reservation.selected_seats) if reservation.selected_seats else 'Not specified'}</p>
+                    <p><strong>Total Cost:</strong> ${reservation.total_cost}</p>
+                    <p><strong>Reservation ID:</strong> {reservation.id}</p>
+                </div>
+                
+                {html_changes}
+                
+                <div class="warning">
+                    <p><strong>⚠️ Security Note:</strong> If you did not make these changes, please contact our support team immediately.</p>
+                </div>
+                
+                <p>We look forward to seeing you at the cinema!</p>
+            </div>
+            <div class="footer">
+                <p>Thank you for choosing <strong>ReelTime</strong>!</p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Send email using SendGrid
+        success = send_sendgrid_email(
+            to_email=user.email,
+            subject=subject,
+            plain_text_content=plain_text_message,
+            html_content=html_message
+        )
+        
+        if success:
+            print(f"🟢 SendGrid: Edit confirmation email sent successfully for reservation {reservation_id}")
+        else:
+            print(f"🔴 SendGrid: Failed to send edit confirmation email for reservation {reservation_id}")
+            
+        return success
+        
+    except Reservation.DoesNotExist:
+        print(f"🔴 SendGrid: Reservation {reservation_id} not found")
+        logger.error(f"Reservation {reservation_id} not found for edit confirmation email")
+        return False
+    except Exception as e:
+        print(f"🔴 SendGrid: Error sending edit confirmation email: {e}")
+        logger.error(f"Error sending edit confirmation email for reservation {reservation_id}: {e}")
+        return False
