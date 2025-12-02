@@ -151,50 +151,46 @@ def confirm_admin(request, token):
 def register_user(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
+        
         if form.is_valid():
             try:
                 user = form.save()
-                print("User created:", user.username)
                 
-                messages.success(request, "Registration successful! Please log in.")
-                
-                # Check if it's an AJAX request
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': True,
-                        'message': 'Registration successful! Please log in.',
-                        'redirect_url': '/?show_login=true'
-                    })
-                else:
-                    # Regular form submission
-                    return redirect('login')
+                # ALWAYS return JSON for POST requests
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Registration successful! Please log in.',
+                    'redirect_url': '/?show_login=true'
+                })
                     
             except Exception as e:
                 print("Error during user creation:", str(e))
-                # Handle unique constraint errors (like duplicate email)
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': False,
-                        'errors': {'email': [{'message': 'This email is already registered. Please use a different email or log in.'}]}
-                    }, status=400)
-                else:
-                    messages.error(request, "This email is already registered. Please use a different email or log in.")
-                    return render(request, 'accounts/register.html', {'form': form})
+                error_message = 'This email is already registered. Please use a different email or log in.'
+                
+                return JsonResponse({
+                    'success': False,
+                    'errors': {'email': [error_message]}
+                }, status=400)
         else:
             # Form has errors
             print("Form errors:", form.errors)
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                # Return JSON errors for AJAX
-                return JsonResponse({
-                    'success': False,
-                    'errors': form.errors.get_json_data()
-                }, status=400)
-            else:
-                # Regular form submission with errors
-                return render(request, 'accounts/register.html', {'form': form})
-    else:
-        form = RegistrationForm()
+            
+            # Convert errors
+            errors_dict = {}
+            for field, error_list in form.errors.items():
+                error_messages = []
+                for error in error_list:
+                    error_messages.append(str(error))
+                errors_dict[field] = error_messages
+            
+            # ALWAYS return JSON for POST requests
+            return JsonResponse({
+                'success': False,
+                'errors': errors_dict
+            }, status=400)
     
+    # GET request - render the form
+    form = RegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
 
 

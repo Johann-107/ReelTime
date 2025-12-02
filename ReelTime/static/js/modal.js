@@ -96,41 +96,15 @@ function closeRegisterModal() { registerModal.close(); }
 function openAdminRegisterModal() { adminRegisterModal.open(); }
 function closeAdminRegisterModal() { adminRegisterModal.close(); }
 
-// Function to display form errors
-function showFormErrors(form, errors) {
-    // Clear previous errors
-    const existingErrors = form.querySelectorAll('.error-message');
-    existingErrors.forEach(error => error.remove());
-    
-    // Remove error borders
-    const inputs = form.querySelectorAll('.form-input');
-    inputs.forEach(input => input.classList.remove('error'));
-    
-    // Display new errors
-    for (const field in errors) {
-        const input = form.querySelector(`[name="${field}"]`);
-        if (input) {
-            input.classList.add('error');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.style.color = '#ff6b6b';
-            errorDiv.style.fontSize = '0.8rem';
-            errorDiv.style.marginTop = '0.25rem';
-            errorDiv.textContent = errors[field][0].message;
-            input.parentNode.appendChild(errorDiv);
-        }
-    }
-}
-
 // Make messages available
 window.messages = {
     success: function(msg) {
         console.log('Success:', msg);
-        alert(msg);
+        alert('✓ ' + msg);
     },
     error: function(msg) {
         console.error('Error:', msg);
-        alert(msg);
+        alert('✗ ' + msg);
     }
 };
 
@@ -170,60 +144,280 @@ function handleFormSubmission(form, formName) {
         submitButton.disabled = true;
         
         // Clear previous errors
-        const existingErrors = this.querySelectorAll('.error-message');
-        existingErrors.forEach(error => error.remove());
-        const inputs = this.querySelectorAll('.form-input');
-        inputs.forEach(input => input.classList.remove('error'));
+        clearFormErrors(form);
+        
+        // Debug: Log what we're sending
+        console.log('Sending to:', this.action);
+        console.log('Form data:', Object.fromEntries(formData.entries()));
         
         fetch(this.action, {
             method: 'POST',
             body: formData,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
             }
         })
         .then(response => {
             console.log(`${formName} AJAX response status:`, response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(`${formName} AJAX response data:`, data);
-            if (data.success) {
-                console.log(`${formName} successful!`);
-                if (formName === 'registration') {
-                    closeRegisterModal();
-                } else if (formName === 'admin registration') {
-                    closeAdminRegisterModal();
-                    messages.success(data.message || 'Admin registration successful!');
-                }
+            console.log('Content-Type:', response.headers.get('content-type'));
+            
+            // Get response as text first
+            return response.text().then(text => {
+                console.log(`${formName} response length:`, text.length);
+                console.log(`${formName} response (first 200 chars):`, text.substring(0, 200));
                 
-                setTimeout(() => {
-                    window.location.href = data.redirect_url || '/?show_login=true';
-                }, 100);
-            } else {
-                console.log(`${formName} failed`);
-                if (data.errors) {
-                    showFormErrors(form, data.errors);
-                } else if (data.message) {
-                    messages.error(data.message);
+                // Try to parse as JSON
+                try {
+                    const data = JSON.parse(text);
+                    console.log(`${formName} parsed as JSON:`, data);
+                    return { status: response.status, data: data, type: 'json' };
+                } catch (e) {
+                    console.log(`${formName} not JSON, treating as HTML/text`);
+                    return { status: response.status, data: text, type: 'html' };
                 }
+            });
+        })
+        .then(result => {
+            console.log(`${formName} result type:`, result.type, 'data:', result.data);
+            
+            if (result.type === 'json') {
+                handleJsonResponse(form, formName, result.data, result.status);
+            } else {
+                handleHtmlResponse(form, formName, result.data, result.status);
             }
         })
         .catch(error => {
             console.error(`${formName} AJAX Error:`, error);
-            messages.error(`An error occurred during ${formName}. Please try again.`);
+            messages.error(`Network error during ${formName}. Please check your connection.`);
         })
         .finally(() => {
-            isSubmitting = false;
-            submitButton.disabled = false;
-            submitButton.textContent = originalText;
+            setTimeout(() => {
+                isSubmitting = false;
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }, 1000);
         });
         
         return false;
     });
+}
+
+// Handle JSON responses
+function handleJsonResponse(form, formName, data, status) {
+    if (data.success) {
+        console.log(`${formName} successful!`);
+        if (formName === 'registration') {
+            closeRegisterModal();
+            messages.success(data.message || 'Registration successful! Please log in.');
+        } else if (formName === 'admin registration') {
+            closeAdminRegisterModal();
+            messages.success(data.message || 'Admin registration successful!');
+        }
+        
+        setTimeout(() => {
+            window.location.href = data.redirect_url || '/?show_login=true';
+        }, 100);
+    } else {
+        console.log(`${formName} failed with JSON errors`);
+        if (data.errors) {
+            showFormErrors(form, data.errors);
+        } else if (data.message) {
+            messages.error(data.message);
+        } else {
+            messages.error('An error occurred. Please try again.');
+        }
+    }
+}
+
+// Handle HTML responses (Django is returning form HTML with errors)
+function handleHtmlResponse(form, formName, html, status) {
+    console.log('Handling HTML response for', formName);
+    
+    if (status === 400) {
+        // Extract errors from Django's HTML error list
+        const errors = extractErrorsFromHtml(html);
+        console.log('Extracted errors from HTML:', errors);
+        
+        if (Object.keys(errors).length > 0) {
+            showFormErrors(form, errors);
+        } else {
+            // Fallback error message
+            messages.error('Please check your form for errors.');
+        }
+    } else {
+        messages.error(`Server error (${status}). Please try again.`);
+    }
+}
+
+// Extract Django form errors from HTML
+function extractErrorsFromHtml(html) {
+    const errors = {};
+    console.log('Parsing HTML for errors...');
+    
+    // Create a temporary DOM to parse the HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Look for Django error lists
+    const errorLists = doc.querySelectorAll('.errorlist');
+    console.log('Found error lists:', errorLists.length);
+    
+    errorLists.forEach(errorList => {
+        // Get the field name from parent structure
+        let fieldName = '';
+        let fieldErrors = [];
+        
+        // The structure: <li>field_name<ul class="errorlist">...</ul></li>
+        const listItem = errorList.parentElement;
+        
+        if (listItem && listItem.tagName === 'LI') {
+            // The field name should be the text content of the <li> before the <ul>
+            const fullText = listItem.textContent || '';
+            
+            // Try to extract field name
+            const lines = fullText.split('\n').filter(line => line.trim());
+            if (lines.length > 0) {
+                // Look for common field names
+                const possibleFieldNames = ['phone_number', 'password', 'email', 'username', 'first_name', 'last_name'];
+                
+                for (const possibleField of possibleFieldNames) {
+                    if (fullText.toLowerCase().includes(possibleField)) {
+                        fieldName = possibleField;
+                        break;
+                    }
+                }
+                
+                // If not found by name, try to get it from the text
+                if (!fieldName && lines[0]) {
+                    fieldName = lines[0].trim().toLowerCase().replace(/ /g, '_');
+                }
+            }
+        }
+        
+        // Get all error messages from the <ul>
+        const errorItems = errorList.querySelectorAll('li');
+        errorItems.forEach(item => {
+            fieldErrors.push(item.textContent.trim());
+        });
+        
+        // If we found field name and errors, add to errors object
+        if (fieldName && fieldErrors.length > 0) {
+            errors[fieldName] = fieldErrors;
+            console.log(`Found errors for ${fieldName}:`, fieldErrors);
+        } else if (fieldErrors.length > 0) {
+            // If we have errors but no field name, treat as general errors
+            errors['__all__'] = fieldErrors;
+            console.log('Found general errors:', fieldErrors);
+        }
+    });
+    
+    // Also check for individual error fields by ID
+    const errorFields = doc.querySelectorAll('[id$="_error"]');
+    errorFields.forEach(errorField => {
+        const id = errorField.id;
+        const fieldMatch = id.match(/id_(.+)_error/);
+        if (fieldMatch) {
+            const fieldName = fieldMatch[1];
+            const errorMessages = [];
+            errorField.querySelectorAll('li').forEach(item => {
+                errorMessages.push(item.textContent.trim());
+            });
+            if (errorMessages.length > 0) {
+                errors[fieldName] = errorMessages;
+            }
+        }
+    });
+    
+    console.log('Final extracted errors:', errors);
+    return errors;
+}
+
+// Clear all form errors
+function clearFormErrors(form) {
+    const existingErrors = form.querySelectorAll('.error-message, .alert-danger');
+    existingErrors.forEach(error => error.remove());
+    
+    const inputs = form.querySelectorAll('.form-input, input, select, textarea');
+    inputs.forEach(input => {
+        input.classList.remove('error');
+        input.style.borderColor = '';
+    });
+}
+
+// Enhanced showFormErrors function
+function showFormErrors(form, errors) {
+    console.log('showFormErrors called with:', errors);
+    
+    // Clear previous errors
+    clearFormErrors(form);
+    
+    // Display new errors
+    for (const field in errors) {
+        if (field === '__all__' || field === 'non_field_errors') {
+            // Display general errors
+            const generalErrorDiv = document.createElement('div');
+            generalErrorDiv.className = 'error-message general-error';
+            generalErrorDiv.style.cssText = `
+                background-color: #ffebee;
+                color: #c62828;
+                padding: 12px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                border: 1px solid #ffcdd2;
+                text-align: center;
+                font-weight: 600;
+            `;
+            
+            const errorMessages = Array.isArray(errors[field]) 
+                ? errors[field] 
+                : [errors[field]];
+            
+            generalErrorDiv.textContent = errorMessages.join(', ');
+            form.prepend(generalErrorDiv);
+            continue;
+        }
+        
+        // Find the input field
+        let input = form.querySelector(`[name="${field}"]`);
+        
+        if (!input) {
+            // Try variations for Django field names
+            input = form.querySelector(`[name*="${field}"]`) ||
+                    form.querySelector(`#id_${field}`) ||
+                    form.querySelector(`#${field}`);
+        }
+        
+        if (input) {
+            input.classList.add('error');
+            input.style.borderColor = '#ff6b6b';
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.style.color = '#ff6b6b';
+            errorDiv.style.fontSize = '0.8rem';
+            errorDiv.style.marginTop = '0.25rem';
+            errorDiv.style.fontWeight = '500';
+            
+            const errorMessages = Array.isArray(errors[field]) 
+                ? errors[field] 
+                : [errors[field]];
+            
+            errorDiv.textContent = errorMessages.join(', ');
+            input.parentNode.appendChild(errorDiv);
+            
+            console.log(`Displayed error for ${field}:`, errorMessages);
+        } else {
+            console.warn(`Could not find input for field: ${field}`);
+        }
+    }
+    
+    // Scroll to first error
+    const firstError = form.querySelector('.error');
+    if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+    }
 }
 
 // Initialize modal event listeners
